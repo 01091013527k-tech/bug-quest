@@ -24,6 +24,26 @@ button{font-family:inherit;color:inherit}
 #bg .cloud{position:absolute;opacity:.95;animation:drift linear infinite}
 #bg .hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:24vh}
 #bg .fly{position:absolute;width:46px;height:46px;animation:flyaround 18s ease-in-out infinite}
+#bg .sun{position:absolute;right:18vw;top:1vh;width:100px;animation:spin 40s linear infinite}
+#bg .moon{position:absolute;right:18vw;top:2vh;width:84px}
+#bg .star{position:absolute;width:4px;height:4px;border-radius:50%;background:#FFF8D6;box-shadow:0 0 6px #FFF3A8;animation:twinkle 2.4s ease-in-out infinite}
+#bg .snowman{position:absolute;left:3vw;bottom:12vh;font-size:64px}
+#bg .tree{position:absolute;right:4vw;bottom:13vh;font-size:56px;opacity:.9}
+#bg .parts i{position:absolute;top:-6vh;display:block}
+#bg .drop{width:2px;height:22px;background:linear-gradient(rgba(255,255,255,0),rgba(90,140,200,.75));animation:fall linear infinite}
+#bg .flake{border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(255,255,255,.9);animation:fallsway linear infinite}
+#bg .petal{width:12px;height:9px;border-radius:60% 0 60% 0;background:#FFB7CF;animation:fallsway linear infinite}
+#bg .leaf{font-size:24px;font-style:normal;animation:fallsway linear infinite}
+#bg .fog{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.15),rgba(255,255,255,.55));animation:fogmove 12s ease-in-out infinite alternate}
+#bg .flash{position:absolute;inset:0;background:#fff;opacity:0;animation:flash 7s infinite}
+@keyframes fall{to{transform:translateY(112vh)}}
+@keyframes fallsway{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(4vw,28vh) rotate(90deg)}50%{transform:translate(-2vw,56vh) rotate(180deg)}75%{transform:translate(3vw,84vh) rotate(270deg)}100%{transform:translate(0,112vh) rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fogmove{from{opacity:.6}to{opacity:1}}
+@keyframes flash{0%,90%,100%{opacity:0}92%{opacity:.6}94%{opacity:0}96%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){#bg .parts,#bg .flash{display:none}}
+.pill.wx{cursor:pointer;border:0;font-family:inherit;color:var(--ink)}
 #app{position:relative;z-index:1;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden}
 .screen{min-height:100%;padding:14px 20px 18px;display:flex;flex-direction:column;gap:14px;animation:fadeIn .35s ease}
 .center{align-items:center;justify-content:center}
@@ -705,13 +725,55 @@ const App={screen:null,loggedIn:false,ptab:'settings',parentFrom:null,
 let cleanups=[];
 function stopAll(){cleanups.forEach(f=>{try{f();}catch(e){}});cleanups=[];try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch(e){}try{TTS&&TTS.stop&&TTS.stop();}catch(e){}}
 
-function renderBG(){
- const cloud=(w,top,dur,delay)=>`<svg class="cloud" style="top:${top}vh;width:${w}px;animation-duration:${dur}s;animation-delay:-${delay}s" viewBox="0 0 120 60"><ellipse cx="40" cy="38" rx="30" ry="18" fill="#fff"/><ellipse cx="66" cy="28" rx="28" ry="22" fill="#fff"/><ellipse cx="88" cy="40" rx="24" ry="15" fill="#fff"/></svg>`;
- const flower=(x,c)=>`<g transform="translate(${x} 0)"><line x1="0" y1="0" x2="0" y2="18" stroke="#3FA34F" stroke-width="2"/><circle cx="0" cy="-2" r="6" fill="${c}"/><circle cx="0" cy="-2" r="2.5" fill="#FFE066"/></g>`;
- $('#bg').innerHTML=cloud(170,6,90,10)+cloud(120,16,120,60)+cloud(210,28,140,100)+
- `<svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none"><path d="M0 90 Q200 20 420 80 Q620 140 800 60 Q900 20 1000 50 L1000 200 L0 200Z" fill="#A8E08A"/><path d="M0 140 Q250 80 500 130 Q750 180 1000 110 L1000 200 L0 200Z" fill="#7CCB5E"/><g transform="translate(0 150)">${[60,180,330,470,620,760,900].map((x,i)=>flower(x,['#FF7EA8','#FFD54F','#fff','#9C7CF4'][i%4])).join('')}</g></svg>`+
- `<div class="fly" style="left:6vw;top:40vh">${bugSVG(2)}</div><div class="fly" style="left:55vw;top:62vh;animation-duration:24s;animation-delay:-8s">${bugSVG(3)}</div>`;
-}
+/* ---------- 계절·날씨 배경 ---------- */
+const CITIES={seoul:['서울',37.57,126.98],incheon:['인천',37.46,126.71],suwon:['수원',37.26,127.03],gangneung:['강릉',37.75,128.88],cheongju:['청주',36.64,127.49],daejeon:['대전',36.35,127.38],sejong:['세종',36.48,127.29],jeonju:['전주',35.82,127.15],gwangju:['광주',35.16,126.85],daegu:['대구',35.87,128.6],ulsan:['울산',35.54,129.31],busan:['부산',35.18,129.08],changwon:['창원',35.23,128.68],jeju:['제주',33.5,126.53]};
+let WX=lsGet('bugquest_wx');
+function season(d=now()){const m=d.getMonth()+1;return m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';}
+const SEASON_KO={spring:'봄',summer:'여름',autumn:'가을',winter:'겨울'};
+function wxKind(code){if(code==null)return 'clear';if(code<=1)return 'clear';if(code<=3)return 'cloudy';if(code===45||code===48)return 'fog';if(code>=95)return 'storm';if((code>=71&&code<=77)||code===85||code===86)return 'snow';if(code>=51)return 'rain';return 'clear';}
+function wxLoc(){const st=(Store.state&&Store.state.settings)||{};if(st.wxLoc&&st.wxLoc.lat!=null)return st.wxLoc;const c=CITIES[st.wxCity||'seoul']||CITIES.seoul;return {name:c[0],lat:c[1],lon:c[2]};}
+function wxOn(){const st=(Store.state&&Store.state.settings)||{};return st.wxOn!==false;}
+function wxNow(){if(!wxOn()||!WX)return null;if(Date.now()-WX.t>3*3600e3)return null;return WX;}
+function isNight(){const w=wxNow();if(w&&w.isDay!=null)return !w.isDay;const h=now().getHours();return h<6||h>=19;}
+async function loadWeather(force){if(!wxOn()){renderBG();return;}const L=wxLoc();const key=L.lat.toFixed(2)+','+L.lon.toFixed(2);
+ if(!force&&WX&&WX.key===key&&Date.now()-WX.t<50*60e3){renderBG();return;}
+ try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${L.lat}&longitude=${L.lon}&current=weather_code,temperature_2m,is_day&timezone=Asia%2FSeoul`;
+  const r=await withTimeout(fetch(url),7000);const j=await r.json();const c=j&&j.current;if(c){WX={key,t:Date.now(),code:c.weather_code,temp:Math.round(c.temperature_2m),isDay:c.is_day===1,place:L.name};lsSet('bugquest_wx',WX);}}catch(e){}
+ renderBG();updWxPill();}
+function wxInfo(){const w=wxNow();const se=season();const k=w?wxKind(w.code):null;const night=isNight();
+ const icon=k==='rain'?'🌧️':k==='storm'?'⛈️':k==='snow'?'❄️':k==='fog'?'🌫️':k==='cloudy'?'☁️':night?'🌙':({spring:'🌸',summer:'☀️',autumn:'🍁',winter:'⛄'})[se];
+ const word=k==='rain'?'비가 와요':k==='storm'?'천둥번개가 쳐요':k==='snow'?'눈이 와요':k==='fog'?'안개가 꼈어요':k==='cloudy'?'구름이 많아요':k==='clear'?(night?'별이 반짝이는 밤이에요':'맑아요'):'';
+ return {se,k,night,icon,word,temp:w?w.temp:null,place:w?w.place:null};}
+function updWxPill(){const el=document.getElementById('wxpill');if(el)el.innerHTML=wxPillHTML();}
+function wxPillHTML(){const i=wxInfo();return `${i.icon} ${SEASON_KO[i.se]}${i.temp!=null?` · ${i.temp}°`:''}`;}
+function sayWeather(){const i=wxInfo();SFX.tap();speak(`지금은 ${SEASON_KO[i.se]}이에요.${i.word?` 오늘 ${i.place?i.place+'은 ':''}${i.word}.`:''}${i.temp!=null?` 기온은 ${i.temp}도예요.`:''}${i.k==='rain'||i.k==='storm'?' 밖에 나갈 땐 우산을 챙기자!':i.k==='snow'?' 따뜻하게 입자!':i.temp!=null&&i.temp<=3?' 춥다! 따뜻하게 입자!':i.temp!=null&&i.temp>=28?' 덥다! 물을 많이 마시자!':''}`);}
+function renderBG(){const i=wxInfo();const se=i.se,k=i.k,night=i.night;
+ const SKY={spring:['#BFE6FF','#FFE6F0','#F4FFE8'],summer:['#7FD3FF','#C6EEFF','#E9FFF0'],autumn:['#A9D8F5','#FFE5C4','#FFF4DF'],winter:['#C6DAEE','#E6EFF8','#F8FBFF']}[se];
+ let sky=SKY;if(k==='cloudy')sky=['#B7C6D6','#DCE4EC','#EEF2F6'];if(k==='rain'||k==='storm')sky=['#8EA2B7','#B6C4D2','#D6DFE7'];if(k==='snow')sky=['#C3D1E1','#E4ECF5','#FFFFFF'];if(k==='fog')sky=['#CAD2D9','#E2E6EA','#F0F2F4'];
+ if(night)sky=['#24345E','#3F5287','#7D90C2'];
+ document.body.style.background=`linear-gradient(${sky[0]} 0%,${sky[1]} 55%,${sky[2]} 100%)`;
+ const HILL={spring:['#BDE8A6','#93D46F','#FF9EC4'],summer:['#94DD74','#5DC24B','#FFE066'],autumn:['#F3CF86','#E2A65A','#E46A3A'],winter:['#F5F9FD','#DDE9F4','#FFFFFF']}[se];
+ const hill=night?HILL.map(c=>c):HILL;
+ const cloud=(w,top,dur,delay,grey)=>`<svg class="cloud" style="top:${top}vh;width:${w}px;animation-duration:${dur}s;animation-delay:-${delay}s" viewBox="0 0 120 60"><g fill="${grey?'#E3E8EE':'#fff'}" opacity="${night?.35:1}"><ellipse cx="40" cy="38" rx="30" ry="18"/><ellipse cx="66" cy="28" rx="28" ry="22"/><ellipse cx="88" cy="40" rx="24" ry="15"/></g></svg>`;
+ const nClouds=k==='cloudy'||k==='rain'||k==='storm'?6:k==='clear'||!k?3:4;let html='';
+ for(let c=0;c<nClouds;c++)html+=cloud(120+((c*53)%110),4+((c*7)%26),90+c*17,c*37,k&&k!=='clear');
+ if(night){html+=`<svg class="moon" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#FFF6C8"/><circle cx="64" cy="40" r="30" fill="#3F5287"/></svg>`;for(let s=0;s<26;s++)html+=`<i class="star" style="left:${(s*37)%100}vw;top:${(s*13)%45}vh;animation-delay:-${(s%7)*.6}s"></i>`;}
+ else if(!k||k==='clear')html+=`<svg class="sun" viewBox="0 0 100 100"><g stroke="#FFC93C" stroke-width="5" stroke-linecap="round">${Array.from({length:12},(_,j)=>{const a=j*30*Math.PI/180;return `<line x1="${50+34*Math.cos(a)}" y1="${50+34*Math.sin(a)}" x2="${50+44*Math.cos(a)}" y2="${50+44*Math.sin(a)}"/>`;}).join('')}</g><circle cx="50" cy="50" r="26" fill="#FFD54F"/><circle cx="42" cy="47" r="3" fill="#C98A00"/><circle cx="58" cy="47" r="3" fill="#C98A00"/><path d="M42 57 Q50 64 58 57" stroke="#C98A00" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+ const deco=se==='spring'?['#FF8FB8','#fff','#FFD54F','#FF9EC4']:se==='summer'?['#FFD54F','#fff','#FF7EA8','#9C7CF4']:se==='autumn'?['#E46A3A','#FFB443','#C0392B','#F3CF86']:['#fff','#E3F0FB','#fff','#fff'];
+ const flower=(x,c)=>se==='winter'?`<g transform="translate(${x} 0)"><circle cx="0" cy="4" r="7" fill="#fff"/></g>`:`<g transform="translate(${x} 0)"><line x1="0" y1="0" x2="0" y2="18" stroke="${se==='autumn'?'#A66A2C':'#3FA34F'}" stroke-width="2"/><circle cx="0" cy="-2" r="6" fill="${c}"/><circle cx="0" cy="-2" r="2.5" fill="#FFE066"/></g>`;
+ html+=`<svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none"><path d="M0 90 Q200 20 420 80 Q620 140 800 60 Q900 20 1000 50 L1000 200 L0 200Z" fill="${hill[0]}"/><path d="M0 140 Q250 80 500 130 Q750 180 1000 110 L1000 200 L0 200Z" fill="${hill[1]}"/><g transform="translate(0 150)">${[60,180,330,470,620,760,900].map((x,j)=>flower(x,deco[j%4])).join('')}</g>${night?'<rect width="1000" height="200" fill="#1B2547" opacity=".35"/>':''}</svg>`;
+ if(se==='winter'&&!night)html+=`<div class="snowman">⛄</div>`;
+ if(se==='autumn')html+=`<div class="tree">🍁</div>`;
+ if(!night&&(k==='clear'||!k||k==='cloudy')&&se!=='winter')html+=`<div class="fly" style="left:6vw;top:40vh">${bugSVG(se==='autumn'?6:2)}</div><div class="fly" style="left:55vw;top:62vh;animation-duration:24s;animation-delay:-8s">${bugSVG(se==='summer'?9:3)}</div>`;
+ let parts='';const P=(n,fn)=>{for(let j=0;j<n;j++)parts+=fn(j);};
+ if(k==='rain'||k==='storm')P(46,j=>`<i class="drop" style="left:${(j*23)%100}vw;animation-duration:${.55+(j%5)*.08}s;animation-delay:-${(j%11)*.13}s"></i>`);
+ else if(k==='snow')P(36,j=>`<i class="flake" style="left:${(j*29)%100}vw;width:${6+(j%4)*3}px;height:${6+(j%4)*3}px;animation-duration:${6+(j%6)}s;animation-delay:-${(j%9)*.9}s"></i>`);
+ else if(se==='spring'&&!night)P(16,j=>`<i class="petal" style="left:${(j*31)%100}vw;animation-duration:${9+(j%5)*1.5}s;animation-delay:-${(j%8)*1.3}s"></i>`);
+ else if(se==='autumn')P(12,j=>`<i class="leaf" style="left:${(j*37)%100}vw;animation-duration:${10+(j%5)*1.6}s;animation-delay:-${(j%7)*1.5}s">${j%2?'🍁':'🍂'}</i>`);
+ else if(se==='winter'&&!k)P(14,j=>`<i class="flake" style="left:${(j*29)%100}vw;width:${5+(j%3)*2}px;height:${5+(j%3)*2}px;animation-duration:${9+(j%6)}s;animation-delay:-${(j%9)*1.1}s;opacity:.7"></i>`);
+ html+=`<div class="parts">${parts}</div>`;
+ if(k==='fog')html+=`<div class="fog"></div>`;if(k==='storm')html+=`<div class="flash"></div>`;
+ $('#bg').innerHTML=html;}
 
 /* ---------- 최초 설정 ---------- */
 function renderSetup(){return `<div class="screen center"><div class="panel setup">
@@ -759,7 +821,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  return `<div class="screen home">
  <header class="topbar">
   <div class="me"><div class="avatar">${HERO_SVG}</div><div><div class="name">${esc(name)} 탐험가</div><div class="lv">Lv.${lv} ${levelTitle(lv)}</div><div class="lvbar"><i style="width:${(s.stars%10)*10}%"></i></div></div></div>
-  <div class="stats"><div class="pill">⭐ ${s.stars}</div><div class="pill">🔥 ${streak()}일</div></div>
+  <div class="stats"><div class="pill">⭐ ${s.stars}</div><div class="pill">🔥 ${streak()}일</div><button class="pill wx" id="wxpill" onclick="sayWeather()">${wxPillHTML()}</button></div>
   <div class="tb-actions"><button class="icon-btn" onclick="openParent()">🔒<small>부모님</small></button><button class="icon-btn" onclick="logout()">🚪<small>나가기</small></button></div>
  </header>
  <section class="hboard">
@@ -1213,6 +1275,9 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
   <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
+  <div class="pcard"><h4>🌤️ 계절·날씨 배경</h4><div class="hint">배경이 계절(봄·여름·가을·겨울)과 오늘 날씨(맑음·구름·비·눈·밤)에 맞춰 매일 바뀌어요. 날씨는 30분마다 새로 확인해요.</div>
+  <div class="prow"><span class="pl">날씨 지역</span><div class="chips">${Object.entries(CITIES).map(([k,c])=>`<button class="chip ${!PS.wxLoc&&(PS.wxCity||'seoul')===k?'on':''}" onclick="PS.wxLoc=null;psSet('wxCity','${k}',this)">${c[0]}</button>`).join('')}<button class="chip ${PS.wxLoc?'on':''}" onclick="useMyLoc(this)">📍 현재 위치</button></div></div>
+  <div class="prow"><span class="pl">날씨 효과</span><div class="chips"><button class="chip ${PS.wxOn!==false?'on':''}" onclick="psSet('wxOn',true,this)">켜기</button><button class="chip ${PS.wxOn===false?'on':''}" onclick="psSet('wxOn',false,this)">끄기 (계절만)</button></div></div></div>
   <div class="pcard"><h4>🔢 숫자 따라쓰기 범위</h4><div class="chips">${[10,20,30,50,100].map(m=>`<button class="chip ${(PS.numMax||10)===m?'on':''}" onclick="psSet('numMax',${m},this)">1~${m}</button>`).join('')}</div><div class="hint">매일 숫자 10개를 써요. 범위를 넓히면 새로 배우는 숫자(예: 21~30) 5개 + 앞에서 배운 숫자 5개가 섞여 나와요.</div></div>
   <div class="pcard"><h4>👪 우리 가족 따라쓰기</h4><div class="hint">입력한 정보로 따라쓰기 문제가 만들어져요. 이 정보는 태블릿 안에만 저장되고 인터넷에 올라가지 않아요. 하나도 입력하지 않으면 이 과목은 나오지 않아요.</div>
   ${FAMILY_FIELDS.map(([k,l,e,kind])=>`<label class="lb">${e} ${l}<input class="inp" id="f_${k}" ${kind==='tel'?'inputmode="tel" placeholder="010-1234-5678"':'placeholder="예: 김민지"'} maxlength="${kind==='tel'?16:8}" value="${esc((s.family||{})[k]||'')}"></label>`).join('')}</div>
@@ -1268,8 +1333,9 @@ function leaveParent(){PS=null;if(App.parentFrom==='login'||!App.loggedIn)App.go
 function psStep(d){PS.questCount=Math.max(1,Math.min(7,PS.questCount+d));$('#qc').textContent=PS.questCount;SFX.tap();}
 function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.subjects[x])){PS.subjects[t]=true;toast('과목은 1개 이상 골라주세요');return;}el.classList.toggle('on',PS.subjects[t]);SFX.tap();}
 function psSet(k,v,el){PS[k]=v;el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');SFX.tap();}
+function useMyLoc(el){if(!navigator.geolocation){toast('이 기기에서는 위치를 쓸 수 없어요');return;}toast('위치를 확인하고 있어요…');navigator.geolocation.getCurrentPosition(p=>{PS.wxLoc={name:'우리 동네',lat:+p.coords.latitude.toFixed(3),lon:+p.coords.longitude.toFixed(3)};el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');toast('현재 위치로 설정했어요. 저장을 눌러주세요');},()=>toast('위치 권한이 없어요. 지역을 직접 골라주세요'),{timeout:10000});}
 function saveSettings(){const s=S();s.family=s.family||{};FAMILY_FIELDS.forEach(([k])=>{const el=$('#f_'+k);if(el)s.family[k]=el.value.trim();});PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
- const rw=rebuildToday();checkBadges();
+ const rw=rebuildToday();checkBadges();setTimeout(()=>loadWeather(true),50);
  Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
  }
 function mapGiftGiven(){confirmBox('보물 지도 선물을 주셨나요?<br>새 지도를 시작할게요',()=>{const s=S();s.maps=(s.maps||0)+1;s.mapOffset=(s.mapOffset||0)+(s.settings.mapLen||40);Store.save();SFX.win();toast('새 보물 지도 시작! 🗺️');App.go('parent');},'네, 줬어요');}
@@ -1282,16 +1348,17 @@ function saveAccount(){const s=S();const id=$('#a_id').value.trim().toLowerCase(
  if(id)s.setup.childId=id;if(pw)s.setup.pwHash=hash(pw);if(pin)s.setup.pinHash=hash('pin:'+pin);lsDel('bugquest_auto');Store.save();SFX.ok();toast('계정 정보를 바꿨어요');App.go('parent');}
 
 /* ---------- 시작 ---------- */
-(async function boot(){renderBG();
+(async function boot(){WX=lsGet('bugquest_wx');renderBG();
  $('#app').innerHTML=`<div class="screen center loading"><div class="crawl">${bugSVG(0)}</div><p>탐험 준비 중...</p></div>`;
  try{window.speechSynthesis&&window.speechSynthesis.getVoices();}catch(e){}
  await Store.init();
  await loadConfig();testBadge();
+ renderBG();loadWeather();setInterval(()=>loadWeather(),30*60e3);
  const s=S();
  if(!s.setup){App.go('setup');return;}
  applyAdmin();
  const auto=lsGet('bugquest_auto');if(auto&&auto===hash('auto:'+s.setup.childId+s.setup.pwHash)){App.loggedIn=true;App.go('home');}else App.go('login');
- let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKey();if(App.screen==='home')App.go('home');}},60000);
+ let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKey();renderBG();if(App.screen==='home')App.go('home');}},60000);
  window.addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(App.screen==='quest'&&Q&&(isTrace(Q.q.type)||Q.q.type==='draw')&&PAD&&PAD.strokes===0)App.go('quest');},400);});
 })();
 </script>
