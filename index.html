@@ -183,13 +183,21 @@ label.lb{display:flex;flex-direction:column;gap:6px;font-size:19px;color:var(--i
 .cbug svg{width:100%;height:100%}
 .cbug .n{position:absolute;right:-4px;top:-6px;width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;animation:pop .3s;box-shadow:0 3px 0 var(--orange-d)}
 /* draw */
-.draw-wrap{flex:1;display:grid;grid-template-columns:1fr 200px;gap:16px;min-height:0}
+.draw-wrap{flex:1;display:grid;grid-template-columns:180px 1fr 200px;gap:16px;min-height:0}
+.excard{background:#fff;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px;box-shadow:0 6px 0 rgba(59,47,92,.1)}
+.excard .ex-e{font-size:110px;line-height:1.1}.excard .ex-s{width:140px}.excard .pn{font-size:26px}
+.ex-s svg{width:100%;height:auto;display:block}
+.pick{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.pick-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,210px));gap:18px}
+.pitem{border:0;background:#fff;border-radius:30px;padding:18px 10px;box-shadow:0 8px 0 var(--cs);border:4px solid var(--c);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
+.pitem:active{transform:translateY(5px);box-shadow:0 3px 0 var(--cs)}
+.pitem .ex-e{font-size:96px;line-height:1.1}.pitem .ex-s{width:120px}.pitem .pn{font-size:24px}
 .draw-wrap .tools .crayons{grid-template-columns:repeat(2,1fr)}
 .sizes{display:flex;gap:8px;justify-content:space-between}
 .size{flex:1;height:52px;border-radius:16px;border:0;background:#fff;box-shadow:0 4px 0 rgba(0,0,0,.12);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .size i{display:block;border-radius:50%;background:var(--ink)}
 .size.on{outline:4px solid var(--purple)}
-@media (max-aspect-ratio:1/1){.draw-wrap{grid-template-columns:1fr;grid-template-rows:1fr auto}.draw-wrap .tools .crayons{grid-template-columns:repeat(5,1fr)}}
+@media (max-aspect-ratio:1/1){.pick-grid{grid-template-columns:repeat(2,minmax(150px,230px))}.excard{flex-direction:row;padding:8px 14px}.excard .ex-e{font-size:60px}.excard .ex-s{width:76px}.draw-wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}.draw-wrap .tools .crayons{grid-template-columns:repeat(5,1fr)}}
 
 /* sub screens */
 .subbar{display:flex;align-items:center;gap:12px}
@@ -270,7 +278,7 @@ table.rec th{color:var(--ink2)}
 .keypad button{height:72px;border:0;border-radius:22px;background:#F3EEFF;font-size:32px;box-shadow:0 5px 0 #D9CFF5;cursor:pointer}
 .keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #D9CFF5}
 .bigimg{width:100%;border-radius:20px;display:block}
-#testbadge{position:fixed;left:50%;transform:translateX(-50%);top:4px;z-index:40;border:0;border-radius:14px;background:#FFE066;color:var(--ink);font-size:14px;padding:4px 12px;box-shadow:0 3px 0 #E8B520;opacity:.9;cursor:pointer}
+#testbadge{position:fixed;left:8px;bottom:6px;z-index:40;border:0;border-radius:14px;background:#FFE066;color:var(--ink);font-size:14px;padding:4px 12px;box-shadow:0 3px 0 #E8B520;opacity:.9;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(200px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:20px;font-size:20px;z-index:60;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{transform:translateX(-50%) translateY(0)}
 @media (max-width:700px){
@@ -359,7 +367,10 @@ const ABC=[['A','Apple','🍎'],['B','Bee','🐝'],['C','Cat','🐱'],['D','Dog'
 const NUMS=[['1','하나','one'],['2','둘','two'],['3','셋','three'],['4','넷','four'],['5','다섯','five'],['6','여섯','six'],['7','일곱','seven'],['8','여덟','eight'],['9','아홉','nine'],['10','열','ten']];
 const COUNTER=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
 const SENT=[{t:'The monkey likes bananas.',a:'🐒',b:'🍌'},{t:'The rabbit likes carrots.',a:'🐰',b:'🥕'},{t:'The bear likes honey.',a:'🐻',b:'🍯'},{t:'The bee likes flowers.',a:'🐝',b:'🌸'},{t:'The cat likes fish.',a:'🐱',b:'🐟'},{t:'The dog likes bones.',a:'🐶',b:'🦴'},{t:'The mouse likes cheese.',a:'🐭',b:'🧀'},{t:'The panda likes bamboo.',a:'🐼',b:'🎋'},{t:'The squirrel likes nuts.',a:'🐿️',b:'🌰'},{t:'The pig likes apples.',a:'🐷',b:'🍎'},{t:'The cow likes grass.',a:'🐮',b:'🌿'},{t:'The bird likes worms.',a:'🐦',b:'🪱'}];
-const THEMES=['나비','무당벌레','해님','꽃밭','우리 가족','장수풍뎅이','도깨비 뿌뿌','내 얼굴','무지개','자동차','물고기','생일 케이크','우리 집','공룡','비 오는 날','개미','눈사람','좋아하는 음식','친구랑 노는 모습','잠자리'];
+const THEMES=[{n:'나비',b:2},{n:'무당벌레',b:0},{n:'꿀벌',b:3},{n:'장수풍뎅이',b:1},{n:'잠자리',b:6},{n:'개미',b:4},{n:'메뚜기',b:7},{n:'도깨비 뿌뿌',p:1},
+ {n:'해님',e:'☀️'},{n:'튤립 꽃',e:'🌷'},{n:'무지개',e:'🌈'},{n:'자동차',e:'🚗'},{n:'물고기',e:'🐟'},{n:'생일 케이크',e:'🎂'},{n:'우리 집',e:'🏠'},{n:'공룡',e:'🦕'},{n:'눈사람',e:'⛄'},{n:'사과',e:'🍎'},{n:'고양이',e:'🐱'},{n:'강아지',e:'🐶'},{n:'나무',e:'🌳'},{n:'비행기',e:'✈️'},{n:'기차',e:'🚂'},{n:'웃는 얼굴',e:'😊'},{n:'로켓',e:'🚀'},{n:'수박',e:'🍉'},{n:'거북이',e:'🐢'},{n:'별',e:'⭐'}];
+function themeArt(name){const t=THEMES.find(x=>x.n===name);if(!t)return `<div class="ex-e">🖍️</div>`;if(t.b!=null)return `<div class="ex-s">${bugSVG(t.b)}</div>`;if(t.p)return `<div class="ex-s">${PPU_SVG}</div>`;return `<div class="ex-e">${t.e}</div>`;}
+function themeOpts(){return shuffle(THEMES.map(t=>t.n)).slice(0,4);}
 const TYPES={
  hangul:{icon:'ㄱ',name:'자음 따라쓰기',c:'#FF7EA8',cs:'#E05A86'},
  vowel:{icon:'ㅏ',name:'모음 따라쓰기',c:'#B388FF',cs:'#8E63E0'},
@@ -445,17 +456,17 @@ function makeQuest(t,off){const s=S();
  if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
   for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const NR=5;const rounds=[];
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const NR=10;const rounds=[];
   for(let r=0;r<NR;r++){const bug=bugs[r];let n;const others=[];const pool=shuffle(bugs.filter(x=>x!==bug));
-   if(r===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r%2===1?1:2;for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:pool[k],k:c});left-=c;}}
+   if(r%3===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r%3===0?0:(r%3===1?1:2);for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:pool[k],k:c});left-=c;}}
    const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({n,bug,others,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
  if(t==='eng'){const picks=shuffle(SENT.map((_,i)=>i)).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
- if(t==='draw'){return {type:t,theme:THEMES[rint(THEMES.length)],done:false};}
+ if(t==='draw'){return {type:t,theme:null,opts:themeOpts(),done:false};}
 }
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
-function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='eng')return '2문제';return '';}
+function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='eng')return '2문제';return '';}
 function grantDayReward(day){const s=S();day.allDone=true;const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
@@ -584,13 +595,13 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
 
 /* ---------- 퀘스트 ---------- */
 let Q=null;
-function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i];Q={i,dayKey:k,q,practice:q.done,round:0,tapped:0,locked:false,pos:q.done?0:(q.pos||0)};App.go('quest');}
+function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i];Q={i,dayKey:k,q,practice:q.done,round:0,tapped:0,locked:false,pos:q.done?0:(q.pos||0),theme:q.done?null:(q.theme||null)};App.go('quest');}
 function guideText(){const q=Q.q;
  if(isTrace(q.type)){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
  if(q.type==='listen')return '소리를 잘 듣고, 맞는 글자를 골라봐!';
  if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const sp=species(r.bug);return `<span class="gicon">${bugSVG(r.bug)}</span> <b>${eunNeun(sp)}</b> 몇 마리일까? ${r.others&&r.others.length?'다른 곤충은 빼고 ':''}하나씩 눌러 세어봐!`;}
  if(q.type==='eng')return '영어 문장을 듣고, 맞는 그림을 골라봐!';
- if(q.type==='draw')return `오늘의 주제는 <b>“${esc(q.theme)}”</b>! 마음껏 그려봐!`;}
+ if(q.type==='draw')return Q.theme?`<b>“${esc(Q.theme)}”</b> 그림을 보고 따라 그려봐! 🖍️`:'오늘은 뭘 그려볼까? 하나 골라봐!';}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
  <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='vowel'||q.type==='abc')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
@@ -693,8 +704,13 @@ function pickEng(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];
 
 /* 그림 그리기 */
 let DRAW=null;
-function mountDraw(){const sizes=[8,18,34];
- $('#qbody').innerHTML=`<div class="draw-wrap"><div class="canvas-box" id="cbox"><div class="sq" id="sq"><canvas id="pad"></canvas></div></div>
+function mountPicker(){Q.opts=Q.opts||(Q.q.opts&&!Q.practice?Q.q.opts:themeOpts());
+ $('#qbody').innerHTML=`<div class="pick"><div class="pick-grid">${Q.opts.map(n=>`<button class="pitem" onclick="pickTheme('${esc(n)}')">${themeArt(n)}<div class="pn">${esc(n)}</div></button>`).join('')}</div>
+ <button class="btn gray" onclick="Q.opts=themeOpts();SFX.tap();mountPicker()">🔄 다른 그림 보기</button></div>`;
+ setTimeout(()=>{if(App.screen==='quest'&&!Q.theme)speak('오늘은 뭘 그려볼까? 하나 골라봐!');},300);}
+function pickTheme(n){SFX.ok();Q.theme=n;if(!Q.practice){Q.q.theme=n;Store.save();}setGuide(guideText());mountDraw();speak(`${n}! 그림을 보고 따라 그려봐!`);}
+function mountDraw(){if(!Q.theme){mountPicker();return;}const sizes=[8,18,34];
+ $('#qbody').innerHTML=`<div class="draw-wrap"><div class="excard">${themeArt(Q.theme)}<div class="pn">${esc(Q.theme)}</div><button class="btn sm gray" onclick="changeTheme()">🔄 주제 바꾸기</button></div><div class="canvas-box" id="cbox"><div class="sq" id="sq"><canvas id="pad"></canvas></div></div>
  <div class="tools">${crayonHTML(0)}<div class="sizes">${sizes.map((z,i)=>`<button class="size ${i===1?'on':''}" onclick="pickSize(${i},this)"><i style="width:${8+i*9}px;height:${8+i*9}px"></i></button>`).join('')}</div>
  <button class="btn gray" id="eraser" onclick="toggleEraser(this)">🧽 지우개</button><button class="btn gray" onclick="clearDraw()">🗑️ 처음부터</button><button class="btn green" style="font-size:24px;padding:14px 10px" onclick="finishDraw()">다 그렸어요! ✅</button></div></div>`;
  requestAnimationFrame(()=>{if(App.screen!=='quest')return;const box=$('#cbox').getBoundingClientRect();let w=Math.floor(box.width-10),h=Math.floor(box.height-14);if(w/h>4/3)w=Math.floor(h*4/3);else h=Math.floor(w*3/4);w=Math.max(260,w);h=Math.max(195,h);
@@ -702,11 +718,12 @@ function mountDraw(){const sizes=[8,18,34];
   PAD=makePad(cv,{bg:'#FFFFFF'});DRAW={scale:cv.width/700,sizes};PAD.size=sizes[1]*DRAW.scale;});}
 function pickSize(i,el){SFX.tap();if(!PAD)return;PAD.size=DRAW.sizes[i]*DRAW.scale;document.querySelectorAll('.size').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 function toggleEraser(el){SFX.tap();if(!PAD)return;PAD.erase=!PAD.erase;el.classList.toggle('on',PAD.erase);el.className='btn '+(PAD.erase?'purple':'gray');el.id='eraser';}
+function changeTheme(){const go=()=>{Q.theme=null;if(!Q.practice){Q.q.theme=null;Store.save();}setGuide(guideText());mountDraw();};if(PAD&&PAD.strokes>0)confirmBox('그린 그림을 지우고<br>다른 주제를 고를까?',go);else go();}
 function clearDraw(){confirmBox('그림을 모두 지우고<br>처음부터 그릴까?',()=>{PAD&&PAD.clear();});}
 async function finishDraw(){if(!PAD)return;if(PAD.strokes<2){setGuide('조금만 더 그려볼까? 🖍️');SFX.no();return;}
  const src=PAD.ctx.canvas;const mw=800;const sc=Math.min(1,mw/src.width);const c=document.createElement('canvas');c.width=Math.round(src.width*sc);c.height=Math.round(src.height*sc);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0,c.width,c.height);
  let qv=0.75,url=c.toDataURL('image/jpeg',qv);while(url.length>230000&&qv>0.3){qv-=0.1;url=c.toDataURL('image/jpeg',qv);}
- const d={id:'d'+Date.now(),ts:Date.now(),date:todayKey(),theme:Q.q.theme,img:url};
+ const d={id:'d'+Date.now(),ts:Date.now(),date:todayKey(),theme:Q.theme,img:url};
  setGuide('그림을 갤러리에 걸고 있어... 🖼️');await Store.addDrawing(d);finishQuest();}
 
 /* 퀘스트 완료 */
