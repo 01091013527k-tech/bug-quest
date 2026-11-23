@@ -19,6 +19,7 @@ window.ADMIN_CONFIG = {
       num: true,                   //   숫자 따라쓰기
       listen: true,                //   소리 듣고 고르기
       count: true,                 //   동물 친구 퀴즈 (세기·이름·찾기·특징)
+      family: true,                //   우리 가족 따라쓰기 (가족 정보는 태블릿 부모 메뉴에서 입력)
       spot: true,                  //   틀린 그림 찾기
       puzzle: true,                //   퍼즐 맞추기
       eng: true,                   //   영어 문장
@@ -29,6 +30,7 @@ window.ADMIN_CONFIG = {
     giftName: '갖고 싶은 장난감',    // (사용 안 함 — 선물은 mapGift 하나로 통일)
     mapGift: '보물 상자 선물',       // 최종 선물 (보물 지도 끝)
     mapLen: 40,                    // 보물 지도 칸 수 (배지 1개 = 1칸)
+    numMax: 10,                    // 숫자 따라쓰기 범위 (10/20/30/50/100)
     mapDays: 40                    // 보물 지도 완주 목표 기간(일) — 선택 과목에 맞춰 배지가 자동 생성돼요
   },
 

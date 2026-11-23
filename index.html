@@ -292,6 +292,7 @@ h3.sec{margin:6px 0 0;font-weight:400;font-size:26px}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .how>div{background:#fff;border-radius:22px;padding:12px 14px;box-shadow:0 5px 0 rgba(59,47,92,.1);font-size:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
 .how b{font-size:36px;font-weight:400}.how small{font-size:15px;color:var(--ink2)}
+.lc-full{font-size:19px;text-align:center;line-height:1.3;word-break:keep-all}.lc-full span{color:#B5AECB}.lc-full span.on{color:var(--c);font-size:24px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -425,6 +426,23 @@ const bugSVG=i=>`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">$
 const HANGUL=[['ㄱ','기역','기린','🦒'],['ㄴ','니은','나비','🦋'],['ㄷ','디귿','다람쥐','🐿️'],['ㄹ','리을','라면','🍜'],['ㅁ','미음','무당벌레','🐞'],['ㅂ','비읍','바나나','🍌'],['ㅅ','시옷','사과','🍎'],['ㅇ','이응','오리','🦆'],['ㅈ','지읒','자동차','🚗'],['ㅊ','치읓','치즈','🧀'],['ㅋ','키읔','코끼리','🐘'],['ㅌ','티읕','토끼','🐰'],['ㅍ','피읖','포도','🍇'],['ㅎ','히읗','하마','🦛'],
 ['ㅏ','아','아이스크림','🍦'],['ㅑ','야','야구','⚾'],['ㅓ','어','어묵','🍢'],['ㅕ','여','여우','🦊'],['ㅗ','오','오이','🥒'],['ㅛ','요','요요','🪀'],['ㅜ','우','우유','🥛'],['ㅠ','유','유령','👻'],['ㅡ','으','음악','🎵'],['ㅣ','이','이빨','🦷']];
 const ABC=[['A','Apple','🍎'],['B','Bee','🐝'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Egg','🥚'],['F','Fish','🐟'],['G','Grapes','🍇'],['H','Hat','🎩'],['I','Ice cream','🍦'],['J','Juice','🧃'],['K','Kite','🪁'],['L','Lion','🦁'],['M','Monkey','🐒'],['N','Nose','👃'],['O','Orange','🍊'],['P','Pig','🐷'],['Q','Queen','👑'],['R','Rabbit','🐰'],['S','Sun','☀️'],['T','Tiger','🐯'],['U','Umbrella','☂️'],['V','Violin','🎻'],['W','Whale','🐳'],['X','Fox','🦊'],['Y','Yo-yo','🪀'],['Z','Zebra','🦓']];
+const HW={'ㄱ':[['기린','🦒'],['고래','🐳'],['거북이','🐢'],['가방','🎒']],'ㄴ':[['나비','🦋'],['나무','🌳'],['노래','🎵'],['눈사람','⛄']],'ㄷ':[['다람쥐','🐿️'],['당근','🥕'],['도토리','🌰'],['돼지','🐷']],'ㄹ':[['라면','🍜'],['로봇','🤖'],['리본','🎀'],['레몬','🍋']],
+ 'ㅁ':[['무당벌레','🐞'],['물고기','🐟'],['모자','🧢'],['말','🐴']],'ㅂ':[['바나나','🍌'],['버스','🚌'],['배','🍐'],['별','⭐']],'ㅅ':[['사과','🍎'],['사자','🦁'],['수박','🍉'],['시계','⏰']],'ㅇ':[['오리','🦆'],['우산','☂️'],['원숭이','🐒'],['아기','👶']],
+ 'ㅈ':[['자동차','🚗'],['자전거','🚲'],['쥐','🐭'],['지구','🌍']],'ㅊ':[['치즈','🧀'],['책','📕'],['초콜릿','🍫'],['칫솔','🪥']],'ㅋ':[['코끼리','🐘'],['케이크','🎂'],['컵','🥤'],['코알라','🐨']],'ㅌ':[['토끼','🐰'],['토마토','🍅'],['택시','🚕'],['트럭','🚚']],
+ 'ㅍ':[['포도','🍇'],['피자','🍕'],['펭귄','🐧'],['풍선','🎈']],'ㅎ':[['하마','🦛'],['호랑이','🐯'],['해','☀️'],['하트','❤️']],
+ 'ㅏ':[['아이스크림','🍦'],['아기','👶'],['아빠','👨']],'ㅑ':[['야구','⚾'],['야옹','🐱']],'ㅓ':[['어묵','🍢'],['엄마','👩']],'ㅕ':[['여우','🦊'],['여름','🏖️']],'ㅗ':[['오이','🥒'],['오리','🦆']],
+ 'ㅛ':[['요요','🪀'],['요리','🍳']],'ㅜ':[['우유','🥛'],['우산','☂️']],'ㅠ':[['유령','👻'],['유리컵','🥛']],'ㅡ':[['음악','🎵'],['은행','🏦']],'ㅣ':[['이빨','🦷'],['이불','🛏️']]};
+const AW={A:[['Apple','🍎'],['Ant','🐜'],['Airplane','✈️']],B:[['Bee','🐝'],['Ball','⚽'],['Banana','🍌']],C:[['Cat','🐱'],['Car','🚗'],['Cake','🍰']],D:[['Dog','🐶'],['Duck','🦆'],['Donut','🍩']],E:[['Egg','🥚'],['Elephant','🐘'],['Ear','👂']],
+ F:[['Fish','🐟'],['Frog','🐸'],['Flower','🌸']],G:[['Grapes','🍇'],['Gift','🎁'],['Goat','🐐']],H:[['Hat','🎩'],['Horse','🐴'],['House','🏠']],I:[['Ice cream','🍦'],['Ink','🖋️'],['Island','🏝️']],J:[['Juice','🧃'],['Jeep','🚙'],['Jam','🍯']],
+ K:[['Kite','🪁'],['Key','🔑'],['Koala','🐨']],L:[['Lion','🦁'],['Leaf','🍃'],['Lemon','🍋']],M:[['Monkey','🐒'],['Moon','🌙'],['Milk','🥛']],N:[['Nose','👃'],['Nut','🥜'],['Notebook','📓']],O:[['Orange','🍊'],['Owl','🦉'],['Octopus','🐙']],
+ P:[['Pig','🐷'],['Panda','🐼'],['Pizza','🍕']],Q:[['Queen','👑'],['Question','❓']],R:[['Rabbit','🐰'],['Rainbow','🌈'],['Robot','🤖']],S:[['Sun','☀️'],['Star','⭐'],['Snake','🐍']],T:[['Tiger','🐯'],['Tree','🌳'],['Train','🚂']],
+ U:[['Umbrella','☂️'],['Unicorn','🦄'],['Up','⬆️']],V:[['Violin','🎻'],['Van','🚐'],['Volcano','🌋']],W:[['Whale','🐳'],['Watch','⌚'],['Water','💧']],X:[['Fox','🦊'],['Box','📦'],['Six','6️⃣']],Y:[['Yo-yo','🪀'],['Yellow','💛'],['Yacht','⛵']],Z:[['Zebra','🦓'],['Zero','0️⃣'],['Zoo','🦁']]};
+const KO1=['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉'],KO10=['','열','스물','서른','마흔','쉰','예순','일흔','여든','아흔'];
+const EN1=['','one','two','three','four','five','six','seven','eight','nine'],EN_T=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],EN10=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+const koNum=n=>n===100?'백':KO10[Math.floor(n/10)]+KO1[n%10];
+const enNum=n=>n===100?'one hundred':n<10?EN1[n]:n<20?EN_T[n-10]:EN10[Math.floor(n/10)]+(n%10?'-'+EN1[n%10]:'');
+const DIGIT_KO=['공','일','이','삼','사','오','육','칠','팔','구'];
+const FAMILY_FIELDS=[['me','내 이름','🧒','name'],['mom','엄마 이름','👩','name'],['dad','아빠 이름','👨','name'],['momTel','엄마 전화번호','📞','tel'],['dadTel','아빠 전화번호','📞','tel']];
 const ABCL=ABC.map(([c,w,e])=>[c.toLowerCase(),w.toLowerCase(),e]);
 const CREATURES=[
  {n:'무당벌레',b:0,f:'나는 빨간 옷에 까만 점이 콕콕 있어. 등이 동그래.'},{n:'장수풍뎅이',b:1,f:'나는 머리에 커다란 뿔이 있어. 힘이 아주 세.'},{n:'나비',b:2,f:'나는 알록달록 예쁜 날개가 있어. 꽃에서 꿀을 먹어.'},{n:'꿀벌',b:3,f:'나는 노란색과 까만색 줄무늬가 있어. 붕붕 날아다니며 꿀을 모아.'},
@@ -452,6 +470,7 @@ const TYPES={
  vowel:{icon:'ㅏ',name:'모음 따라쓰기',c:'#B388FF',cs:'#8E63E0'},
  abc:{icon:'A',name:'대문자 따라쓰기',c:'#5BC0EB',cs:'#3A9AC4'},
  abcl:{icon:'a',name:'소문자 따라쓰기',c:'#4D8DFF',cs:'#2F6AD6'},
+ family:{icon:'👪',name:'우리 가족 따라쓰기',c:'#FF8FA3',cs:'#E06A80'},
  num:{icon:'3',name:'숫자 따라쓰기',c:'#FFB443',cs:'#E0921F'},
  listen:{icon:'👂',name:'소리 듣고 고르기',c:'#9C7CF4',cs:'#7A5AD6'},
  count:{icon:'🐾',name:'동물 친구 퀴즈',c:'#FF6B6B',cs:'#D94848'},
@@ -460,7 +479,7 @@ const TYPES={
  eng:{icon:'💬',name:'영어 문장',c:'#2EC4B6',cs:'#1E9C90'},
  draw:{icon:'🖍️',name:'그림 그리기',c:'#F78FB3',cs:'#D96C93'}
 };
-const TYPE_ORDER=['hangul','vowel','abc','abcl','count','spot','num','puzzle','listen','eng','draw'];
+const TYPE_ORDER=['hangul','vowel','abc','abcl','count','family','spot','num','puzzle','listen','eng','draw'];
 const LEVELS=['알 탐험가','애벌레 탐험가','번데기 탐험가','나비 탐험가','풍뎅이 용사','곤충 박사','숲의 영웅'];
 const CRAYONS=['#FF4D6D','#FF9F43','#FFD233','#5CC96B','#2EC4B6','#3A86FF','#9C7CF4','#F78FB3','#8D5A3B','#2B2140'];
 
@@ -494,7 +513,7 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,abcl:true,count:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40,mapDays:40},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,abcl:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
+function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,abcl:true,count:true,family:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40,mapDays:40,numMax:10},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,abcl:0,family:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
 function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
@@ -523,33 +542,41 @@ const S=()=>Store.state;
 function level(stars){return Math.floor(stars/10)+1;}
 function levelTitle(l){return LEVELS[Math.min(l-1,LEVELS.length-1)];}
 function streak(){const s=S();let n=0;const d=new Date();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
-const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'||t==='num';
-function traceSeq(q){if(q.type==='vowel')return HANGUL.slice(14);if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;if(q.type==='abcl')return ABCL;return [NUMS[(q.idx||0)%NUMS.length]];}
+const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'||t==='num'||t==='family';
+function hw(it,dv){const w=HW[it[0]];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],it[1],p[0],p[1]];}
+function aw(it,dv,low){const w=AW[it[0].toUpperCase()];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],low?p[0].toLowerCase():p[0],p[1]];}
+function traceSeq(q){const dv=q.dv||0;if(q.type==='vowel')return HANGUL.slice(14).map(it=>hw(it,dv));if(q.type==='hangul'){const st=q.set||'all';return (st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL).map(it=>hw(it,dv));}if(q.type==='abc')return ABC.map(it=>aw(it,dv));if(q.type==='abcl')return ABCL.map(it=>aw(it,dv,true));if(q.type==='family')return q.items||[];if(q.nums)return q.nums.map(n=>[String(n),koNum(n),enNum(n)]);return [NUMS[(q.idx||0)%NUMS.length]];}
+function familyReady(){const f=S().family||{};return FAMILY_FIELDS.some(([k])=>(f[k]||'').trim());}
+function familyItems(dv){const f=S().family||{};const filled=FAMILY_FIELDS.filter(([k])=>(f[k]||'').trim());if(!filled.length)return [];const pick=filled.length<=2?filled:[0,1].map(j=>filled[(dv+j)%filled.length]);const items=[];
+ pick.forEach(([k,label,emo,kind])=>{const v=f[k].trim();let parts;if(kind==='tel'){const d=v.replace(/\D/g,'');parts=d.length===11?[d.slice(0,3),d.slice(3,7),d.slice(7)]:d.length===10?[d.slice(0,3),d.slice(3,6),d.slice(6)]:(d.match(/.{1,4}/g)||[]);}else parts=v.replace(/\s/g,'').split('');
+  parts.forEach((pt,i)=>items.push([pt,label,parts,i,emo,kind]));});return items;}
 function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-1)];}
 const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
 const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
-function makeQuest(t,off){const s=S();
- if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,done:false};}
- if(t==='num'){const idx=s.progress[t]+(off[t]||0);off[t]=(off[t]||0)+1;return {type:t,idx,done:false};}
+function yUsed(t){const s=S();const d=new Date();d.setDate(d.getDate()-1);const y=s.days[todayKey(d)];const u=new Set();if(!y)return u;y.quests.filter(q=>q.type===t).forEach(q=>{(q.rounds||[]).forEach(r=>{if(r.c!=null)u.add(r.c);if(r.sc!=null)u.add('sc'+r.sc);if(r.sub!=null)u.add('sub'+r.sub);if(r.a!=null)u.add('a'+r.a);});(q.opts||[]).forEach(o=>u.add('o'+o));});return u;}
+function makeQuest(t,off){const s=S();const dv=dayNum(todayKey());
+ if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,dv:dv+(off[t]=(off[t]||0)+1)-1,done:false};}
+ if(t==='family'){return {type:t,items:familyItems(dv+(off[t]=(off[t]||0)+1)-1),pos:0,done:false};}
+ if(t==='num'){const M=Math.max(10,s.settings.numMax||10);let nums;if(M<=10)nums=Array.from({length:10},(_,i)=>i+1);else{const top=shuffle(Array.from({length:10},(_,i)=>M-9+i)).slice(0,5);const rest=shuffle(Array.from({length:M-10},(_,i)=>i+1)).slice(0,5);nums=top.concat(rest).sort((a,b)=>a-b);}return {type:t,nums,pos:0,done:false};}
  if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
   for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const all=CREATURES.map((_,i)=>i);const kinds=shuffle(['count','count','count','name','name','find','find','feat','feat','feat']);const used=[];const rounds=[];
-  const pick=()=>{let c;let g=0;do{c=rint(all.length);g++;}while(used.includes(c)&&g<50);used.push(c);return c;};
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const all=CREATURES.map((_,i)=>i);const yu=yUsed('count');const kinds=shuffle(['count','count','count','name','name','find','find','feat','feat','feat']);const used=[];const rounds=[];
+  const pick=()=>{let c;let g=0;do{c=rint(all.length);g++;}while((used.includes(c)||(yu.has(c)&&g<30))&&g<80);used.push(c);return c;};
   const others=(c,n)=>{const o=[c];while(o.length<n){const x=rint(all.length);if(!o.includes(x))o.push(x);}return shuffle(o);};
   kinds.forEach((k,r)=>{const c=pick();
-   if(k==='count'){const n=1+rint(r<3?maxN:Math.min(maxN,6));const oth=[];let left=12-n;const kk=rint(3);const pool=shuffle(all.filter(x=>x!==c));for(let j=0;j<kk&&left>0;j++){const m=Math.min(left,1+rint(4));oth.push({c:pool[j],k:m});left-=m;}const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({k,c,n,others:oth,ch:shuffle(ch)});}
+   if(k==='count'){const kk=rint(3);const n=kk===0?3+rint(8):2+rint(7);const oth=[];let left=Math.min(12-n,kk*4);const pool=shuffle(all.filter(x=>x!==c));for(let j=0;j<kk&&left>0;j++){const m=Math.min(left,1+rint(4));oth.push({c:pool[j],k:m});left-=m;}const near=shuffle([n-2,n-1,n+1,n+2].filter(x=>x>=1&&x<=10));const ch=[n,near[0],near[1]];rounds.push({k,c,n,others:oth,ch:shuffle(ch)});}
    else rounds.push({k,c,ch:others(c,k==='find'?4:3)});});
   return {type:t,rounds,done:false};}
- if(t==='spot'){return {type:t,rounds:[makeSpot(),makeSpot()],done:false};}
- if(t==='puzzle'){return {type:t,rounds:[makePuzzle(2),makePuzzle(3),makePuzzle(3)],done:false};}
- if(t==='eng'){const picks=shuffle(SENT.map((_,i)=>i)).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
- if(t==='draw'){return {type:t,theme:null,opts:themeOpts(),done:false};}
+ if(t==='spot'){const yu=yUsed('spot');const sc=shuffle(SPOT_SCENES.map((_,i)=>i));const ord=sc.filter(i=>!yu.has('sc'+i)).concat(sc.filter(i=>yu.has('sc'+i)));return {type:t,rounds:[makeSpot(ord[0]),makeSpot(ord[1])],done:false};}
+ if(t==='puzzle'){const yu=yUsed('puzzle');const subs=shuffle(['ppu','hero'].concat(BUGS.map((_,i)=>i)));const ord=subs.filter(x=>!yu.has('sub'+x)).concat(subs.filter(x=>yu.has('sub'+x)));return {type:t,rounds:[makePuzzle(2,ord[0]),makePuzzle(3,ord[1]),makePuzzle(3,ord[2])],done:false};}
+ if(t==='eng'){const yu=yUsed('eng');const all=shuffle(SENT.map((_,i)=>i));const picks=all.filter(i=>!yu.has('a'+i)).concat(all.filter(i=>yu.has('a'+i))).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
+ if(t==='draw'){const yu=yUsed('draw');const all=shuffle(THEMES.map(x=>x.n));return {type:t,theme:null,opts:all.filter(n=>!yu.has('o'+n)).concat(all.filter(n=>yu.has('o'+n))).slice(0,4),done:false};}
 }
-function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
+function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]&&(t!=='family'||familyReady()));if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
-function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='spot')return `그림 ${q.rounds.length}장`;if(q.type==='puzzle')return `퍼즐 ${q.rounds.length}개`;if(q.type==='eng')return '2문제';return '';}
+function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){if(q.nums)return `숫자 ${q.nums.length}개 (${q.nums[0]}~${q.nums[q.nums.length-1]})`+(!q.done&&q.pos?` (${q.pos}/${q.nums.length})`:'');const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 숫자: ${it[0]}`;}if(q.type==='family'){const ls=[...new Set((q.items||[]).map(x=>x[1]))];return ls.join(' · ')||'가족 정보 필요';}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='spot')return `그림 ${q.rounds.length}장`;if(q.type==='puzzle')return `퍼즐 ${q.rounds.length}개`;if(q.type==='eng')return '2문제';return '';}
 function grantDayReward(day){day.allDone=true;const bug=addSticker();return {bug,min:0};}
 function giveCoupon(){const s=S();const m=s.settings.tvMinutes|0;if(m<=0)return 0;s.coupons.unshift({id:'c'+Date.now()+'_'+rint(1e6),min:m,date:todayKey(),used:false});return m;}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
@@ -557,9 +584,9 @@ function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null
  if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
 let LAST_BOARD_FULL=false;
 function addSticker(){const s=S();const goal=s.settings.stickerGoal||10;if(s.stickers.current.length>=goal)s.stickers.current=[];const c=(s.stickers.total%goal)%CREATURES.length;s.stickers.total++;s.stickers.current.push(c);LAST_BOARD_FULL=false;if(s.stickers.current.length>=goal){s.stickers.boards=(s.stickers.boards||0)+1;s.boardLog=(s.boardLog||[]).concat([{d:todayKey()}]);LAST_BOARD_FULL=true;}s.giftReady=false;return c;}
-const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
+const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['family','👪','가족 쓰기'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
 const BT=Object.fromEntries(BADGE_TYPES.map(([t,ic,lb])=>[t,{ic,lb}]));
-function activeSubjects(){const s=S();const en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);return en.length?en:['hangul'];}
+function activeSubjects(){const s=S();const en=TYPE_ORDER.filter(t=>s.settings.subjects[t]&&(t!=='family'||familyReady()));return en.length?en:['hangul'];}
 let _BC=null,_BK='';
 function getBadges(){const s=S();const st=s.settings;const en=activeSubjects();const qc=Math.max(1,Math.min(7,st.questCount|0||5));const D=st.mapDays||40;const key=en.join(',')+'|'+qc+'|'+D+'|'+(st.stickerGoal||10);if(_BK===key&&_BC)return _BC;
  const L=[{id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},{id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)}];
@@ -697,7 +724,7 @@ function guideText(){const q=Q.q;
  if(q.type==='draw')return Q.theme?`<b>“${esc(Q.theme)}”</b> 그림을 보고 따라 그려봐! 🖍️`:'오늘은 뭘 그려볼까? 하나 골라봐!';}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
- <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
+ <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(isTrace(q.type)&&traceSeq(q).length>1)?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
  <div class="qbody" id="qbody"></div></div>`;}
 function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='spot')mountSpot();else if(t==='puzzle')mountPuzzle();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
@@ -783,6 +810,7 @@ const STROKES={
  'r':[[[36,42],[36,78]],ARC(52,58,16,180,320)],'s':[JN(ARC(50,51,10,-20,-270),ARC(50,69,9,-90,160))],'t':[[[48,18],[48,78]],[[34,44],[62,44]]],
  'u':[JN([[32,42],[32,62]],ARC(48,62,16,180,0),[[64,42]]),[[64,42],[64,78]]],'v':[[[30,42],[50,78],[70,42]]],'w':[[[22,42],[36,78],[50,52],[64,78],[78,42]]],
  'x':[[[32,42],[68,78]],[[68,42],[32,78]]],'y':[[[32,42],[52,72]],[[70,42],[42,98]]],'z':[[[32,42],[68,42],[32,78],[70,78]]],
+ '0':[ARC(50,50,28,-90,-450,40)],
  '1':[[[36,24],[54,10],[54,90]]],
  '2':[JN(ARC(50,34,26,-165,15),[[22,90],[82,90]])],
  '3':[JN(ARC(48,30,21,-160,90),ARC(48,70,21,-90,160))],
@@ -795,6 +823,8 @@ const STROKES={
  '10':[[[30,10],[30,90]],ARC(68,50,18,-90,-450,40)]
 };
 const SCOL=['#FF5A5F','#3A86FF','#2EC4B6','#FF9F43','#9C7CF4'];
+function compStrokes(str){if(STROKES[str])return STROKES[str];if(!/^\d{2,4}$/.test(str))return null;const n=str.length;const w=100/n;const kx=Math.min(1,w*0.92/62);const ky=Math.min(1,kx*1.35);const out=[];
+ str.split('').forEach((d,i)=>{const cx=i*w+w/2;(STROKES[d]||[]).forEach(s=>out.push(s.map(([x,y])=>[cx+(x-50)*kx,50+(y-50)*ky])));});return out;}
 function pLen(p){let l=0;for(let i=1;i<p.length;i++)l+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);return l;}
 function pAt(p,d){for(let i=1;i<p.length;i++){const sl=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]);if(d<=sl||i===p.length-1){const t=sl?Math.min(1,d/sl):0;return [p[i-1][0]+(p[i][0]-p[i-1][0])*t,p[i-1][1]+(p[i][1]-p[i-1][1])*t,Math.atan2(p[i][1]-p[i-1][1],p[i][0]-p[i-1][0])];}d-=sl;}return [p[0][0],p[0][1],0];}
 function mapPts(strokes,W){const sc=W*0.76/100,of=W*0.12;return strokes.map(s=>s.map(([x,y])=>[of+x*sc,of+y*sc]));}
@@ -804,10 +834,11 @@ function drawBody(ctx,ss,W,color,width){ctx.save();ctx.lineCap='round';ctx.lineJ
 /* ---- 따라쓰기 ---- */
 let TRACE=null;
 async function mountTrace(){const q=Q.q;const it=curItem();
- const word=(q.type==='hangul'||q.type==='vowel')?`${it[3]}<div class="lc-word">${it[2]}</div>`:(q.type==='abc'||q.type==='abcl')?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
- const hasS=!!STROKES[it[0]];
+ const famCard=q.type==='family'?`<div class="lc-word">${it[4]} ${esc(it[1])}</div><div class="lc-full">${it[2].map((p,i)=>`<span class="${i===it[3]?'on':''}">${esc(p)}</span>`).join(it[5]==='tel'?'-':'')}</div>`:'';
+ const word=q.type==='family'?'':(q.type==='hangul'||q.type==='vowel')?`${it[3]}<div class="lc-word">${it[2]}</div>`:(q.type==='abc'||q.type==='abcl')?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${+it[0]<=10?'🐞'.repeat(Math.min(5,+it[0]))+(+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''):(+it[0]<=59?'🔟'.repeat(Math.floor(+it[0]/10))+'<br>'+'🐞'.repeat(+it[0]%10):'')}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
+ const STK=compStrokes(it[0]);const hasS=!!STK;
  $('#qbody').innerHTML=`<div class="trace-wrap">
- <div class="letter-card"><div class="lc-ch">${esc(it[0])}</div><div class="lc-emoji">${word}</div><button class="btn sm purple" onclick="sayTrace()">🔊 들어보기</button>${hasS?'<button class="btn sm orange" onclick="playOrder()">▶ 순서 보기</button>':''}</div>
+ <div class="letter-card"><div class="lc-ch" style="${it[0].length>2?'font-size:'+(it[0].length>3?44:58)+'px':''}">${esc(it[0])}</div>${famCard}<div class="lc-emoji">${word}</div><button class="btn sm purple" onclick="sayTrace()">🔊 들어보기</button>${hasS?'<button class="btn sm orange" onclick="playOrder()">▶ 순서 보기</button>':''}</div>
  <div class="canvas-box" id="cbox"><div class="sq" id="sq"><canvas id="tpl"></canvas><canvas id="anim" style="pointer-events:none"></canvas><canvas id="ink"></canvas></div></div>
  <div class="tools">${crayonHTML(0)}<button class="btn gray" onclick="clearTrace()">🧽 지우기</button><div class="meter"><i id="meter"></i><span class="mstar">⭐</span></div><button id="doneBtn" class="btn green" style="font-size:25px;padding:16px 8px" onclick="finishTrace()">다 했어요! ✅</button></div></div>`;
  if(!hasS){try{await withTimeout(document.fonts.load('200px Jua',it[0]),3000);}catch(e){}}
@@ -818,7 +849,7 @@ async function mountTrace(){const q=Q.q;const it=curItem();
  if(q.type==='abcl'){const yy=v=>W*0.12+v*W*0.76/100;tc.lineWidth=2*dpr;[[10,'#D6E6FF',1],[42,'#9CC3FF',1],[78,'#FF9AA8',0],[98,'#D6E6FF',1]].forEach(([v,c,d])=>{tc.strokeStyle=c;tc.setLineDash(d?[8*dpr,8*dpr]:[]);tc.beginPath();tc.moveTo(0,yy(v));tc.lineTo(W,yy(v));tc.stroke();});tc.setLineDash([]);}
  else{tc.strokeStyle='#F1D9E4';tc.lineWidth=2*dpr;tc.setLineDash([8*dpr,8*dpr]);tc.beginPath();tc.moveTo(W/2,0);tc.lineTo(W/2,W);tc.moveTo(0,W/2);tc.lineTo(W,W/2);tc.stroke();tc.setLineDash([]);}
  const mc=document.createElement('canvas');mc.width=mc.height=W;const m=mc.getContext('2d');let ss=null;
- if(hasS){ss=mapPts(STROKES[it[0]],W);const bw=W*0.1;
+ if(hasS){ss=mapPts(STK,W);const bw=W*0.1;
   drawBody(m,ss,W,'#000',bw);drawBody(tc,ss,W,'#EFE7FF',bw);
   tc.save();tc.setLineDash([9*dpr,8*dpr]);drawBody(tc,ss,W,'#B7A2F0',3*dpr);tc.restore();
   const R=W*0.036,labels=[];
@@ -853,7 +884,7 @@ function playOrder(){if(!TRACE||!TRACE.ss)return;stopOrder();const tok=ORDER_TOK
   requestAnimationFrame(step);};
  requestAnimationFrame(step);}
 function sayTrace(){const q=Q.q;const it=curItem();
- if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else if(q.type==='abcl')speak(`small ${it[0].toUpperCase()}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
+ if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else if(q.type==='abcl')speak(`small ${it[0].toUpperCase()}. ${it[1]}.`,'en');else if(q.type==='family'){speak(it[5]==='tel'?`${it[1]}, ${it[2].map(p=>p.split('').map(d=>DIGIT_KO[+d]).join(' ')).join(', ')}`:`${it[1]}, ${it[2].join('')}. ${it[0]}`);}else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
 function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.3;
  const m=$('#meter');if(m)m.style.width=Math.min(100,ratio/goal*100)+'%';
  if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');if(b)b.classList.add('ready');}
@@ -863,7 +894,7 @@ function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;con
 function clearTrace(){SFX.tap();if(PAD)PAD.clear();if(TRACE){TRACE.ready=false;$('#meter').style.width='0%';const b=$('#doneBtn');if(b)b.classList.remove('ready');}}
 function wipKey(){return Q.dayKey+':'+Q.i+(Q.practice?':p':'');}
 function saveThumb(){const T=TRACE;const S2=150;const c=document.createElement('canvas');c.width=c.height=S2;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,S2,S2);
- if(T.ss){const ss=mapPts(STROKES[curItem()[0]],S2);drawBody(x,ss,S2,'#EFE7FF',S2*0.1);}
+ if(T.ss){const ss=mapPts(compStrokes(curItem()[0]),S2);drawBody(x,ss,S2,'#EFE7FF',S2*0.1);}
  x.drawImage(T.ink,0,0,S2,S2);Q.thumbs=Q.thumbs||[];Q.thumbs[Q.pos]=c.toDataURL('image/jpeg',0.7);lsSet('bugquest_wip',{k:wipKey(),t:Q.thumbs});}
 function finishTrace(){if(!TRACE||TRACE.done||App.screen!=='quest')return;if(TRACE.auto){clearTimeout(TRACE.auto);TRACE.auto=null;}const ratio=checkTrace();if(TRACE.auto){clearTimeout(TRACE.auto);TRACE.auto=null;}
  if(ratio<0.3){SFX.no();const b=$('#doneBtn');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}setGuide('점선을 조금 더 따라 써볼까? ✏️');return;}
@@ -928,7 +959,7 @@ const SPOT_SCENES=[{n:'숲속',bg:'linear-gradient(#CFF1FF,#E8FAD9 55%,#B9E59A)'
  {n:'바닷속',bg:'linear-gradient(#9EE2FF,#5BB8F0)',e:['🐟','🐠','🐡','🐙','🦀','🐚','🐳','🪸','⭐','🦑','🐬','🐢']},
  {n:'농장',bg:'linear-gradient(#DDF3FF,#FFF6D6 55%,#D8EFA8)',e:['🐮','🐷','🐔','🐑','🐴','🌾','🏠','🚜','🥕','🌻','🐶','🐤']},
  {n:'놀이터',bg:'linear-gradient(#D6F0FF,#FFF0F5 60%,#E7F7C8)',e:['🎈','⚽','🛝','🌳','🧸','🪁','🚲','🌼','🐶','🦋','☀️','🍦']}];
-function makeSpot(){const sc=rint(SPOT_SCENES.length);const S0=SPOT_SCENES[sc];const cells=shuffle(Array.from({length:12},(_,i)=>i));const em=shuffle(S0.e);
+function makeSpot(sc0){const sc=sc0!=null?sc0:rint(SPOT_SCENES.length);const S0=SPOT_SCENES[sc];const cells=shuffle(Array.from({length:12},(_,i)=>i));const em=shuffle(S0.e);
  const pos=c=>({x:12+(c%4)*25+(Math.random()*6-3),y:16+Math.floor(c/4)*32+(Math.random()*6-3)});
  const items=cells.slice(0,7).map((c,i)=>Object.assign({e:em[i]},pos(c)));const free=cells.slice(7);
  const kinds=shuffle(['gone','swap','add']);const idx=shuffle(items.map((_,i)=>i));const diffs=[];
@@ -960,7 +991,7 @@ function puzzleSVG(r){const [a,b,g]=PZ_BG[r.bg%PZ_BG.length];let inner;
  else inner=`<svg x="60" y="70" width="280" height="280" viewBox="0 0 100 100">${BUGS[r.sub%BUGS.length].d}</svg>`;
  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="400" height="400" fill="url(#g)"/><circle cx="340" cy="60" r="34" fill="#FFD54F"/><g fill="#fff"><ellipse cx="80" cy="60" rx="40" ry="18"/><ellipse cx="110" cy="50" rx="30" ry="20"/></g><path d="M0 330 Q100 290 200 320 Q300 350 400 310 L400 400 L0 400Z" fill="${g}"/><g fill="#FF7EA8"><circle cx="40" cy="360" r="8"/><circle cx="360" cy="370" r="8"/></g><g fill="#FFD54F"><circle cx="300" cy="372" r="7"/><circle cx="90" cy="380" r="7"/></g>${inner}</svg>`;}
 function puzzleURL(r){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(puzzleSVG(r));}
-function makePuzzle(n){const N=n*n;let p;do{p=shuffle(Array.from({length:N},(_,i)=>i));}while(p.filter((v,i)=>v===i).length>Math.floor(N/3));const subs=['ppu','hero'].concat(BUGS.map((_,i)=>i));return {n,perm:p,sub:subs[rint(subs.length)],bg:rint(PZ_BG.length)};}
+function makePuzzle(n,sub0){const N=n*n;let p;do{p=shuffle(Array.from({length:N},(_,i)=>i));}while(p.filter((v,i)=>v===i).length>Math.floor(N/3));const subs=['ppu','hero'].concat(BUGS.map((_,i)=>i));return {n,perm:p,sub:sub0!=null?sub0:subs[rint(subs.length)],bg:rint(PZ_BG.length)};}
 function mountPuzzle(){const r=Q.q.rounds[Q.round];Q.perm=Q.perm&&Q.perm.round===Q.round?Q.perm:{round:Q.round,p:r.perm.slice()};Q.sel=-1;Q.locked=false;const url=puzzleURL(r);
  $('#qbody').innerHTML=`<div class="puz"><div class="pz-prev"><img src="${url}" alt=""><div>완성 그림</div></div><div class="pz-box" id="pzb"></div></div>`;
  requestAnimationFrame(()=>{const b=$('#pzb');if(!b)return;const box=b.parentNode.getBoundingClientRect();const size=Math.max(240,Math.floor(Math.min(box.height-10,box.width-230)));b.style.width=b.style.height=size+'px';renderPuzzle();});
@@ -1011,7 +1042,7 @@ async function finishDraw(){if(!PAD)return;if(PAD.strokes<2){setGuide('조금만
 function finishQuest(){const s=S();
  if(Q.practice){SFX.win();showCelebrate({title:'연습 끝! 잘했어요!',lines:['<span>💪 연습도 정말 멋졌어!</span>']});return;}
  const day=s.days[Q.dayKey];const q=day&&day.quests[Q.i];if(!q||q.done){App.go('home');return;}
- q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
+ q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='num'&&q.nums)s.progress.num=Math.max(s.progress.num,q.nums[q.nums.length-1]);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;const cm=giveCoupon();if(cm)lines.push(`<span>📺 TV ${cm}분 쿠폰 1장을 받았어요!</span>`);
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
  if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도 한 칸 앞으로!</span>');}
@@ -1095,6 +1126,9 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
   <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
+  <div class="pcard"><h4>🔢 숫자 따라쓰기 범위</h4><div class="chips">${[10,20,30,50,100].map(m=>`<button class="chip ${(PS.numMax||10)===m?'on':''}" onclick="psSet('numMax',${m},this)">1~${m}</button>`).join('')}</div><div class="hint">매일 숫자 10개를 써요. 범위를 넓히면 새로 배우는 숫자(예: 21~30) 5개 + 앞에서 배운 숫자 5개가 섞여 나와요.</div></div>
+  <div class="pcard"><h4>👪 우리 가족 따라쓰기</h4><div class="hint">입력한 정보로 따라쓰기 문제가 만들어져요. 이 정보는 태블릿 안에만 저장되고 인터넷에 올라가지 않아요. 하나도 입력하지 않으면 이 과목은 나오지 않아요.</div>
+  ${FAMILY_FIELDS.map(([k,l,e,kind])=>`<label class="lb">${e} ${l}<input class="inp" id="f_${k}" ${kind==='tel'?'inputmode="tel" placeholder="010-1234-5678"':'placeholder="예: 김민지"'} maxlength="${kind==='tel'?16:8}" value="${esc((s.family||{})[k]||'')}"></label>`).join('')}</div>
   <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
  if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
   <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards||0}개 · 판을 채울 때마다 보물 지도 1칸</span></div></div>
@@ -1106,7 +1140,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><button class="btn yellow" onclick="bonus('star')">⭐ 별 1개</button><button class="btn pink" onclick="bonus('sticker')">🐞 스티커 1개</button><button class="btn blue" onclick="bonus('coupon')">📺 TV 쿠폰 1장</button></div></div>`;}
  if(tab==='records'){const keys=Object.keys(s.days).sort().reverse().slice(0,14);const lv=level(s.stars);body=weeklyReport()+`<div class="pcard"><h4>📊 한눈에 보기</h4><div class="kv">
   <div>별<b>⭐ ${s.stars}</b></div><div>레벨<b>Lv.${lv}</b></div><div>연속 탐험<b>🔥 ${streak()}일</b></div><div>배지<b>🏅 ${Object.keys(s.badges).length}</b></div>
-  <div>자음 완주<b>${(s.counts.hangul||0)}번</b></div><div>모음 완주<b>${(s.counts.vowel||0)}번</b></div><div>알파벳 완주<b>${(s.counts.abc||0)}번</b></div><div>숫자 진도<b>${Math.min(s.progress.num,NUMS.length)} / ${NUMS.length}</b></div><div>그림<b>🎨 ${s.counts.draw}</b></div></div>
+  <div>자음 완주<b>${(s.counts.hangul||0)}번</b></div><div>모음 완주<b>${(s.counts.vowel||0)}번</b></div><div>알파벳 완주<b>${(s.counts.abc||0)}번</b></div><div>숫자 범위<b>1~${s.settings.numMax||10}</b></div><div>그림<b>🎨 ${s.counts.draw}</b></div></div>
   <div class="hint">과목별 완료 횟수: ${TYPE_ORDER.map(t=>`${TYPES[t].name} ${s.counts[t]||0}`).join(' · ')}</div></div>
   <div class="pcard"><h4>📅 최근 2주</h4>${keys.length?`<table class="rec"><tr><th>날짜</th><th>완료</th><th>퀘스트</th></tr>${keys.map(k=>{const d=s.days[k];const dn=d.quests.filter(q=>q.done).length;return `<tr><td>${prettyDate(k)}</td><td>${d.allDone?'✅':dn+' / '+d.quests.length}</td><td style="font-size:15px;color:var(--ink2)">${d.quests.map(q=>(q.done?'✔ ':'· ')+TYPES[q.type].name).join(', ')}</td></tr>`;}).join('')}</table>`:'<div class="hint">아직 기록이 없어요</div>'}</div>
   <div class="pcard"><h4>📤 기록 코드</h4><div class="hint">버튼을 눌러 복사한 코드를 Claude 채팅에 붙여주면 학습 기록을 정리해 드려요. 기기를 바꿀 때 옮기는 용도로도 써요.</div><div><button class="btn purple sm" onclick="copyRecord()">📋 기록 코드 복사</button></div><textarea class="inp" id="rc" readonly placeholder="여기에 코드가 나와요"></textarea>
@@ -1136,7 +1170,7 @@ function leaveParent(){PS=null;if(App.parentFrom==='login'||!App.loggedIn)App.go
 function psStep(d){PS.questCount=Math.max(1,Math.min(7,PS.questCount+d));$('#qc').textContent=PS.questCount;SFX.tap();}
 function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.subjects[x])){PS.subjects[t]=true;toast('과목은 1개 이상 골라주세요');return;}el.classList.toggle('on',PS.subjects[t]);SFX.tap();}
 function psSet(k,v,el){PS[k]=v;el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');SFX.tap();}
-function saveSettings(){const s=S();PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
+function saveSettings(){const s=S();s.family=s.family||{};FAMILY_FIELDS.forEach(([k])=>{const el=$('#f_'+k);if(el)s.family[k]=el.value.trim();});PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
  const rw=rebuildToday();checkBadges();
  Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
  }
