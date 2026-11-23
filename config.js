@@ -24,8 +24,8 @@ window.ADMIN_CONFIG = {
       eng: true,                   //   영어 문장
       draw: true                   //   그림 그리기
     },
-    tvMinutes: 10,                 // 하루 완료 시 TV 쿠폰 시간(분), 0이면 안 줌
-    stickerGoal: 10,               // 스티커판 칸 수
+    tvMinutes: 10,                 // 학습(퀘스트) 1개 완료마다 TV 쿠폰 1장 — 1장 시청 시간(분), 0이면 안 줌
+    stickerGoal: 10,               // 스티커판 칸 수 = 탐험 도감 친구 수
     giftName: '갖고 싶은 장난감',    // 스티커판 완성 선물
     mapGift: '보물 상자 선물',       // 보물 지도 완성 선물
     mapLen: 40,                    // 보물 지도 칸 수 (배지 1개 = 1칸)
