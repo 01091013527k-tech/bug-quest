@@ -280,6 +280,13 @@ h3.sec{margin:6px 0 0;font-weight:400;font-size:26px}
 .pz-t.sel{outline:6px solid var(--orange);transform:scale(.94)}
 .pz-box.solved .pz-t{border-radius:0}
 @media (max-aspect-ratio:1/1){.sp-wrap{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.puz{flex-direction:column}.pz-prev{width:140px}}
+.week{display:flex;align-items:center;gap:8px;padding:0 10px;flex-wrap:wrap}
+.wk-l{font-size:18px;color:var(--ink2);margin-right:4px}
+.wk{display:flex;flex-direction:column;align-items:center;font-size:14px;color:var(--ink2)}
+.wk-c{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.8);border:3px dashed #D5CCEE;display:flex;align-items:center;justify-content:center;font-size:20px}
+.wk.full .wk-c{border:3px solid #fff;background:#FFF3C4;box-shadow:0 3px 0 #E8B520}.wk.full .wk-c svg{width:38px;height:38px}
+.wk.half .wk-c{border-style:solid;border-color:#fff}
+.wk.today span{color:var(--pink-d);font-weight:700}.wk.today .wk-c{border-color:var(--pink)}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -482,7 +489,7 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,abcl:true,count:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,abcl:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
+function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,abcl:true,count:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40,mapDays:40},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,abcl:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
 function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
@@ -544,18 +551,24 @@ function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null
  if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
 function addSticker(){const s=S();const bug=s.stickers.total%BUGS.length;s.stickers.total++;s.stickers.current.push(bug);if(s.stickers.current.length>=s.settings.stickerGoal)s.giftReady=true;return bug;}
 const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
-const BADGES=[
- {id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},
- {id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)},
- ...[[10,'⭐'],[30,'🌟'],[60,'💫'],[100,'🏅']].map(([n,ic])=>({id:'star'+n,icon:ic,name:`별 ${n}개`,desc:`별 ${n}개 모으기`,t:s=>s.stars>=n})),
- ...[3,7,14,21].map(n=>({id:'streak'+n,icon:n>=14?'🌈':'🔥',name:`${n}일 연속`,desc:`${n}일 연속 탐험`,t:()=>streak()>=n})),
- ...BADGE_TYPES.flatMap(([t,ic,lb])=>[1,5,15].map(n=>({id:`${t}_${n}`,icon:ic,name:n===1?`${lb} 첫 도전`:`${lb} ${n}번`,desc:`${lb} 퀘스트 ${n}번 완료`,t:s=>(s.counts[t]||0)>=n}))),
- {id:'board1',icon:'🏆',name:'스티커판 완성',desc:'스티커판 처음 채우기',t:s=>s.stickers.boards>=1||s.giftReady},
- {id:'dex',icon:'📖',name:'곤충 도감 완성',desc:'곤충 친구 12마리 모두 만나기',t:s=>s.stickers.total>=BUGS.length}
-];
-function mapEntries(){const s=S();const e=BADGES.filter(b=>s.badges[b.id]).map(b=>({d:s.badges[b.id],icon:b.icon,name:b.name,o:BADGES.indexOf(b)}));(s.mapBonus||[]).forEach((x,i)=>e.push({d:x.d,icon:'💌',name:'부모님 칭찬',o:1000+i}));e.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.o-b.o);return e.slice(s.mapOffset||0);}
+const BT=Object.fromEntries(BADGE_TYPES.map(([t,ic,lb])=>[t,{ic,lb}]));
+function activeSubjects(){const s=S();const en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);return en.length?en:['hangul'];}
+let _BC=null,_BK='';
+function getBadges(){const s=S();const st=s.settings;const en=activeSubjects();const qc=Math.max(1,Math.min(7,st.questCount|0||5));const D=st.mapDays||40;const key=en.join(',')+'|'+qc+'|'+D;if(_BK===key&&_BC)return _BC;
+ const L=[{id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},{id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)}];
+ [2,6,12,20].forEach((d,i)=>{const n=qc*d;L.push({id:'star_t'+(i+1),icon:['⭐','🌟','💫','🏅'][i],name:`별 ${n}개`,desc:`별 ${n}개 모으기`,t:s=>s.stars>=n});});
+ [3,7,14,21].forEach(n=>L.push({id:'streak'+n,icon:n>=14?'🌈':'🔥',name:`${n}일 연속`,desc:`${n}일 연속 탐험`,t:()=>streak()>=n}));
+ L.push({id:'board1',icon:'🏆',name:'스티커판 완성',desc:'스티커판 처음 채우기',t:s=>s.stickers.boards>=1||s.giftReady});
+ L.push({id:'dex',icon:'📖',name:'곤충 도감 완성',desc:'곤충 친구 12마리 모두 만나기',t:s=>s.stickers.total>=BUGS.length});
+ const N=st.mapLen||40;const slots=Math.max(en.length,N-L.length);const per=Math.floor(slots/en.length);const extra=slots-per*en.length;
+ en.forEach((t,j)=>{const m=BT[t]||{ic:'⭐',lb:t};const tiers=Math.max(1,per+(j<extra?1:0));const total=Math.max(tiers,Math.round(D*qc/en.length));let prev=0;
+  for(let i=1;i<=tiers;i++){let thr=i===1?1:Math.round(total*Math.pow((i-1)/(tiers-1),1.15));thr=Math.max(thr,prev+1);prev=thr;const th=thr;
+   L.push({id:`${t}_t${i}`,icon:m.ic,name:i===1?`${m.lb} 첫 도전`:`${m.lb} ${th}번`,desc:`${m.lb} 퀘스트 ${th}번 완료`,t:s=>(s.counts[t]||0)>=th});}});
+ _BK=key;_BC=L;return L;}
+function badgeInfo(id){return getBadges().find(b=>b.id===id)||(S().badgeMeta||{})[id]||null;}
+function mapEntries(){const s=S();const e=[];Object.keys(s.badges).forEach(id=>{const b=badgeInfo(id);if(b)e.push({d:s.badges[id],icon:b.icon,name:b.name,o:getBadges().findIndex(x=>x.id===id)});});(s.mapBonus||[]).forEach((x,i)=>e.push({d:x.d,icon:'💌',name:'부모님 칭찬',o:1000+i}));e.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.o-b.o);return e.slice(s.mapOffset||0);}
 function mapProg(){return Math.min(mapEntries().length,S().settings.mapLen||40);}
-function checkBadges(){const s=S();const nb=[];BADGES.forEach(b=>{if(!s.badges[b.id]&&b.t(s)){s.badges[b.id]=todayKey();nb.push(b);}});return nb;}
+function checkBadges(){const s=S();const nb=[];s.badgeMeta=s.badgeMeta||{};getBadges().forEach(b=>{if(!s.badges[b.id]&&b.t(s)){s.badges[b.id]=todayKey();s.badgeMeta[b.id]={icon:b.icon,name:b.name};nb.push(b);}});return nb;}
 
 /* ================= 관리자 설정 (config.js) ================= */
 function loadConfig(){return new Promise(r=>{let done=false;const fin=()=>{if(!done){done=true;r();}};const sc=document.createElement('script');sc.src='config.js?t='+Date.now();sc.onload=fin;sc.onerror=fin;document.head.appendChild(sc);setTimeout(fin,5000);});}
@@ -649,6 +662,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  </header>
  <section class="hero-area"><div class="char ppu float">${PPU_SVG}</div><div class="bubble left">${msg2}</div><div class="char heroc bob">${HERO_SVG}</div></section>
  <div class="trail-lbl">🗺️ 오늘의 탐험 <b>${done} / ${qs.length}</b></div><div class="trail"><div class="fill" style="width:${pct}%"></div><div class="walker" style="left:${Math.max(4,Math.min(96,pct))}%">${bugSVG(0)}</div><div class="goal">🎁</div></div>
+ ${weekStrip()}
  <section class="quests">${qs.map((q,i)=>{const T=TYPES[q.type];return `<button class="qcard ${q.done?'done':''}" style="--c:${T.c};--cs:${T.cs}" onclick="startQuest(${i})"><div class="qnum">${i+1}</div><div class="qicon">${T.icon}</div><div class="qname">${T.name}</div><div class="qsub">${esc(questSub(q))}</div>${q.done?'<div class="stamp">참<br>잘했어요</div>':''}</button>`;}).join('')}</section>
  <nav class="bottom-nav">
   <button onclick="App.go('stickers')"><span class="ni">🐞</span>스티커판<b>${Math.min(cur,goal)} / ${goal}${s.giftReady?' 🎁':''}</b></button>
@@ -656,6 +670,9 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
   <button onclick="App.go('badges')"><span class="ni">🗺️</span>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}칸</b></button>
   <button onclick="App.go('gallery')"><span class="ni">🎨</span>그림 갤러리<b>${Store.drawings.length}장</b></button>
  </nav></div>`;}
+
+function weekDays(){const d=new Date();const dow=(d.getDay()+6)%7;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);return Array.from({length:7},(_,i)=>{const x=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);return todayKey(x);});}
+function weekStrip(){const s=S();const t=todayKey();return `<div class="week"><span class="wk-l">이번 주 출석</span>${weekDays().map((k,i)=>{const d=s.days[k];const st=d&&d.allDone?'full':d&&d.quests.some(q=>q.done)?'half':'';return `<div class="wk ${st} ${k===t?'today':''}"><div class="wk-c">${st==='full'?bugSVG(dayNum(k)%BUGS.length):st==='half'?'🐾':''}</div><span>${'월화수목금토일'[i]}</span></div>`;}).join('')}</div>`;}
 
 /* ---------- 퀘스트 ---------- */
 let Q=null;
@@ -867,9 +884,10 @@ function mountListen(){const r=Q.q.rounds[Q.round];const lab=i=>r.mode==='ko'?HA
  <div class="choices">${r.ch.map(i=>`<button class="choice" onclick="pickListen(this,${i})">${esc(lab(i))}</button>`).join('')}</div></div>`;
  Q.locked=false;setTimeout(()=>{if(App.screen==='quest')playListen();},350);}
 function playListen(){const r=Q.q.rounds[Q.round];if(!r)return;if(r.mode==='ko')speak(HANGUL[r.a][1]);else speak(ABC[r.a][0]+'.','en');}
-function pickListen(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];
+function pickListen(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];stat(i===r.a);
  if(i===r.a){Q.locked=true;el.classList.add('right');SFX.ok();const it=listenItem(r);setGuide(r.mode==='ko'?`딩동댕! <b>${it[0]}</b> (${it[1]}) 맞았어! 👏`:`Great! <b>${it[0]}</b> 맞았어! 👏`);nextRound(mountListen);}
  else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide('앗, 다시 한 번 들어볼까? 🔊');setTimeout(playListen,500);}}
+function stat(ok){if(Q.practice)return;const s=S();s.stats=s.stats||{};const t=Q.q.type;const o=s.stats[t]=s.stats[t]||{r:0,w:0};ok?o.r++:o.w++;}
 function nextRound(mount){Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mount();}},1300);}
 
 /* 동물 친구 퀴즈 (세기·이름·찾기·특징) */
@@ -889,13 +907,13 @@ function mountCount(){const r=Q.q.rounds[Q.round];const k=qKind(r);Q.locked=fals
  setTimeout(()=>{if(App.screen==='quest')playQuiz();},350);}
 function playQuiz(){const r=Q.q.rounds[Q.round];if(!r)return;const k=qKind(r);const n=cName(r.c);
  if(k==='find')speak(`${eulReul(n)} 찾아봐!`);else if(k==='feat')speak(`${CREATURES[r.c].f} 나는 누구일까?`);else if(k==='name')speak('이 친구 이름은 뭘까?');}
-function pickQuiz(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];const n=cName(i);
+function pickQuiz(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];const n=cName(i);stat(i===r.c);
  if(i===r.c){Q.locked=true;el.classList.add('right');SFX.ok();const p=PRAISE[rint(PRAISE.length)];setGuide(`${p} <b>${esc(n)}</b>${hasBatchim(n)?'이야':'야'}! 👏`);speak(`${p} ${n}${hasBatchim(n)?'이야':'야'}!`);nextRound(mountCount);}
  else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();if(qKind(r)==='name'){setGuide(`음, <b>${esc(n)}</b>${hasBatchim(n)?'이':'가'} 아니야. 다시 골라볼까?`);speak(`${n}${hasBatchim(n)?'이':'가'} 아니야. 다시 골라볼까?`);}else{setGuide(`이건 <b>${esc(n)}</b>${hasBatchim(n)?'이야':'야'}! 다시 찾아볼까?`);speak(`이건 ${n}${hasBatchim(n)?'이야':'야'}! 다시 찾아볼까?`);}}}
 function tapBug(el){const r=Q.q.rounds[Q.round];if(el.querySelector('.n'))return;const c=qC(r);
  if(el.dataset.t!=='1'){SFX.no();el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');const o=cName(+el.dataset.b),t=cName(c);setGuide(`이건 <b>${o}</b>${hasBatchim(o)?'이야':'야'}! <span class="gicon">${cArt(c)}</span> <b>${t}</b>만 세어보자!`);speak(`이건 ${o}${hasBatchim(o)?'이야':'야'}! ${t}만 세어보자!`);return;}
  Q.tapped++;const n=Q.tapped;el.insertAdjacentHTML('beforeend',`<span class="n">${n}</span>`);SFX.tap();speak(NUMS[Math.min(n,10)-1][1]);}
-function pickCount(el,n){if(Q.locked)return;const r=Q.q.rounds[Q.round];const c=qC(r);
+function pickCount(el,n){if(Q.locked)return;const r=Q.q.rounds[Q.round];const c=qC(r);stat(n===r.n);
  if(n===r.n){Q.locked=true;el.classList.add('right');SFX.ok();const sp=cName(c);setGuide(`맞았어! ${sp} <b>${COUNTER[n]} 마리</b>야! 👏`);speak(`맞았어! ${sp} ${COUNTER[n]} 마리!`);nextRound(mountCount);}
  else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide(`<span class="gicon">${cArt(c)}</span> <b>${cName(c)}</b>만 하나씩 눌러서 다시 세어볼까?`);}}
 
@@ -920,7 +938,7 @@ function mountSpot(){const r=Q.q.rounds[Q.round];Q.found=[];Q.locked=false;
  setTimeout(()=>{if(App.screen==='quest')speak('두 그림에서 다른 곳 세 군데를 찾아봐!');},350);}
 function tapSpot(e,panel){if(Q.locked)return;const r=Q.q.rounds[Q.round];const b=panel.getBoundingClientRect();const x=(e.clientX-b.left)/b.width*100,y=(e.clientY-b.top)/b.height*100;
  let best=-1,bd=1e9;r.diffs.forEach((d,i)=>{if(Q.found.includes(i))return;const dd=Math.hypot((d.x-x),(d.y-y)*b.height/b.width);if(dd<bd){bd=dd;best=i;}});
- if(best>=0&&bd<13){Q.found.push(best);const d=r.diffs[best];document.querySelectorAll('.sp-marks').forEach(m=>m.insertAdjacentHTML('beforeend',`<span class="sp-ok" style="left:${d.x}%;top:${d.y}%"></span>`));
+ stat(best>=0&&bd<13);if(best>=0&&bd<13){Q.found.push(best);const d=r.diffs[best];document.querySelectorAll('.sp-marks').forEach(m=>m.insertAdjacentHTML('beforeend',`<span class="sp-ok" style="left:${d.x}%;top:${d.y}%"></span>`));
   [...$('#spc').children].forEach((el,i)=>el.classList.toggle('on',i<Q.found.length));SFX.ok();
   if(Q.found.length>=r.diffs.length){Q.locked=true;setGuide('우와! 다른 곳을 모두 찾았어! 👏');speak('우와! 다 찾았어!');nextRound(mountSpot);}
   else{setGuide(`찾았다! 👀 ${r.diffs.length-Q.found.length}군데 더 있어!`);speak(`찾았다! ${COUNTER[r.diffs.length-Q.found.length]} 군데 더 있어!`);}}
@@ -955,7 +973,7 @@ function mountEng(){const r=Q.q.rounds[Q.round];const s=SENT[r.a];
  <div class="choices">${r.ch.map(i=>`<button class="choice pic" onclick="pickEng(this,${i})">${SENT[i].a}<span class="h">❤️</span>${SENT[i].b}</button>`).join('')}</div></div>`;
  Q.locked=false;setTimeout(()=>{if(App.screen==='quest')playEng();},350);}
 function playEng(){const r=Q.q.rounds[Q.round];if(r)speak(SENT[r.a].t,'en');}
-function pickEng(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];
+function pickEng(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];stat(i===r.a);
  if(i===r.a){Q.locked=true;el.classList.add('right');SFX.ok();setGuide('맞았어! 같이 따라 말해볼까? 🗣️');setTimeout(()=>speak(SENT[r.a].t,'en'),300);Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mountEng();}},3000);}
  else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide('다시 잘 들어볼까? 🔊');setTimeout(playEng,500);}}
 
@@ -1027,7 +1045,7 @@ function renderBadges(){const s=S();const N=s.settings.mapLen||40;const ent=mapE
  <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">배지를 하나 받을 때마다 한 칸! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">받은 배지가 순서대로 지도에 붙어요</div>`}</div></div>
  <div class="map" style="height:${rows*130+30}px"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${path}" class="road"/>${dp?`<path d="${dp}" class="road done"/>`:''}</svg>${nodes}</div>
  <h3 class="sec">🏅 배지 모음</h3>
- <div class="badges">${BADGES.map(b=>{const g=s.badges[b.id];return `<div class="badge ${g?'':'lock'}"><div class="bi">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${g?prettyDate(g):b.desc}</div></div>`;}).join('')}</div></div>`;}
+ <div class="badges">${getBadges().map(b=>{const g=s.badges[b.id];return `<div class="badge ${g?'':'lock'}"><div class="bi">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${g?prettyDate(g):b.desc}</div></div>`;}).join('')}</div></div>`;}
 
 /* ---------- 갤러리 ---------- */
 function renderGallery(){const ds=Store.drawings;return `<div class="screen">${subbar('🎨 그림 갤러리')}
@@ -1067,7 +1085,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">하루 완료 시 TV 쿠폰</span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
   <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
   <label class="lb">스티커판 완성 선물<input class="inp" id="p_gift" maxlength="30" value="${esc(PS.giftName)}"></label>
-  <div class="prow"><span class="pl">보물 지도 칸 수</span><div class="chips">${[30,40,45].map(m=>`<button class="chip ${(PS.mapLen||40)===m?'on':''}" onclick="psSet('mapLen',${m},this)">${m}칸</button>`).join('')}</div><span class="hint">배지 1개 = 1칸 (매일 하면 40칸 ≈ 한 달~한 달 반)</span></div>
+  <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
   <label class="lb">보물 지도 완성 선물<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
   <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
@@ -1080,7 +1098,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="pcard"><h4>📺 사용 안 한 TV 쿠폰 (${unused.length}장)</h4>${unused.length?unused.map(c=>`<div class="prow"><span class="pl">TV ${c.min}분</span><span class="hint">${prettyDate(c.date)}</span><button class="btn blue sm" onclick="markCoupon('${c.id}')">사용 처리</button></div>`).join(''):'<div class="hint">없어요</div>'}</div>
   <div class="pcard"><h4>🌟 특별 보상 주기</h4><div class="hint">약속을 잘 지켰거나 칭찬할 일이 있을 때 직접 줄 수 있어요.</div>
   <div class="prow"><button class="btn yellow" onclick="bonus('star')">⭐ 별 1개</button><button class="btn pink" onclick="bonus('sticker')">🐞 스티커 1개</button><button class="btn blue" onclick="bonus('coupon')">📺 TV 쿠폰 1장</button></div></div>`;}
- if(tab==='records'){const keys=Object.keys(s.days).sort().reverse().slice(0,14);const lv=level(s.stars);body=`<div class="pcard"><h4>📊 한눈에 보기</h4><div class="kv">
+ if(tab==='records'){const keys=Object.keys(s.days).sort().reverse().slice(0,14);const lv=level(s.stars);body=weeklyReport()+`<div class="pcard"><h4>📊 한눈에 보기</h4><div class="kv">
   <div>별<b>⭐ ${s.stars}</b></div><div>레벨<b>Lv.${lv}</b></div><div>연속 탐험<b>🔥 ${streak()}일</b></div><div>배지<b>🏅 ${Object.keys(s.badges).length}</b></div>
   <div>자음 완주<b>${(s.counts.hangul||0)}번</b></div><div>모음 완주<b>${(s.counts.vowel||0)}번</b></div><div>알파벳 완주<b>${(s.counts.abc||0)}번</b></div><div>숫자 진도<b>${Math.min(s.progress.num,NUMS.length)} / ${NUMS.length}</b></div><div>그림<b>🎨 ${s.counts.draw}</b></div></div>
   <div class="hint">과목별 완료 횟수: ${TYPE_ORDER.map(t=>`${TYPES[t].name} ${s.counts[t]||0}`).join(' · ')}</div></div>
@@ -1098,6 +1116,16 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="hint">아이디·비밀번호는 아이용 간단 잠금이에요. 중요한 비밀번호는 쓰지 마세요.</div></div>`;}
  return `<div class="screen"><header class="subbar"><button class="icon-btn" onclick="leaveParent()">⬅️<small>나가기</small></button><h2>🔒 부모님 메뉴</h2></header>
  <div class="ptabs">${tabs.filter(t=>App.parentFrom!=='login'||t[0]==='account').map(t=>`<button class="ptab ${tab===t[0]?'on':''}" onclick="App.ptab='${t[0]}';App.go('parent')">${t[1]}</button>`).join('')}</div>${body}</div>`;}
+function weeklyReport(){const s=S();const wk=weekDays();const per={};let qd=0,full=0,att=0;
+ wk.forEach(k=>{const d=s.days[k];if(!d)return;if(d.quests.some(q=>q.done))att++;if(d.allDone)full++;d.quests.forEach(q=>{if(q.done){qd++;per[q.type]=(per[q.type]||0)+1;}});});
+ const acc=Object.entries(s.stats||{}).filter(([t,o])=>TYPES[t]&&o.r+o.w>=5).map(([t,o])=>({t,p:Math.round(o.r/(o.r+o.w)*100),n:o.r+o.w})).sort((a,b)=>b.p-a.p);
+ const best=acc[0],weak=acc.length>1?acc[acc.length-1]:null;
+ const comment=att===0?'이번 주는 아직 탐험 기록이 없어요. 오늘 함께 시작해 보세요!':full>=5?'이번 주 정말 꾸준했어요! 많이 칭찬해 주세요 👏':full>=3?'잘하고 있어요. 이틀만 더 하면 연속 배지에 가까워져요.':'조금씩 시작했어요. 정해진 시간에 같이 앉아 주면 습관이 잡혀요.';
+ return `<div class="pcard"><h4>📈 이번 주 학습 리포트</h4><div class="kv"><div>출석<b>${att} / 7일</b></div><div>하루 완료<b>${full}일</b></div><div>끝낸 퀘스트<b>${qd}개</b></div><div>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}칸</b></div></div>
+  <div class="hint">과목별: ${Object.keys(per).length?Object.entries(per).map(([t,n])=>`${TYPES[t]?TYPES[t].name:t} ${n}`).join(' · '):'아직 없어요'}</div>
+  ${acc.length?`<div class="hint">정답률: ${acc.map(a=>`${TYPES[a.t].name} ${a.p}%`).join(' · ')}</div>`:''}
+  ${best?`<div class="prow"><span style="font-size:19px">💪 잘하는 과목: <b>${TYPES[best.t].name}</b>${weak&&weak.p<best.p?` &nbsp; 🌱 더 연습하면 좋은 과목: <b>${TYPES[weak.t].name}</b>`:''}</span></div>`:''}
+  <div style="font-size:19px;color:var(--pink-d)">💬 ${comment}</div></div>`;}
 function leaveParent(){PS=null;if(App.parentFrom==='login'||!App.loggedIn)App.go('login');else App.go('home');}
 function psStep(d){PS.questCount=Math.max(1,Math.min(7,PS.questCount+d));$('#qc').textContent=PS.questCount;SFX.tap();}
 function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.subjects[x])){PS.subjects[t]=true;toast('과목은 1개 이상 골라주세요');return;}el.classList.toggle('on',PS.subjects[t]);SFX.tap();}
