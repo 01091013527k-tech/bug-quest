@@ -6,6 +6,9 @@
 window.ADMIN_CONFIG = {
   rev: 1,
 
+  // 테스트 모드: true면 화면 위에 '처음으로' 버튼이 보여요. 실사용 때 false로 바꿔요.
+  testMode: true,
+
   settings: {
     questCount: 3,                 // 하루 퀘스트 개수 (1~7)
     subjects: {                    // 학습 과목 켜기/끄기

@@ -105,7 +105,7 @@ label.lb{display:flex;flex-direction:column;gap:6px;font-size:19px;color:var(--i
 .trail .walker{position:absolute;top:-14px;width:52px;margin-left:-26px;transition:left .6s}
 .trail .goal{position:absolute;right:-6px;top:-12px;font-size:34px}
 .trail-lbl{font-size:21px;padding:0 10px;margin-bottom:-4px}.trail-lbl b{font-weight:400;color:var(--green-d)}
-.quests{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:16px;padding:6px}
+.quests{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,250px));justify-content:center;gap:16px;padding:6px}
 .qcard{position:relative;border:0;background:#fff;border-radius:30px;padding:16px 10px 14px;min-height:196px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 8px 0 var(--cs),0 12px 24px rgba(59,47,92,.12);border:4px solid var(--c);cursor:pointer;transition:transform .1s}
 .qcard:active{transform:translateY(5px);box-shadow:0 3px 0 var(--cs)}
 .qcard .qnum{position:absolute;left:12px;top:10px;width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
@@ -268,6 +268,7 @@ table.rec th{color:var(--ink2)}
 .keypad button{height:72px;border:0;border-radius:22px;background:#F3EEFF;font-size:32px;box-shadow:0 5px 0 #D9CFF5;cursor:pointer}
 .keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #D9CFF5}
 .bigimg{width:100%;border-radius:20px;display:block}
+#testbadge{position:fixed;left:50%;transform:translateX(-50%);top:4px;z-index:40;border:0;border-radius:14px;background:#FFE066;color:var(--ink);font-size:14px;padding:4px 12px;box-shadow:0 3px 0 #E8B520;opacity:.9;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(200px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:20px;font-size:20px;z-index:60;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{transform:translateX(-50%) translateY(0)}
 @media (max-width:700px){
@@ -442,6 +443,10 @@ function makeQuest(t,off){const s=S();
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
 function questSub(q){if(q.type==='hangul'||q.type==='abc'||q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return '3문제';if(q.type==='eng')return '2문제';return '';}
+function grantDayReward(day){const s=S();day.allDone=true;const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
+function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
+ if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
+ if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
 function addSticker(){const s=S();const bug=s.stickers.total%BUGS.length;s.stickers.total++;s.stickers.current.push(bug);if(s.stickers.current.length>=s.settings.stickerGoal)s.giftReady=true;return bug;}
 const BADGES=[
  {id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},
@@ -468,7 +473,7 @@ function loadConfig(){return new Promise(r=>{let done=false;const fin=()=>{if(!d
 let PENDING_GRANTS=[];
 function applyAdmin(){const A=window.ADMIN_CONFIG;if(!A)return;const s=S();let ch=false;
  if(A.rev&&(s.adminRev||0)<A.rev){if(A.settings){const ns=Object.assign({},s.settings,A.settings);ns.subjects=Object.assign({},s.settings.subjects,A.settings.subjects||{});if(!TYPE_ORDER.some(t=>ns.subjects[t]))ns.subjects.hangul=true;ns.questCount=Math.max(1,Math.min(7,ns.questCount|0||3));s.settings=ns;s.giftReady=s.stickers.current.length>=ns.stickerGoal;
-   const d=s.days[todayKey()];if(d&&!d.quests.some(q=>q.done))d.quests=genQuests();}
+   rebuildToday();}
   s.adminRev=A.rev;ch=true;}
  if(!Array.isArray(s.grantsApplied))s.grantsApplied=[];
  (A.grants||[]).forEach(g=>{if(!g||!g.id||s.grantsApplied.includes(g.id))return;const lines=[];
@@ -480,6 +485,9 @@ function applyAdmin(){const A=window.ADMIN_CONFIG;if(!A)return;const s=S();let c
  if(ch){checkBadges();Store.save();}}
 function showGrants(){if(!PENDING_GRANTS.length)return;const g=PENDING_GRANTS.shift();SFX.win();
  showCelebrate({title:'부모님의 특별 선물!',lines:[g.note?`<span>💌 ${esc(g.note)}</span>`:''].concat(g.lines.map(l=>`<span>${l}</span>`)).filter(Boolean)});}
+const TEST_MODE=()=>!!(window.ADMIN_CONFIG&&window.ADMIN_CONFIG.testMode);
+function fullReset(){confirmBox('🧪 모든 기록과 계정을 지우고<br>처음 설정 화면으로 돌아갈까요?',()=>{lsDel('bugquest_state');lsDel('bugquest_drawings');lsDel('bugquest_auto');Store.state=defaultState();Store.drawings=[];PENDING_GRANTS=[];PS=null;App.loggedIn=false;lsSet('bugquest_state',Store.state);toast('처음 상태로 돌아갔어요');App.go('setup');},'처음으로',true);}
+function testBadge(){let b=document.getElementById('testbadge');if(TEST_MODE()){if(!b){b=document.createElement('button');b.id='testbadge';b.textContent='🧪 테스트 모드 · 처음으로';b.onclick=fullReset;document.body.appendChild(b);}}else if(b)b.remove();}
 function exportCode(){return 'BQ1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S()))));}
 function copyRecord(){const code=exportCode();const ta=$('#rc');ta.value=code;ta.focus();ta.select();
  try{navigator.clipboard.writeText(code).then(()=>toast('기록 코드를 복사했어요! Claude에게 붙여주세요'),()=>toast('코드를 길게 눌러 복사해 주세요'));}catch(e){toast('코드를 길게 눌러 복사해 주세요');}}
@@ -517,7 +525,7 @@ function renderSetup(){return `<div class="screen center"><div class="panel setu
 </div></div>`;}
 function doSetup(){const name=$('#s_name').value.trim(),id=$('#s_id').value.trim(),pw=$('#s_pw').value,pin=$('#s_pin').value.trim();const e=$('#s_err');
  if(!name)return e.textContent='아이 이름을 입력해 주세요';if(!id)return e.textContent='아이디를 입력해 주세요';if(pw.length<4)return e.textContent='비밀번호는 4자 이상으로 해주세요';if(!/^\d{4}$/.test(pin))return e.textContent='부모님 비밀번호는 숫자 4자리예요';
- S().setup={childName:name,childId:id.toLowerCase(),pwHash:hash(pw),pinHash:hash('pin:'+pin)};applyAdmin();PENDING_GRANTS=[];Store.save();SFX.ok();toast('설정 완료! 이제 로그인해 보세요');App.go('login');}
+ S().setup={childName:name,childId:id.toLowerCase(),pwHash:hash(pw),pinHash:hash('pin:'+pin)};S().grantsApplied=((window.ADMIN_CONFIG&&window.ADMIN_CONFIG.grants)||[]).map(g=>g&&g.id).filter(Boolean);applyAdmin();PENDING_GRANTS=[];Store.save();SFX.ok();toast('설정 완료! 이제 로그인해 보세요');App.go('login');}
 
 /* ---------- 로그인 ---------- */
 function renderLogin(){return `<div class="screen center login">
@@ -685,7 +693,7 @@ function finishQuest(){const s=S();
  q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.idx!=null&&s.progress[q.type]!=null)s.progress[q.type]=Math.max(s.progress[q.type],q.idx+1);
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
- if(!day.allDone&&day.quests.every(x=>x.done)){day.allDone=true;bug=addSticker();if(s.settings.tvMinutes>0){s.coupons.unshift({id:'c'+Date.now(),min:s.settings.tvMinutes,date:todayKey(),used:false});lines.push(`<span>📺 TV ${s.settings.tvMinutes}분 쿠폰을 받았어요!</span>`);}if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
+ if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(rw.min)lines.push(`<span>📺 TV ${rw.min}분 쿠폰을 받았어요!</span>`);if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
  const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));
  Store.save();SFX.win();
  showCelebrate({title:bug!=null?'오늘 탐험 성공!':'참 잘했어요!',lines,bug});
@@ -750,7 +758,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
   <label class="lb">스티커판 완성 선물<input class="inp" id="p_gift" maxlength="30" value="${esc(PS.giftName)}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
-  <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 Claude에게 말해서 바꾼 설정이 올라오면, 여기서 바꾼 값보다 그 설정이 우선 적용돼요.</div>`;}
+  <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
  if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🎁 스티커판 선물</h4>
   <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards}개</span></div>
   ${s.giftReady?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">스티커판 완성! “${esc(s.settings.giftName)}” 선물을 주세요.</span><button class="btn pink" onclick="giftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 스티커판이 시작돼요 (넘친 스티커는 다음 판으로 옮겨져요)</div>`:'<div class="hint">스티커판이 다 차면 여기서 선물 지급을 확인할 수 있어요.</div>'}</div>
@@ -781,8 +789,9 @@ function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.su
 function psSet(k,v,el){PS[k]=v;el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');SFX.tap();}
 function saveSettings(){const s=S();PS.giftName=($('#p_gift').value.trim()||'선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
  if(s.stickers.current.length>=s.settings.stickerGoal)s.giftReady=true;else s.giftReady=false;
- const k=todayKey();const d=s.days[k];let regen=false;if(d&&!d.quests.some(q=>q.done)){d.quests=genQuests();regen=true;}
- Store.save();SFX.ok();toast(regen?'저장했어요! 오늘 퀘스트도 새 설정으로 바꿨어요':'저장했어요! 새 설정은 내일 퀘스트부터 적용돼요');}
+ const rw=rebuildToday();checkBadges();
+ Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
+ }
 function giftGiven(){confirmBox('선물을 주셨나요?<br>새 스티커판을 시작할게요',()=>{const s=S();const g=s.settings.stickerGoal;s.stickers.current=s.stickers.current.slice(g);s.stickers.boards++;s.giftReady=s.stickers.current.length>=g;checkBadges();Store.save();SFX.win();toast('새 스티커판 시작! 🐞');App.go('parent');},'네, 줬어요');}
 function markCoupon(id){const c=S().coupons.find(x=>x.id===id);if(c){c.used=true;c.usedAt=todayKey();Store.save();toast('사용 처리했어요');}App.go('parent');}
 function bonus(kind){const s=S();if(kind==='star'){s.stars++;toast('별 1개를 줬어요 ⭐');}else if(kind==='sticker'){const b=addSticker();toast(`스티커 1개를 줬어요 (${BUGS[b].n})`);}else{s.coupons.unshift({id:'c'+Date.now(),min:s.settings.tvMinutes||10,date:todayKey(),used:false});toast('TV 쿠폰 1장을 줬어요 📺');}checkBadges();Store.save();SFX.ok();App.go('parent');}
@@ -796,7 +805,7 @@ function saveAccount(){const s=S();const id=$('#a_id').value.trim().toLowerCase(
  $('#app').innerHTML=`<div class="screen center loading"><div class="crawl">${bugSVG(0)}</div><p>탐험 준비 중...</p></div>`;
  try{window.speechSynthesis&&window.speechSynthesis.getVoices();}catch(e){}
  await Store.init();
- await loadConfig();
+ await loadConfig();testBadge();
  const s=S();
  if(!s.setup){App.go('setup');return;}
  applyAdmin();
