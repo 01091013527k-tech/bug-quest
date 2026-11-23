@@ -253,6 +253,33 @@ h3.sec{margin:6px 0 0;font-weight:400;font-size:26px}
 .node.goal .nl{font-size:16px;color:var(--pink-d)}
 .me-pin{position:absolute;top:-56px;width:50px;z-index:2;animation:bob 1.6s ease-in-out infinite}
 .me-pin svg{width:100%;height:auto;display:block}
+.emo{font-size:70px;line-height:1;display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.cbug .emo{font-size:64px}.gicon .emo{font-size:34px}
+.quiz{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;min-height:0}
+.bigart{width:220px;height:220px;background:#fff;border-radius:40px;box-shadow:0 8px 0 rgba(59,47,92,.12);display:flex;align-items:center;justify-content:center;padding:16px}
+.bigart svg{width:100%;height:100%}.bigart .emo{font-size:150px}
+.choice.name{font-size:40px;min-width:200px;height:110px}
+.choice.art{width:170px;min-width:170px;height:170px;padding:14px;display:flex;align-items:center;justify-content:center}
+.choice.art svg{width:100%;height:100%}.choice.art .emo{font-size:100px}
+.spot{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+.sp-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:0}
+.sp-panel{position:relative;border-radius:26px;box-shadow:0 6px 0 rgba(59,47,92,.12);border:5px solid #fff;overflow:hidden;touch-action:manipulation;cursor:pointer}
+.sp-i{position:absolute;transform:translate(-50%,-50%);font-size:clamp(34px,5.4vw,60px);line-height:1;pointer-events:none}
+.sp-marks{position:absolute;inset:0;pointer-events:none}
+.sp-ok{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border:6px solid #FF4D6D;border-radius:50%;animation:pop .35s}
+.sp-no{position:absolute;transform:translate(-50%,-50%);color:#9A90B5;font-size:28px}
+.sp-hint{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,rgba(255,235,59,.75),rgba(255,235,59,0) 70%);animation:bounceIn .6s ease 3}
+.sp-bar{display:flex;align-items:center;justify-content:center;gap:16px}
+.sp-count{display:flex;gap:10px}.sp-count i{width:34px;height:34px;border-radius:50%;border:4px solid var(--c);background:#fff}.sp-count i.on{background:var(--c)}
+.puz{flex:1;display:flex;align-items:center;justify-content:center;gap:20px;min-height:0}
+.pz-prev{width:190px;background:#fff;border-radius:24px;padding:10px;text-align:center;font-size:18px;color:var(--ink2);box-shadow:0 6px 0 rgba(59,47,92,.1)}
+.pz-prev img{width:100%;border-radius:16px;display:block}
+.pz-box{display:grid;gap:4px;background:#fff;padding:6px;border-radius:24px;box-shadow:0 8px 0 rgba(59,47,92,.12)}
+.pz-box.solved{gap:0;box-shadow:0 0 0 8px #FFD54F,0 8px 0 rgba(59,47,92,.12)}
+.pz-t{border:0;border-radius:10px;cursor:pointer;background-repeat:no-repeat;padding:0;transition:transform .12s}
+.pz-t.sel{outline:6px solid var(--orange);transform:scale(.94)}
+.pz-box.solved .pz-t{border-radius:0}
+@media (max-aspect-ratio:1/1){.sp-wrap{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.puz{flex-direction:column}.pz-prev{width:140px}}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -386,6 +413,21 @@ const bugSVG=i=>`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">$
 const HANGUL=[['ㄱ','기역','기린','🦒'],['ㄴ','니은','나비','🦋'],['ㄷ','디귿','다람쥐','🐿️'],['ㄹ','리을','라면','🍜'],['ㅁ','미음','무당벌레','🐞'],['ㅂ','비읍','바나나','🍌'],['ㅅ','시옷','사과','🍎'],['ㅇ','이응','오리','🦆'],['ㅈ','지읒','자동차','🚗'],['ㅊ','치읓','치즈','🧀'],['ㅋ','키읔','코끼리','🐘'],['ㅌ','티읕','토끼','🐰'],['ㅍ','피읖','포도','🍇'],['ㅎ','히읗','하마','🦛'],
 ['ㅏ','아','아이스크림','🍦'],['ㅑ','야','야구','⚾'],['ㅓ','어','어묵','🍢'],['ㅕ','여','여우','🦊'],['ㅗ','오','오이','🥒'],['ㅛ','요','요요','🪀'],['ㅜ','우','우유','🥛'],['ㅠ','유','유령','👻'],['ㅡ','으','음악','🎵'],['ㅣ','이','이빨','🦷']];
 const ABC=[['A','Apple','🍎'],['B','Bee','🐝'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Egg','🥚'],['F','Fish','🐟'],['G','Grapes','🍇'],['H','Hat','🎩'],['I','Ice cream','🍦'],['J','Juice','🧃'],['K','Kite','🪁'],['L','Lion','🦁'],['M','Monkey','🐒'],['N','Nose','👃'],['O','Orange','🍊'],['P','Pig','🐷'],['Q','Queen','👑'],['R','Rabbit','🐰'],['S','Sun','☀️'],['T','Tiger','🐯'],['U','Umbrella','☂️'],['V','Violin','🎻'],['W','Whale','🐳'],['X','Fox','🦊'],['Y','Yo-yo','🪀'],['Z','Zebra','🦓']];
+const ABCL=ABC.map(([c,w,e])=>[c.toLowerCase(),w.toLowerCase(),e]);
+const CREATURES=[
+ {n:'무당벌레',b:0,f:'나는 빨간 옷에 까만 점이 콕콕 있어. 등이 동그래.'},{n:'장수풍뎅이',b:1,f:'나는 머리에 커다란 뿔이 있어. 힘이 아주 세.'},{n:'나비',b:2,f:'나는 알록달록 예쁜 날개가 있어. 꽃에서 꿀을 먹어.'},{n:'꿀벌',b:3,f:'나는 노란색과 까만색 줄무늬가 있어. 붕붕 날아다니며 꿀을 모아.'},
+ {n:'개미',b:4,f:'나는 몸이 작고 영차영차 먹이를 날라. 친구들과 줄지어 다녀.'},{n:'반딧불이',b:5,f:'나는 밤이 되면 꼬리에서 반짝반짝 빛이 나.'},{n:'잠자리',b:6,f:'나는 몸이 길쭉하고 투명한 날개가 네 장 있어. 눈이 아주 커.'},{n:'메뚜기',b:7,f:'나는 초록색이고 뒷다리가 길어서 폴짝폴짝 잘 뛰어.'},
+ {n:'사슴벌레',b:8,f:'나는 머리에 커다란 집게가 있어. 사슴뿔처럼 생겼지.'},{n:'매미',b:9,f:'나는 여름에 나무에 붙어서 맴맴 큰 소리로 울어.'},{n:'쇠똥구리',b:10,f:'나는 동그란 공을 데굴데굴 굴려.'},{n:'귀뚜라미',b:11,f:'나는 가을밤에 귀뚤귀뚤 노래해. 더듬이가 아주 길어.'},
+ {n:'강아지',e:'🐶',f:'나는 멍멍 짖고, 반가우면 꼬리를 살랑살랑 흔들어.'},{n:'고양이',e:'🐱',f:'나는 야옹 하고 울어. 수염이 있고 생선을 좋아해.'},{n:'토끼',e:'🐰',f:'나는 귀가 길쭉하고 깡충깡충 뛰어. 당근을 좋아해.'},{n:'곰',e:'🐻',f:'나는 몸집이 크고 꿀을 좋아해. 겨울에는 겨울잠을 자.'},
+ {n:'판다',e:'🐼',f:'나는 하얀 몸에 눈 주위가 까매. 대나무를 냠냠 먹어.'},{n:'사자',e:'🦁',f:'나는 목에 멋진 갈기가 있어. 어흥! 동물의 왕이야.'},{n:'호랑이',e:'🐯',f:'나는 노란 몸에 까만 줄무늬가 있어. 어흥!'},{n:'코끼리',e:'🐘',f:'나는 코가 아주 길고 귀가 커다래.'},
+ {n:'기린',e:'🦒',f:'나는 목이 아주 아주 길어서 높은 나뭇잎도 먹을 수 있어.'},{n:'원숭이',e:'🐒',f:'나는 나무를 잘 타고 바나나를 좋아해.'},{n:'펭귄',e:'🐧',f:'나는 추운 곳에 살아. 뒤뚱뒤뚱 걷고 헤엄을 잘 쳐.'},{n:'거북이',e:'🐢',f:'나는 등에 딱딱한 껍질이 있어. 느릿느릿 걸어.'},
+ {n:'개구리',e:'🐸',f:'나는 개굴개굴 울고 폴짝 뛰어. 어릴 때는 올챙이였어.'},{n:'고래',e:'🐳',f:'나는 바다에 사는 아주 커다란 동물이야. 머리에서 물을 뿜어.'},{n:'돼지',e:'🐷',f:'나는 코가 납작하고 꿀꿀 울어.'},{n:'소',e:'🐮',f:'나는 음매 하고 울고 우유를 줘.'},
+ {n:'얼룩말',e:'🦓',f:'나는 하얀 몸에 까만 줄무늬가 있는 말이야.'},{n:'부엉이',e:'🦉',f:'나는 밤에 깨어 있어. 눈이 동그랗고 부엉부엉 울어.'},{n:'병아리',e:'🐤',f:'나는 노랗고 작아. 삐약삐약 울어.'},{n:'문어',e:'🐙',f:'나는 바다에 살고 다리가 여덟 개야.'},
+ {n:'악어',e:'🐊',f:'나는 입이 크고 이빨이 뾰족해. 물가에 살아.'},{n:'다람쥐',e:'🐿️',f:'나는 도토리를 볼에 가득 모아. 꼬리가 복슬복슬해.'}];
+const cName=i=>CREATURES[i].n;
+function cArt(i){const c=CREATURES[i];return c.b!=null?bugSVG(c.b):`<span class="emo">${c.e}</span>`;}
+const eulReul=w=>w+(hasBatchim(w)?'을':'를');
+const PRAISE=['딩동댕!','정답!','맞았어!','우와, 대단해!','최고야!'];
 const NUMS=[['1','하나','one'],['2','둘','two'],['3','셋','three'],['4','넷','four'],['5','다섯','five'],['6','여섯','six'],['7','일곱','seven'],['8','여덟','eight'],['9','아홉','nine'],['10','열','ten']];
 const COUNTER=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
 const SENT=[{t:'The monkey likes bananas.',a:'🐒',b:'🍌'},{t:'The rabbit likes carrots.',a:'🐰',b:'🥕'},{t:'The bear likes honey.',a:'🐻',b:'🍯'},{t:'The bee likes flowers.',a:'🐝',b:'🌸'},{t:'The cat likes fish.',a:'🐱',b:'🐟'},{t:'The dog likes bones.',a:'🐶',b:'🦴'},{t:'The mouse likes cheese.',a:'🐭',b:'🧀'},{t:'The panda likes bamboo.',a:'🐼',b:'🎋'},{t:'The squirrel likes nuts.',a:'🐿️',b:'🌰'},{t:'The pig likes apples.',a:'🐷',b:'🍎'},{t:'The cow likes grass.',a:'🐮',b:'🌿'},{t:'The bird likes worms.',a:'🐦',b:'🪱'}];
@@ -396,14 +438,17 @@ function themeOpts(){return shuffle(THEMES.map(t=>t.n)).slice(0,4);}
 const TYPES={
  hangul:{icon:'ㄱ',name:'자음 따라쓰기',c:'#FF7EA8',cs:'#E05A86'},
  vowel:{icon:'ㅏ',name:'모음 따라쓰기',c:'#B388FF',cs:'#8E63E0'},
- abc:{icon:'A',name:'알파벳 따라쓰기',c:'#5BC0EB',cs:'#3A9AC4'},
+ abc:{icon:'A',name:'대문자 따라쓰기',c:'#5BC0EB',cs:'#3A9AC4'},
+ abcl:{icon:'a',name:'소문자 따라쓰기',c:'#4D8DFF',cs:'#2F6AD6'},
  num:{icon:'3',name:'숫자 따라쓰기',c:'#FFB443',cs:'#E0921F'},
  listen:{icon:'👂',name:'소리 듣고 고르기',c:'#9C7CF4',cs:'#7A5AD6'},
- count:{icon:'🐞',name:'곤충 세기',c:'#FF6B6B',cs:'#D94848'},
+ count:{icon:'🐾',name:'동물 친구 퀴즈',c:'#FF6B6B',cs:'#D94848'},
+ spot:{icon:'🔍',name:'틀린 그림 찾기',c:'#20B486',cs:'#178A66'},
+ puzzle:{icon:'🧩',name:'퍼즐 맞추기',c:'#FF8A3D',cs:'#DB6A1E'},
  eng:{icon:'💬',name:'영어 문장',c:'#2EC4B6',cs:'#1E9C90'},
  draw:{icon:'🖍️',name:'그림 그리기',c:'#F78FB3',cs:'#D96C93'}
 };
-const TYPE_ORDER=['hangul','vowel','abc','num','listen','count','eng','draw'];
+const TYPE_ORDER=['hangul','vowel','abc','abcl','count','spot','num','puzzle','listen','eng','draw'];
 const LEVELS=['알 탐험가','애벌레 탐험가','번데기 탐험가','나비 탐험가','풍뎅이 용사','곤충 박사','숲의 영웅'];
 const CRAYONS=['#FF4D6D','#FF9F43','#FFD233','#5CC96B','#2EC4B6','#3A86FF','#9C7CF4','#F78FB3','#8D5A3B','#2B2140'];
 
@@ -437,8 +482,8 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,num:true,listen:true,count:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:30},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,num:0,listen:0,count:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapSteps:0,mapLog:[],maps:0,mapGiftGiven:false};}
-function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));const hadMap=s.mapSteps!=null;m(s,d);if(!hadMap&&s.days){const ks=Object.keys(s.days).filter(k=>s.days[k].allDone).sort();s.mapSteps=ks.length;s.mapLog=ks.map(k=>({d:k}));}if(s.setup===undefined)s.setup=null;return s;}
+function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,abc:true,abcl:true,count:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,abcl:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
+function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
   let db=null,user=null;
@@ -466,53 +511,50 @@ const S=()=>Store.state;
 function level(stars){return Math.floor(stars/10)+1;}
 function levelTitle(l){return LEVELS[Math.min(l-1,LEVELS.length-1)];}
 function streak(){const s=S();let n=0;const d=new Date();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
-const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='num';
-function traceSeq(q){if(q.type==='vowel')return HANGUL.slice(14);if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;return [NUMS[(q.idx||0)%NUMS.length]];}
+const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'||t==='num';
+function traceSeq(q){if(q.type==='vowel')return HANGUL.slice(14);if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;if(q.type==='abcl')return ABCL;return [NUMS[(q.idx||0)%NUMS.length]];}
 function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-1)];}
 const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
 const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
 function makeQuest(t,off){const s=S();
- if(t==='hangul'||t==='vowel'||t==='abc'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,done:false};}
+ if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,done:false};}
  if(t==='num'){const idx=s.progress[t]+(off[t]||0);off[t]=(off[t]||0)+1;return {type:t,idx,done:false};}
  if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
   for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const NR=10;const rounds=[];
-  for(let r=0;r<NR;r++){const bug=bugs[r];let n;const others=[];const pool=shuffle(bugs.filter(x=>x!==bug));
-   if(r%3===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r%3===0?0:(r%3===1?1:2);for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:pool[k],k:c});left-=c;}}
-   const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({n,bug,others,ch:shuffle(ch)});}
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const all=CREATURES.map((_,i)=>i);const kinds=shuffle(['count','count','count','name','name','find','find','feat','feat','feat']);const used=[];const rounds=[];
+  const pick=()=>{let c;let g=0;do{c=rint(all.length);g++;}while(used.includes(c)&&g<50);used.push(c);return c;};
+  const others=(c,n)=>{const o=[c];while(o.length<n){const x=rint(all.length);if(!o.includes(x))o.push(x);}return shuffle(o);};
+  kinds.forEach((k,r)=>{const c=pick();
+   if(k==='count'){const n=1+rint(r<3?maxN:Math.min(maxN,6));const oth=[];let left=12-n;const kk=rint(3);const pool=shuffle(all.filter(x=>x!==c));for(let j=0;j<kk&&left>0;j++){const m=Math.min(left,1+rint(4));oth.push({c:pool[j],k:m});left-=m;}const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({k,c,n,others:oth,ch:shuffle(ch)});}
+   else rounds.push({k,c,ch:others(c,k==='find'?4:3)});});
   return {type:t,rounds,done:false};}
+ if(t==='spot'){return {type:t,rounds:[makeSpot(),makeSpot()],done:false};}
+ if(t==='puzzle'){return {type:t,rounds:[makePuzzle(2),makePuzzle(3),makePuzzle(3)],done:false};}
  if(t==='eng'){const picks=shuffle(SENT.map((_,i)=>i)).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
  if(t==='draw'){return {type:t,theme:null,opts:themeOpts(),done:false};}
 }
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
-function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='eng')return '2문제';return '';}
-function grantDayReward(day){const s=S();day.allDone=true;s.mapSteps=(s.mapSteps||0)+1;s.mapLog=(s.mapLog||[]).concat([{d:todayKey()}]).slice(-80);const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
+function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='spot')return `그림 ${q.rounds.length}장`;if(q.type==='puzzle')return `퍼즐 ${q.rounds.length}개`;if(q.type==='eng')return '2문제';return '';}
+function grantDayReward(day){const s=S();day.allDone=true;const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
  if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
 function addSticker(){const s=S();const bug=s.stickers.total%BUGS.length;s.stickers.total++;s.stickers.current.push(bug);if(s.stickers.current.length>=s.settings.stickerGoal)s.giftReady=true;return bug;}
+const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
 const BADGES=[
  {id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},
  {id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)},
- {id:'streak3',icon:'🔥',name:'3일 연속',desc:'3일 연속 탐험',t:()=>streak()>=3},
- {id:'streak7',icon:'🌈',name:'7일 연속',desc:'일주일 내내 탐험',t:()=>streak()>=7},
- {id:'hangul10',icon:'✏️',name:'자음 꼬마 작가',desc:'자음 따라쓰기 10번',t:s=>s.counts.hangul>=10},
- {id:'vowel10',icon:'🖊️',name:'모음 꼬마 작가',desc:'모음 따라쓰기 10번',t:s=>(s.counts.vowel||0)>=10},
- {id:'abc10',icon:'🔤',name:'ABC 친구',desc:'알파벳 따라쓰기 10번',t:s=>s.counts.abc>=10},
- {id:'num10',icon:'🔢',name:'숫자 박사',desc:'숫자 따라쓰기 10번',t:s=>s.counts.num>=10},
- {id:'listen10',icon:'👂',name:'귀가 쫑긋',desc:'소리 퀘스트 10번',t:s=>s.counts.listen>=10},
- {id:'count10',icon:'🐞',name:'곤충 세기 왕',desc:'곤충 세기 10번',t:s=>s.counts.count>=10},
- {id:'eng10',icon:'💬',name:'영어 말하기',desc:'영어 문장 10번',t:s=>s.counts.eng>=10},
- {id:'draw5',icon:'🎨',name:'꼬마 화가',desc:'그림 5장 그리기',t:s=>s.counts.draw>=5},
- {id:'star50',icon:'⭐',name:'별 50개',desc:'별 50개 모으기',t:s=>s.stars>=50},
+ ...[[10,'⭐'],[30,'🌟'],[60,'💫'],[100,'🏅']].map(([n,ic])=>({id:'star'+n,icon:ic,name:`별 ${n}개`,desc:`별 ${n}개 모으기`,t:s=>s.stars>=n})),
+ ...[3,7,14,21].map(n=>({id:'streak'+n,icon:n>=14?'🌈':'🔥',name:`${n}일 연속`,desc:`${n}일 연속 탐험`,t:()=>streak()>=n})),
+ ...BADGE_TYPES.flatMap(([t,ic,lb])=>[1,5,15].map(n=>({id:`${t}_${n}`,icon:ic,name:n===1?`${lb} 첫 도전`:`${lb} ${n}번`,desc:`${lb} 퀘스트 ${n}번 완료`,t:s=>(s.counts[t]||0)>=n}))),
  {id:'board1',icon:'🏆',name:'스티커판 완성',desc:'스티커판 처음 채우기',t:s=>s.stickers.boards>=1||s.giftReady},
- {id:'hangulAll',icon:'👑',name:'한글 자모 마스터',desc:'ㄱ부터 ㅣ까지 모두 쓰기',t:s=>s.progress.hangul>=14&&!!s.progress.vowel},
- {id:'abcAll',icon:'🦁',name:'A부터 Z까지',desc:'알파벳 26자 모두 쓰기',t:s=>s.progress.abc>=ABC.length},
- {id:'dex',icon:'🔍',name:'곤충 도감 완성',desc:'곤충 친구 12마리 모두 만나기',t:s=>s.stickers.total>=BUGS.length}
+ {id:'dex',icon:'📖',name:'곤충 도감 완성',desc:'곤충 친구 12마리 모두 만나기',t:s=>s.stickers.total>=BUGS.length}
 ];
+function mapEntries(){const s=S();const e=BADGES.filter(b=>s.badges[b.id]).map(b=>({d:s.badges[b.id],icon:b.icon,name:b.name,o:BADGES.indexOf(b)}));(s.mapBonus||[]).forEach((x,i)=>e.push({d:x.d,icon:'💌',name:'부모님 칭찬',o:1000+i}));e.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.o-b.o);return e.slice(s.mapOffset||0);}
+function mapProg(){return Math.min(mapEntries().length,S().settings.mapLen||40);}
 function checkBadges(){const s=S();const nb=[];BADGES.forEach(b=>{if(!s.badges[b.id]&&b.t(s)){s.badges[b.id]=todayKey();nb.push(b);}});return nb;}
 
 /* ================= 관리자 설정 (config.js) ================= */
@@ -611,7 +653,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  <nav class="bottom-nav">
   <button onclick="App.go('stickers')"><span class="ni">🐞</span>스티커판<b>${Math.min(cur,goal)} / ${goal}${s.giftReady?' 🎁':''}</b></button>
   <button onclick="App.go('coupons')"><span class="ni">📺</span>쿠폰함<b>${unused}장</b></button>
-  <button onclick="App.go('badges')"><span class="ni">🗺️</span>보물 지도<b>${Math.min(s.mapSteps||0,s.settings.mapLen||30)} / ${s.settings.mapLen||30}칸</b></button>
+  <button onclick="App.go('badges')"><span class="ni">🗺️</span>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}칸</b></button>
   <button onclick="App.go('gallery')"><span class="ni">🎨</span>그림 갤러리<b>${Store.drawings.length}장</b></button>
  </nav></div>`;}
 
@@ -621,15 +663,21 @@ function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i
 function guideText(){const q=Q.q;
  if(isTrace(q.type)){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
  if(q.type==='listen')return '소리를 잘 듣고, 맞는 글자를 골라봐!';
- if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const sp=species(r.bug);return `<span class="gicon">${bugSVG(r.bug)}</span> <b>${eunNeun(sp)}</b> 몇 마리일까? ${r.others&&r.others.length?'다른 곤충은 빼고 ':''}하나씩 눌러 세어봐!`;}
+ if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const k=qKind(r);const c=qC(r);const n=cName(c);
+  if(k==='count')return `<span class="gicon">${cArt(c)}</span> <b>${eunNeun(n)}</b> 몇 마리일까? ${r.others&&r.others.length?'다른 친구는 빼고 ':''}하나씩 눌러 세어봐!`;
+  if(k==='name')return '이 친구 이름은 뭘까? 🤔 이름을 골라봐!';
+  if(k==='find')return `<b>${eulReul(n)}</b> 찾아봐! 🔎`;
+  return `🔊 ${CREATURES[c].f} <b>나는 누구일까?</b>`;}
+ if(q.type==='spot')return '두 그림에서 <b>다른 곳 3군데</b>를 찾아 눌러봐! 🔍';
+ if(q.type==='puzzle')return '조각 두 개를 차례로 눌러서 자리를 바꿔봐! 🧩';
  if(q.type==='eng')return '영어 문장을 듣고, 맞는 그림을 골라봐!';
  if(q.type==='draw')return Q.theme?`<b>“${esc(Q.theme)}”</b> 그림을 보고 따라 그려봐! 🖍️`:'오늘은 뭘 그려볼까? 하나 골라봐!';}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
- <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='vowel'||q.type==='abc')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
+ <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
  <div class="qbody" id="qbody"></div></div>`;}
-function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
+function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='spot')mountSpot();else if(t==='puzzle')mountPuzzle();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
 function setGuide(html){const g=$('#guide');if(g){g.innerHTML=html;g.classList.remove('pop');void g.offsetWidth;g.classList.add('pop');}}
 function updRounds(){const r=$('#rounds');if(r)[...r.children].forEach((el,i)=>el.classList.toggle('on',i<Q.round));}
 
@@ -704,6 +752,14 @@ const STROKES={
  'X':[[[22,10],[78,90]],[[78,10],[22,90]]],
  'Y':[[[22,10],[50,50]],[[78,10],[50,50]],[[50,50],[50,90]]],
  'Z':[[[22,10],[78,10],[22,90],[80,90]]],
+ 'a':[ARC(47,60,18,-10,-370)],'b':[[[32,10],[32,78]],ARC(50,60,18,180,540)],'c':[ARC(52,60,18,-40,-320)],'d':[ARC(47,60,18,-10,-370),[[66,10],[66,78]]],
+ 'e':[JN([[32,60],[68,60]],ARC(50,60,18,0,-320))],'f':[JN(ARC(60,22,12,-20,-180),[[48,22],[48,78]]),[[34,44],[62,44]]],'g':[ARC(48,58,17,-10,-370),JN([[65,42],[65,86]],ARC(50,86,15,0,160))],
+ 'h':[[[32,10],[32,78]],JN(ARC(48,58,16,180,360),[[64,78]])],'i':[[[50,42],[50,78]],[[50,24],[50,27]]],'j':[JN([[56,42],[56,86]],ARC(42,86,14,0,160)),[[56,24],[56,27]]],
+ 'k':[[[32,10],[32,78]],[[64,40],[32,62]],[[42,55],[66,78]]],'l':[[[50,10],[50,78]]],'m':[[[24,42],[24,78]],JN(ARC(36,56,12,180,360),[[48,78]]),JN(ARC(60,56,12,180,360),[[72,78]])],
+ 'n':[[[32,42],[32,78]],JN(ARC(48,58,16,180,360),[[64,78]])],'o':[ARC(50,60,18,-90,-450)],'p':[[[32,42],[32,98]],ARC(50,60,18,180,540)],'q':[ARC(47,60,18,-10,-370),[[66,42],[66,98]]],
+ 'r':[[[36,42],[36,78]],ARC(52,58,16,180,320)],'s':[JN(ARC(50,51,10,-20,-270),ARC(50,69,9,-90,160))],'t':[[[48,18],[48,78]],[[34,44],[62,44]]],
+ 'u':[JN([[32,42],[32,62]],ARC(48,62,16,180,0),[[64,42]]),[[64,42],[64,78]]],'v':[[[30,42],[50,78],[70,42]]],'w':[[[22,42],[36,78],[50,52],[64,78],[78,42]]],
+ 'x':[[[32,42],[68,78]],[[68,42],[32,78]]],'y':[[[32,42],[52,72]],[[70,42],[42,98]]],'z':[[[32,42],[68,42],[32,78],[70,78]]],
  '1':[[[36,24],[54,10],[54,90]]],
  '2':[JN(ARC(50,34,26,-165,15),[[22,90],[82,90]])],
  '3':[JN(ARC(48,30,21,-160,90),ARC(48,70,21,-90,160))],
@@ -725,7 +781,7 @@ function drawBody(ctx,ss,W,color,width){ctx.save();ctx.lineCap='round';ctx.lineJ
 /* ---- 따라쓰기 ---- */
 let TRACE=null;
 async function mountTrace(){const q=Q.q;const it=curItem();
- const word=(q.type==='hangul'||q.type==='vowel')?`${it[3]}<div class="lc-word">${it[2]}</div>`:q.type==='abc'?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
+ const word=(q.type==='hangul'||q.type==='vowel')?`${it[3]}<div class="lc-word">${it[2]}</div>`:(q.type==='abc'||q.type==='abcl')?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
  const hasS=!!STROKES[it[0]];
  $('#qbody').innerHTML=`<div class="trace-wrap">
  <div class="letter-card"><div class="lc-ch">${esc(it[0])}</div><div class="lc-emoji">${word}</div><button class="btn sm purple" onclick="sayTrace()">🔊 들어보기</button>${hasS?'<button class="btn sm orange" onclick="playOrder()">▶ 순서 보기</button>':''}</div>
@@ -736,7 +792,8 @@ async function mountTrace(){const q=Q.q;const it=curItem();
  const box=$('#cbox').getBoundingClientRect();const size=Math.max(220,Math.floor(Math.min(box.width,box.height)-14));const sq=$('#sq');sq.style.width=size+'px';sq.style.height=size+'px';
  const dpr=Math.min(2,window.devicePixelRatio||1);const W=Math.round(size*dpr);const tpl=$('#tpl'),ink=$('#ink'),an=$('#anim');tpl.width=tpl.height=ink.width=ink.height=an.width=an.height=W;
  const tc=tpl.getContext('2d');
- tc.strokeStyle='#F1D9E4';tc.lineWidth=2*dpr;tc.setLineDash([8*dpr,8*dpr]);tc.beginPath();tc.moveTo(W/2,0);tc.lineTo(W/2,W);tc.moveTo(0,W/2);tc.lineTo(W,W/2);tc.stroke();tc.setLineDash([]);
+ if(q.type==='abcl'){const yy=v=>W*0.12+v*W*0.76/100;tc.lineWidth=2*dpr;[[10,'#D6E6FF',1],[42,'#9CC3FF',1],[78,'#FF9AA8',0],[98,'#D6E6FF',1]].forEach(([v,c,d])=>{tc.strokeStyle=c;tc.setLineDash(d?[8*dpr,8*dpr]:[]);tc.beginPath();tc.moveTo(0,yy(v));tc.lineTo(W,yy(v));tc.stroke();});tc.setLineDash([]);}
+ else{tc.strokeStyle='#F1D9E4';tc.lineWidth=2*dpr;tc.setLineDash([8*dpr,8*dpr]);tc.beginPath();tc.moveTo(W/2,0);tc.lineTo(W/2,W);tc.moveTo(0,W/2);tc.lineTo(W,W/2);tc.stroke();tc.setLineDash([]);}
  const mc=document.createElement('canvas');mc.width=mc.height=W;const m=mc.getContext('2d');let ss=null;
  if(hasS){ss=mapPts(STROKES[it[0]],W);const bw=W*0.1;
   drawBody(m,ss,W,'#000',bw);drawBody(tc,ss,W,'#EFE7FF',bw);
@@ -773,7 +830,7 @@ function playOrder(){if(!TRACE||!TRACE.ss)return;stopOrder();const tok=ORDER_TOK
   requestAnimationFrame(step);};
  requestAnimationFrame(step);}
 function sayTrace(){const q=Q.q;const it=curItem();
- if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
+ if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else if(q.type==='abcl')speak(`small ${it[0].toUpperCase()}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
 function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.3;
  const m=$('#meter');if(m)m.style.width=Math.min(100,ratio/goal*100)+'%';
  if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');if(b)b.classList.add('ready');}
@@ -815,19 +872,82 @@ function pickListen(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];
  else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide('앗, 다시 한 번 들어볼까? 🔊');setTimeout(playListen,500);}}
 function nextRound(mount){Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mount();}},1300);}
 
-/* 곤충 세기 */
-function mountCount(){const r=Q.q.rounds[Q.round];Q.tapped=0;const others=r.others||[];
- const items=shuffle(Array(r.n).fill(r.bug).concat(...others.map(o=>Array(o.k).fill(o.bug))));
- const cells=shuffle(Array.from({length:12},(_,i)=>i)).slice(0,items.length);
- $('#qbody').innerHTML=`<div class="count"><div class="field-area" id="farea">${cells.map((c,k)=>{const col=c%4,row=Math.floor(c/4);const x=6+col*23+Math.random()*6,y=4+row*31+Math.random()*6;const b=items[k];return `<button class="cbug" data-b="${b}" data-t="${b===r.bug?1:0}" style="left:${x}%;top:${y}%;animation-delay:-${(k*0.37).toFixed(2)}s" onclick="tapBug(this)">${bugSVG(b)}</button>`;}).join('')}</div>
- <div class="choices num">${r.ch.map(n=>`<button class="choice" onclick="pickCount(this,${n})">${n}</button>`).join('')}</div></div>`;Q.locked=false;
- setTimeout(()=>{if(App.screen==='quest')speak(`${eunNeun(species(r.bug))} 몇 마리일까?`);},350);}
-function tapBug(el){const r=Q.q.rounds[Q.round];if(el.querySelector('.n'))return;
- if(el.dataset.t!=='1'){SFX.no();el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');const o=species(+el.dataset.b),t=species(r.bug);setGuide(`이건 <b>${o}</b>야! <span class="gicon">${bugSVG(r.bug)}</span> <b>${t}</b>만 세어보자!`);speak(`이건 ${o}야! ${t}만 세어보자!`);return;}
+/* 동물 친구 퀴즈 (세기·이름·찾기·특징) */
+function qC(r){return r.c!=null?r.c:r.bug;}
+function qKind(r){return r.k||'count';}
+function mountCount(){const r=Q.q.rounds[Q.round];const k=qKind(r);Q.locked=false;
+ if(k==='count'){Q.tapped=0;const c=qC(r);const others=(r.others||[]).map(o=>({c:o.c!=null?o.c:o.bug,k:o.k}));
+  const items=shuffle(Array(r.n).fill(c).concat(...others.map(o=>Array(o.k).fill(o.c))));
+  const cells=shuffle(Array.from({length:12},(_,i)=>i)).slice(0,items.length);
+  $('#qbody').innerHTML=`<div class="count"><div class="field-area" id="farea">${cells.map((cc,j)=>{const col=cc%4,row=Math.floor(cc/4);const x=6+col*23+Math.random()*6,y=4+row*31+Math.random()*6;const b=items[j];return `<button class="cbug" data-b="${b}" data-t="${b===c?1:0}" style="left:${x}%;top:${y}%;animation-delay:-${(j*0.37).toFixed(2)}s" onclick="tapBug(this)">${cArt(b)}</button>`;}).join('')}</div>
+  <div class="choices num">${r.ch.map(n=>`<button class="choice" onclick="pickCount(this,${n})">${n}</button>`).join('')}</div></div>`;
+  setTimeout(()=>{if(App.screen==='quest')speak(`${eunNeun(cName(c))} 몇 마리일까?`);},350);return;}
+ const c=r.c;
+ if(k==='name'){$('#qbody').innerHTML=`<div class="quiz"><div class="bigart pop">${cArt(c)}</div><div class="choices names">${r.ch.map(i=>`<button class="choice name" onclick="pickQuiz(this,${i})">${esc(cName(i))}</button>`).join('')}</div></div>`;
+  setTimeout(()=>{if(App.screen==='quest')speak('이 친구 이름은 뭘까?');},350);return;}
+ $('#qbody').innerHTML=`<div class="quiz"><button class="big-speaker sm" onclick="playQuiz()">🔊</button><div class="choices pics">${r.ch.map(i=>`<button class="choice art" onclick="pickQuiz(this,${i})">${cArt(i)}</button>`).join('')}</div></div>`;
+ setTimeout(()=>{if(App.screen==='quest')playQuiz();},350);}
+function playQuiz(){const r=Q.q.rounds[Q.round];if(!r)return;const k=qKind(r);const n=cName(r.c);
+ if(k==='find')speak(`${eulReul(n)} 찾아봐!`);else if(k==='feat')speak(`${CREATURES[r.c].f} 나는 누구일까?`);else if(k==='name')speak('이 친구 이름은 뭘까?');}
+function pickQuiz(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];const n=cName(i);
+ if(i===r.c){Q.locked=true;el.classList.add('right');SFX.ok();const p=PRAISE[rint(PRAISE.length)];setGuide(`${p} <b>${esc(n)}</b>${hasBatchim(n)?'이야':'야'}! 👏`);speak(`${p} ${n}${hasBatchim(n)?'이야':'야'}!`);nextRound(mountCount);}
+ else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();if(qKind(r)==='name'){setGuide(`음, <b>${esc(n)}</b>${hasBatchim(n)?'이':'가'} 아니야. 다시 골라볼까?`);speak(`${n}${hasBatchim(n)?'이':'가'} 아니야. 다시 골라볼까?`);}else{setGuide(`이건 <b>${esc(n)}</b>${hasBatchim(n)?'이야':'야'}! 다시 찾아볼까?`);speak(`이건 ${n}${hasBatchim(n)?'이야':'야'}! 다시 찾아볼까?`);}}}
+function tapBug(el){const r=Q.q.rounds[Q.round];if(el.querySelector('.n'))return;const c=qC(r);
+ if(el.dataset.t!=='1'){SFX.no();el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');const o=cName(+el.dataset.b),t=cName(c);setGuide(`이건 <b>${o}</b>${hasBatchim(o)?'이야':'야'}! <span class="gicon">${cArt(c)}</span> <b>${t}</b>만 세어보자!`);speak(`이건 ${o}${hasBatchim(o)?'이야':'야'}! ${t}만 세어보자!`);return;}
  Q.tapped++;const n=Q.tapped;el.insertAdjacentHTML('beforeend',`<span class="n">${n}</span>`);SFX.tap();speak(NUMS[Math.min(n,10)-1][1]);}
-function pickCount(el,n){if(Q.locked)return;const r=Q.q.rounds[Q.round];
- if(n===r.n){Q.locked=true;el.classList.add('right');SFX.ok();const sp=species(r.bug);setGuide(`맞았어! ${sp} <b>${COUNTER[n]} 마리</b>야! 👏`);speak(`맞았어! ${sp} ${COUNTER[n]} 마리!`);nextRound(mountCount);}
- else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide(`<span class="gicon">${bugSVG(r.bug)}</span> <b>${species(r.bug)}</b>만 하나씩 눌러서 다시 세어볼까?`);}}
+function pickCount(el,n){if(Q.locked)return;const r=Q.q.rounds[Q.round];const c=qC(r);
+ if(n===r.n){Q.locked=true;el.classList.add('right');SFX.ok();const sp=cName(c);setGuide(`맞았어! ${sp} <b>${COUNTER[n]} 마리</b>야! 👏`);speak(`맞았어! ${sp} ${COUNTER[n]} 마리!`);nextRound(mountCount);}
+ else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide(`<span class="gicon">${cArt(c)}</span> <b>${cName(c)}</b>만 하나씩 눌러서 다시 세어볼까?`);}}
+
+/* 틀린 그림 찾기 */
+const SPOT_SCENES=[{n:'숲속',bg:'linear-gradient(#CFF1FF,#E8FAD9 55%,#B9E59A)',e:['🌳','🌲','🌷','🌻','🍄','🐞','🦋','🐝','🐿️','🐌','🪨','🐇']},
+ {n:'바닷속',bg:'linear-gradient(#9EE2FF,#5BB8F0)',e:['🐟','🐠','🐡','🐙','🦀','🐚','🐳','🪸','⭐','🦑','🐬','🐢']},
+ {n:'농장',bg:'linear-gradient(#DDF3FF,#FFF6D6 55%,#D8EFA8)',e:['🐮','🐷','🐔','🐑','🐴','🌾','🏠','🚜','🥕','🌻','🐶','🐤']},
+ {n:'놀이터',bg:'linear-gradient(#D6F0FF,#FFF0F5 60%,#E7F7C8)',e:['🎈','⚽','🛝','🌳','🧸','🪁','🚲','🌼','🐶','🦋','☀️','🍦']}];
+function makeSpot(){const sc=rint(SPOT_SCENES.length);const S0=SPOT_SCENES[sc];const cells=shuffle(Array.from({length:12},(_,i)=>i));const em=shuffle(S0.e);
+ const pos=c=>({x:12+(c%4)*25+(Math.random()*6-3),y:16+Math.floor(c/4)*32+(Math.random()*6-3)});
+ const items=cells.slice(0,7).map((c,i)=>Object.assign({e:em[i]},pos(c)));const free=cells.slice(7);
+ const kinds=shuffle(['gone','swap','add']);const idx=shuffle(items.map((_,i)=>i));const diffs=[];
+ kinds.forEach((k,j)=>{if(k==='add'){const p=pos(free[0]);diffs.push({k,e:em[8],x:p.x,y:p.y});}else{const i=idx[j];diffs.push({k,i,e:k==='swap'?em[9+j%3]:null,x:items[i].x,y:items[i].y});}});
+ return {sc,items,diffs};}
+function spotPanel(r,right){const S0=SPOT_SCENES[r.sc];let html='';
+ r.items.forEach((it,i)=>{let e=it.e;if(right){const d=r.diffs.find(d=>d.i===i);if(d&&d.k==='gone')return;if(d&&d.k==='swap')e=d.e;}html+=`<span class="sp-i" style="left:${it.x}%;top:${it.y}%">${e}</span>`;});
+ if(right)r.diffs.filter(d=>d.k==='add').forEach(d=>{html+=`<span class="sp-i" style="left:${d.x}%;top:${d.y}%">${d.e}</span>`;});
+ return `<div class="sp-panel" data-r="${right?1:0}" style="background:${S0.bg}" onpointerdown="tapSpot(event,this)">${html}<div class="sp-marks"></div></div>`;}
+function mountSpot(){const r=Q.q.rounds[Q.round];Q.found=[];Q.locked=false;
+ $('#qbody').innerHTML=`<div class="spot"><div class="sp-wrap">${spotPanel(r,false)}${spotPanel(r,true)}</div>
+ <div class="sp-bar"><div class="sp-count" id="spc">${'<i></i>'.repeat(r.diffs.length)}</div><button class="btn sm yellow" id="sphint" onclick="spotHint()">💡 힌트</button></div></div>`;
+ setTimeout(()=>{if(App.screen==='quest')speak('두 그림에서 다른 곳 세 군데를 찾아봐!');},350);}
+function tapSpot(e,panel){if(Q.locked)return;const r=Q.q.rounds[Q.round];const b=panel.getBoundingClientRect();const x=(e.clientX-b.left)/b.width*100,y=(e.clientY-b.top)/b.height*100;
+ let best=-1,bd=1e9;r.diffs.forEach((d,i)=>{if(Q.found.includes(i))return;const dd=Math.hypot((d.x-x),(d.y-y)*b.height/b.width);if(dd<bd){bd=dd;best=i;}});
+ if(best>=0&&bd<13){Q.found.push(best);const d=r.diffs[best];document.querySelectorAll('.sp-marks').forEach(m=>m.insertAdjacentHTML('beforeend',`<span class="sp-ok" style="left:${d.x}%;top:${d.y}%"></span>`));
+  [...$('#spc').children].forEach((el,i)=>el.classList.toggle('on',i<Q.found.length));SFX.ok();
+  if(Q.found.length>=r.diffs.length){Q.locked=true;setGuide('우와! 다른 곳을 모두 찾았어! 👏');speak('우와! 다 찾았어!');nextRound(mountSpot);}
+  else{setGuide(`찾았다! 👀 ${r.diffs.length-Q.found.length}군데 더 있어!`);speak(`찾았다! ${COUNTER[r.diffs.length-Q.found.length]} 군데 더 있어!`);}}
+ else{SFX.tap();const m=panel.querySelector('.sp-marks');m.insertAdjacentHTML('beforeend',`<span class="sp-no" style="left:${x}%;top:${y}%">✖</span>`);const el=m.lastElementChild;setTimeout(()=>el&&el.remove(),600);}}
+function spotHint(){const r=Q.q.rounds[Q.round];const i=r.diffs.findIndex((_,j)=>!Q.found.includes(j));if(i<0)return;const d=r.diffs[i];SFX.tap();
+ const m=document.querySelector('.sp-panel[data-r="1"] .sp-marks');m.insertAdjacentHTML('beforeend',`<span class="sp-hint" style="left:${d.x}%;top:${d.y}%"></span>`);const el=m.lastElementChild;setTimeout(()=>el&&el.remove(),1800);setGuide('반짝이는 곳을 잘 봐! ✨');}
+
+/* 퍼즐 맞추기 */
+const PZ_BG=[['#BFE9FF','#E9FFF0','#8FD16A'],['#FFE3F0','#FFF8E1','#FFB6C9'],['#E5DEFF','#FFF7D6','#B9A6FF'],['#D6F5FF','#FFFBE5','#7FD6C2']];
+function puzzleSVG(r){const [a,b,g]=PZ_BG[r.bg%PZ_BG.length];let inner;
+ if(r.sub==='ppu')inner=PPU_SVG.replace('<svg viewBox="0 0 130 140"','<svg x="70" y="70" width="260" height="280" viewBox="0 0 130 140"');
+ else if(r.sub==='hero')inner=HERO_SVG.replace('<svg viewBox="0 0 130 160"','<svg x="80" y="60" width="240" height="295" viewBox="0 0 130 160"');
+ else inner=`<svg x="60" y="70" width="280" height="280" viewBox="0 0 100 100">${BUGS[r.sub%BUGS.length].d}</svg>`;
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="400" height="400" fill="url(#g)"/><circle cx="340" cy="60" r="34" fill="#FFD54F"/><g fill="#fff"><ellipse cx="80" cy="60" rx="40" ry="18"/><ellipse cx="110" cy="50" rx="30" ry="20"/></g><path d="M0 330 Q100 290 200 320 Q300 350 400 310 L400 400 L0 400Z" fill="${g}"/><g fill="#FF7EA8"><circle cx="40" cy="360" r="8"/><circle cx="360" cy="370" r="8"/></g><g fill="#FFD54F"><circle cx="300" cy="372" r="7"/><circle cx="90" cy="380" r="7"/></g>${inner}</svg>`;}
+function puzzleURL(r){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(puzzleSVG(r));}
+function makePuzzle(n){const N=n*n;let p;do{p=shuffle(Array.from({length:N},(_,i)=>i));}while(p.filter((v,i)=>v===i).length>Math.floor(N/3));const subs=['ppu','hero'].concat(BUGS.map((_,i)=>i));return {n,perm:p,sub:subs[rint(subs.length)],bg:rint(PZ_BG.length)};}
+function mountPuzzle(){const r=Q.q.rounds[Q.round];Q.perm=Q.perm&&Q.perm.round===Q.round?Q.perm:{round:Q.round,p:r.perm.slice()};Q.sel=-1;Q.locked=false;const url=puzzleURL(r);
+ $('#qbody').innerHTML=`<div class="puz"><div class="pz-prev"><img src="${url}" alt=""><div>완성 그림</div></div><div class="pz-box" id="pzb"></div></div>`;
+ requestAnimationFrame(()=>{const b=$('#pzb');if(!b)return;const box=b.parentNode.getBoundingClientRect();const size=Math.max(240,Math.floor(Math.min(box.height-10,box.width-230)));b.style.width=b.style.height=size+'px';renderPuzzle();});
+ setTimeout(()=>{if(App.screen==='quest')speak('조각 두 개를 차례로 눌러서 자리를 바꿔봐!');},350);}
+function renderPuzzle(){const r=Q.q.rounds[Q.round];const n=r.n;const url=puzzleURL(r);const b=$('#pzb');if(!b)return;
+ b.style.gridTemplateColumns=`repeat(${n},1fr)`;
+ b.innerHTML=Q.perm.p.map((piece,slot)=>{const px=piece%n,py=Math.floor(piece/n);const ok=piece===slot;return `<button class="pz-t ${Q.sel===slot?'sel':''} ${ok?'ok':''}" style="background-image:url('${url}');background-size:${n*100}% ${n*100}%;background-position:${n>1?px/(n-1)*100:0}% ${n>1?py/(n-1)*100:0}%" onclick="tapPiece(${slot})"></button>`;}).join('');}
+function tapPiece(slot){if(Q.locked)return;if(Q.sel<0){Q.sel=slot;SFX.tap();renderPuzzle();return;}
+ if(Q.sel===slot){Q.sel=-1;renderPuzzle();return;}const p=Q.perm.p;[p[Q.sel],p[slot]]=[p[slot],p[Q.sel]];const okBefore=0;Q.sel=-1;
+ if(p.every((v,i)=>v===i)){Q.locked=true;renderPuzzle();$('#pzb').classList.add('solved');SFX.ok();setGuide('완성! 정말 잘 맞췄어! 🧩👏');speak('완성! 정말 잘 맞췄어!');Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;Q.perm=null;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mountPuzzle();}},1800);}
+ else{(p[slot]===slot)?SFX.ok():SFX.tap();renderPuzzle();}}
 
 /* 영어 문장 */
 function mountEng(){const r=Q.q.rounds[Q.round];const s=SENT[r.a];
@@ -867,11 +987,11 @@ async function finishDraw(){if(!PAD)return;if(PAD.strokes<2){setGuide('조금만
 function finishQuest(){const s=S();
  if(Q.practice){SFX.win();showCelebrate({title:'연습 끝! 잘했어요!',lines:['<span>💪 연습도 정말 멋졌어!</span>']});return;}
  const day=s.days[Q.dayKey];const q=day&&day.quests[Q.i];if(!q||q.done){App.go('home');return;}
- q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
+ q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
  if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(rw.min)lines.push(`<span>📺 TV ${rw.min}분 쿠폰을 받았어요!</span>`);if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
- const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));if(bug!=null){const L=s.settings.mapLen||30;lines.push(s.mapSteps>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 한 칸 앞으로! (${Math.min(s.mapSteps,L)} / ${L})</span>`);}
+ const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));if(nb.length){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${nb.length}칸 앞으로! (${pg} / ${L})</span>`);}
  Store.save();SFX.win();
  showCelebrate({title:bug!=null?'오늘 탐험 성공!':'참 잘했어요!',lines,bug});
  speak(bug!=null?`오늘 탐험 성공! 새 곤충 친구, ${BUGS[bug].n}를 만났어!`:'참 잘했어요! 별을 받았어!');}
@@ -893,21 +1013,18 @@ function renderCoupons(){const s=S();const list=s.coupons.filter(c=>!c.used).con
 function useCoupon(id){askPin('부모님 확인',()=>{const c=S().coupons.find(x=>x.id===id);if(c&&!c.used){c.used=true;c.usedAt=todayKey();Store.save();SFX.win();toast(`TV ${c.min}분 즐겁게 보세요! 📺`);}App.go(App.screen==='parent'?'parent':'coupons');});}
 
 /* ---------- 배지 ---------- */
-function renderBadges(){const s=S();const N=s.settings.mapLen||30;const steps=Math.min(s.mapSteps||0,N);const done=steps>=N;const total=N+2;const cols=8;const rows=Math.ceil(total/cols);
+function renderBadges(){const s=S();const N=s.settings.mapLen||40;const ent=mapEntries();const steps=Math.min(ent.length,N);const done=steps>=N;const total=N+2;const cols=8;const rows=Math.ceil(total/cols);
  const pos=i=>{const r=Math.floor(i/cols);let c=i%cols;if(r%2===1)c=cols-1-c;return {x:7+c*(86/(cols-1)),y:(r+0.5)*(100/rows)};};
  const pts=Array.from({length:total},(_,i)=>pos(i));
- const bDates={};Object.entries(s.badges).forEach(([id,d])=>{(bDates[d]=bDates[d]||[]).push(id);});
- const log=s.mapLog||[];
  const nodes=pts.map((p,i)=>{let cls='node',inner='',lab='';
   if(i===0){cls+=' start';inner='🏠';lab='출발';}
   else if(i===total-1){cls+=' goal'+(done?' reached':'');inner='🎁';lab=esc(s.settings.mapGift||'보물 선물');}
-  else{const ms=i%10===0;if(i<=steps){const e=log[log.length-steps+i-1];const bid=e&&bDates[e.d]&&bDates[e.d][0];const bb=bid&&BADGES.find(b=>b.id===bid);cls+=' got'+(ms?' ms':'');inner=bb?bb.icon:(ms?'🎀':'🐾');lab=ms?`${i}일째!`:(e?e.d.slice(5).replace('-','/'):'');}
-   else{cls+=(i===steps+1?' next':'')+(ms?' ms':'');inner=ms?'🎀':String(i);lab=ms?`${i}일째`:'';}}
+  else{const ms=i%10===0;const e=ent[i-1];if(i<=steps&&e){cls+=' got'+(ms?' ms':'');inner=e.icon;lab=esc(e.name);}else{cls+=(i===steps+1?' next':'')+(ms?' ms':'');inner=ms?'🎀':String(i);lab=ms?`${i}칸`:'';}}
   const here=(done?i===total-1:i===steps)?`<div class="me-pin">${HERO_SVG}</div>`:'';
   return `<div class="${cls}" style="left:${p.x}%;top:${p.y}%">${here}<div class="nb">${inner}</div>${lab?`<div class="nl">${lab}</div>`:''}</div>`;}).join('');
  const path='M'+pts.map(p=>`${p.x} ${p.y}`).join(' L');const dp=steps?'M'+pts.slice(0,steps+1+(done?1:0)).map(p=>`${p.x} ${p.y}`).join(' L'):'';
  return `<div class="screen">${subbar('🗺️ 보물 지도')}
- <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">하루 탐험을 다 끝내면 한 칸! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">배지를 받은 날은 그 칸에 배지가 붙어요</div>`}</div></div>
+ <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">배지를 하나 받을 때마다 한 칸! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">받은 배지가 순서대로 지도에 붙어요</div>`}</div></div>
  <div class="map" style="height:${rows*130+30}px"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${path}" class="road"/>${dp?`<path d="${dp}" class="road done"/>`:''}</svg>${nodes}</div>
  <h3 class="sec">🏅 배지 모음</h3>
  <div class="badges">${BADGES.map(b=>{const g=s.badges[b.id];return `<div class="badge ${g?'':'lock'}"><div class="bi">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${g?prettyDate(g):b.desc}</div></div>`;}).join('')}</div></div>`;}
@@ -950,15 +1067,15 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">하루 완료 시 TV 쿠폰</span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
   <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
   <label class="lb">스티커판 완성 선물<input class="inp" id="p_gift" maxlength="30" value="${esc(PS.giftName)}"></label>
-  <div class="prow"><span class="pl">보물 지도 칸 수</span><div class="chips">${[20,30,40].map(m=>`<button class="chip ${(PS.mapLen||30)===m?'on':''}" onclick="psSet('mapLen',${m},this)">${m}칸</button>`).join('')}</div><span class="hint">하루 퀘스트를 다 하면 1칸 (30칸 ≈ 한 달~한 달 반)</span></div>
+  <div class="prow"><span class="pl">보물 지도 칸 수</span><div class="chips">${[30,40,45].map(m=>`<button class="chip ${(PS.mapLen||40)===m?'on':''}" onclick="psSet('mapLen',${m},this)">${m}칸</button>`).join('')}</div><span class="hint">배지 1개 = 1칸 (매일 하면 40칸 ≈ 한 달~한 달 반)</span></div>
   <label class="lb">보물 지도 완성 선물<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
   <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
  if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🎁 스티커판 선물</h4>
   <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards}개</span></div>
   ${s.giftReady?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">스티커판 완성! “${esc(s.settings.giftName)}” 선물을 주세요.</span><button class="btn pink" onclick="giftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 스티커판이 시작돼요 (넘친 스티커는 다음 판으로 옮겨져요)</div>`:'<div class="hint">스티커판이 다 차면 여기서 선물 지급을 확인할 수 있어요.</div>'}</div>
-  <div class="pcard"><h4>🗺️ 보물 지도 선물</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${Math.min(s.mapSteps||0,s.settings.mapLen||30)} / ${s.settings.mapLen||30}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
-  ${(s.mapSteps||0)>=(s.settings.mapLen||30)?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">지도 끝 도착! “${esc(s.settings.mapGift||'보물 선물')}”을 주세요.</span><button class="btn pink" onclick="mapGiftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 보물 지도가 시작돼요</div>`:'<div class="hint">하루 퀘스트를 모두 끝낸 날마다 한 칸씩 가요. 칸이 다 차면 여기서 선물 지급을 확인해요.</div>'}
+  <div class="pcard"><h4>🗺️ 보물 지도 선물</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${mapProg()} / ${s.settings.mapLen||40}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
+  ${mapProg()>=(s.settings.mapLen||40)?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">지도 끝 도착! “${esc(s.settings.mapGift||'보물 선물')}”을 주세요.</span><button class="btn pink" onclick="mapGiftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 보물 지도가 시작돼요</div>`:'<div class="hint">배지를 하나 받을 때마다 한 칸씩 가요. 칸이 다 차면 여기서 선물 지급을 확인해요.</div>'}
   <div class="prow"><button class="btn sm purple" onclick="bonus('map')">🗺️ 지도 1칸 앞으로 (특별 보상)</button></div></div>
   <div class="pcard"><h4>📺 사용 안 한 TV 쿠폰 (${unused.length}장)</h4>${unused.length?unused.map(c=>`<div class="prow"><span class="pl">TV ${c.min}분</span><span class="hint">${prettyDate(c.date)}</span><button class="btn blue sm" onclick="markCoupon('${c.id}')">사용 처리</button></div>`).join(''):'<div class="hint">없어요</div>'}</div>
   <div class="pcard"><h4>🌟 특별 보상 주기</h4><div class="hint">약속을 잘 지켰거나 칭찬할 일이 있을 때 직접 줄 수 있어요.</div>
@@ -990,10 +1107,10 @@ function saveSettings(){const s=S();PS.giftName=($('#p_gift').value.trim()||'선
  const rw=rebuildToday();checkBadges();
  Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
  }
-function mapGiftGiven(){confirmBox('보물 지도 선물을 주셨나요?<br>새 지도를 시작할게요',()=>{const s=S();s.maps=(s.maps||0)+1;s.mapSteps=Math.max(0,(s.mapSteps||0)-(s.settings.mapLen||30));s.mapLog=[];Store.save();SFX.win();toast('새 보물 지도 시작! 🗺️');App.go('parent');},'네, 줬어요');}
+function mapGiftGiven(){confirmBox('보물 지도 선물을 주셨나요?<br>새 지도를 시작할게요',()=>{const s=S();s.maps=(s.maps||0)+1;s.mapOffset=(s.mapOffset||0)+(s.settings.mapLen||40);Store.save();SFX.win();toast('새 보물 지도 시작! 🗺️');App.go('parent');},'네, 줬어요');}
 function giftGiven(){confirmBox('선물을 주셨나요?<br>새 스티커판을 시작할게요',()=>{const s=S();const g=s.settings.stickerGoal;s.stickers.current=s.stickers.current.slice(g);s.stickers.boards++;s.giftReady=s.stickers.current.length>=g;checkBadges();Store.save();SFX.win();toast('새 스티커판 시작! 🐞');App.go('parent');},'네, 줬어요');}
 function markCoupon(id){const c=S().coupons.find(x=>x.id===id);if(c){c.used=true;c.usedAt=todayKey();Store.save();toast('사용 처리했어요');}App.go('parent');}
-function bonus(kind){const s=S();if(kind==='map'){s.mapSteps=(s.mapSteps||0)+1;s.mapLog=(s.mapLog||[]).concat([{d:todayKey()}]);checkBadges();Store.save();SFX.ok();toast('지도 1칸 앞으로! 🗺️');App.go('parent');return;}if(kind==='star'){s.stars++;toast('별 1개를 줬어요 ⭐');}else if(kind==='sticker'){const b=addSticker();toast(`스티커 1개를 줬어요 (${BUGS[b].n})`);}else{s.coupons.unshift({id:'c'+Date.now(),min:s.settings.tvMinutes||10,date:todayKey(),used:false});toast('TV 쿠폰 1장을 줬어요 📺');}checkBadges();Store.save();SFX.ok();App.go('parent');}
+function bonus(kind){const s=S();if(kind==='map'){s.mapBonus=(s.mapBonus||[]).concat([{d:todayKey()}]);checkBadges();Store.save();SFX.ok();toast('지도 1칸 앞으로! 🗺️');App.go('parent');return;}if(kind==='star'){s.stars++;toast('별 1개를 줬어요 ⭐');}else if(kind==='sticker'){const b=addSticker();toast(`스티커 1개를 줬어요 (${BUGS[b].n})`);}else{s.coupons.unshift({id:'c'+Date.now(),min:s.settings.tvMinutes||10,date:todayKey(),used:false});toast('TV 쿠폰 1장을 줬어요 📺');}checkBadges();Store.save();SFX.ok();App.go('parent');}
 function resetProgress(){confirmBox('정말 모든 학습 기록과<br>보상을 지울까요?',()=>{const s=S();const keep={setup:s.setup,settings:s.settings};const n=defaultState();n.setup=keep.setup;n.settings=keep.settings;Store.state=n;Store.save();toast('초기화했어요');App.go('parent');},'지우기',true);}
 function saveAccount(){const s=S();const id=$('#a_id').value.trim().toLowerCase(),pw=$('#a_pw').value,pin=$('#a_pin').value.trim();const e=$('#a_err');
  if(!id&&!pw&&!pin){e.textContent='바꿀 내용을 입력해 주세요';return;}if(pw&&pw.length<4){e.textContent='비밀번호는 4자 이상으로 해주세요';return;}if(pin&&!/^\d{4}$/.test(pin)){e.textContent='부모님 비밀번호는 숫자 4자리예요';return;}
