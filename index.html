@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>도담이와 곤충 탐험대</title>
+<title>도윤이와 곤충 탐험대</title>
 <meta name="theme-color" content="#9FDCFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -324,6 +324,10 @@ details.pcard summary{list-style:none;cursor:pointer}details.pcard summary::-web
 .rws{display:flex;flex-direction:column;gap:2px;margin:6px 0}.modal .rw{font-size:21px;margin:3px 0}
 @media (max-aspect-ratio:1/1){.hboard{grid-template-columns:1fr}}
 @media (max-width:700px){.hb-msg .ppu{width:64px}.hb-msg .bubble{font-size:19px}}
+.claim{display:flex;align-items:center;gap:16px;background:linear-gradient(90deg,#FFF3C4,#FFE0EC);border-radius:26px;padding:14px 20px;box-shadow:0 6px 0 rgba(59,47,92,.1);animation:pop .45s}
+.claim .cl-ic{font-size:54px;animation:wiggle .9s ease-in-out infinite}.claim .cl-t{flex:1;font-size:24px;display:flex;flex-direction:column}.claim small{font-size:16px;color:var(--ink2)}
+.claim .btn{animation:bounceIn 1.2s ease infinite}
+.bottom-nav button.alert{box-shadow:0 6px 0 var(--orange-d),0 0 0 5px rgba(255,159,67,.45)}.bottom-nav button.alert b{color:var(--orange-d)}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -618,7 +622,12 @@ function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
  if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
 let LAST_BOARD_FULL=false;
-function addSticker(){const s=S();const goal=s.settings.stickerGoal||10;if(s.stickers.current.length>=goal)s.stickers.current=[];const c=(s.stickers.total%goal)%CREATURES.length;s.stickers.total++;s.stickers.current.push(c);LAST_BOARD_FULL=false;if(s.stickers.current.length>=goal){s.stickers.boards=(s.stickers.boards||0)+1;s.boardLog=(s.boardLog||[]).concat([{d:todayKey()}]);LAST_BOARD_FULL=true;}s.giftReady=false;return c;}
+function boardFull(){const s=S();return s.stickers.current.length>=(s.settings.stickerGoal||10);}
+function addSticker(){const s=S();const goal=s.settings.stickerGoal||10;const c=(s.stickers.total%goal)%CREATURES.length;s.stickers.total++;LAST_BOARD_FULL=false;
+ if(s.stickers.current.length>=goal){s.stickers.extra=(s.stickers.extra||[]).concat([c]);}else{s.stickers.current.push(c);if(s.stickers.current.length>=goal)LAST_BOARD_FULL=true;}s.giftReady=false;return c;}
+function claimBoard(){const s=S();if(!boardFull())return;const goal=s.settings.stickerGoal||10;s.stickers.boards=(s.stickers.boards||0)+1;s.boardLog=(s.boardLog||[]).concat([{d:todayKey()}]);
+ const ex=s.stickers.extra||[];s.stickers.current=ex.slice(0,goal);s.stickers.extra=ex.slice(goal);const nb=checkBadges();Store.save();SFX.win();speak('스티커판 완성! 보물 지도 한 칸 앞으로!');
+ openOverlay(`<div class="ov-bg"><canvas id="confetti"></canvas><div class="modal"><div class="mchar float">${HERO_SVG}</div><h2>보물 지도 한 칸 앞으로!</h2><div class="rws"><div class="rw">🏆 스티커판 ${s.stickers.boards}판 완성!</div><div class="rw">🐞 새 스티커판이 시작됐어요</div>${nb.map(b=>`<div class="rw">🏅 새 배지: ${b.icon} ${b.name}</div>`).join('')}<div class="rw">🗺️ ${mapProg()} / ${s.settings.mapLen||40}칸</div></div><div class="btns"><button class="btn big green" onclick="closeOverlay();App.go('badges')">좋아요! 🙌</button></div></div></div>`);confetti();}
 const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['family','👪','가족 쓰기'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
 const BT=Object.fromEntries(BADGE_TYPES.map(([t,ic,lb])=>[t,{ic,lb}]));
 function activeSubjects(){const s=S();const en=TYPE_ORDER.filter(t=>s.settings.subjects[t]&&(t!=='family'||familyReady()));return en.length?en:['hangul'];}
@@ -672,7 +681,7 @@ function testMenu(){if(!TEST_MODE())return;openOverlay(`<div class="ov-bg" oncli
  <div class="hint">테스트 모드가 꺼지면 이 메뉴와 버튼은 모두 사라져요.</div></div></div>`);}
 function testCompleteDay(next){const s=S();if(!App.loggedIn||!s.setup){toast('로그인 후에 사용할 수 있어요');return;}const day=ensureToday();let n=0;let lines=[];
  day.quests.forEach(q=>{if(q.done)return;q.done=true;n++;s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;giveCoupon();if(isTrace(q.type))q.pos=traceSeq(q).length;});
- if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);lines.push(`스티커: ${cName(rw.bug)}`);if(LAST_BOARD_FULL)lines.push('스티커판 완성');}
+ if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);lines.push(`스티커: ${cName(rw.bug)}`);if(LAST_BOARD_FULL)lines.push('스티커판 완성(지도에서 한 칸 가기 버튼)');}
  const nb=checkBadges();if(nb.length)lines.push(`배지 ${nb.length}개`);Store.save();
  if(next){DAY_OFF++;try{localStorage.setItem('bugquest_dayoff',String(DAY_OFF));}catch(e){}testBadge();}
  closeOverlay();App.go(App.screen==='parent'?'parent':'home');toast(`✅ ${n}개 완료${lines.length?' · '+lines.join(' · '):''}${next?` → ${prettyDate(todayKey())}`:''}`);}
@@ -722,7 +731,7 @@ function doSetup(){const name=$('#s_name').value.trim(),id=$('#s_id').value.trim
 
 /* ---------- 로그인 ---------- */
 function renderLogin(){return `<div class="screen center login">
- <div class="logo">도담이와<b>곤충 탐험대</b></div>
+ <div class="logo">도윤이와<b>곤충 탐험대</b></div>
  <div class="login-row"><div class="char hero bob">${HERO_SVG}</div>
  <form class="panel loginbox" onsubmit="event.preventDefault();doLogin()">
   <div class="bubble">안녕! 아이디랑 비밀번호를 넣어줘 🐞</div>
@@ -759,8 +768,8 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  </section>
  <section class="quests">${qs.map((q,i)=>{const T=TYPES[q.type];const nx=i===ni;return `<button class="qcard ${q.done?'done':''} ${nx?'next':''}" style="--c:${T.c};--cs:${T.cs}" onclick="startQuest(${i})"><div class="qnum">${i+1}</div><div class="qicon">${T.icon}</div><div class="qname">${T.name}</div><div class="qsub">${esc(questSub(q))}</div>${q.done?'<div class="stamp">참<br>잘했어요</div>':''}${nx?'<div class="qgo">▶ 시작!</div>':''}</button>`;}).join('')}</section>
  <nav class="bottom-nav">
-  <button onclick="App.go('badges')"><span class="ni">🗺️</span><span>보물 지도</span><b>${mapProg()} / ${s.settings.mapLen||40}칸</b></button>
-  <button onclick="App.go('stickers')"><span class="ni">🐞</span><span>스티커판</span><b>${Math.min(cur,goal)} / ${goal}</b></button>
+  <button class="${boardFull()?'alert':''}" onclick="App.go('badges')"><span class="ni">🗺️</span><span>보물 지도</span><b>${boardFull()?'🏆 한 칸 가기!':`${mapProg()} / ${s.settings.mapLen||40}칸`}</b></button>
+  <button onclick="App.go('stickers')"><span class="ni">🐞</span><span>스티커판</span><b>${cur>=goal?'완성! 🏆':`${cur} / ${goal}`}</b></button>
   <button onclick="App.go('coupons')"><span class="ni">📺</span><span>TV 쿠폰</span><b>${unused.length}장 · ${umin}분</b></button>
   <button onclick="App.go('gallery')"><span class="ni">🎨</span><span>갤러리</span><b>${Store.drawings.length}장</b></button>
  </nav></div>`;}
@@ -1111,8 +1120,8 @@ function finishQuest(){const s=S();
  q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='num'&&q.nums)s.progress.num=Math.max(s.progress.num,q.nums[q.nums.length-1]);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;const cm=giveCoupon();if(cm)lines.push(`<span>📺 TV ${cm}분 쿠폰 1장을 받았어요!</span>`);
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
- if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도 한 칸 앞으로!</span>');}
- const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));const stepsAdd=nb.length+(bug!=null&&LAST_BOARD_FULL?1:0);if(stepsAdd){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${stepsAdd}칸 앞으로! (${pg} / ${L})</span>`);}
+ if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도에서 <b>한 칸 가기</b> 버튼을 눌러봐!</span>');}
+ const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));const stepsAdd=nb.length;if(stepsAdd){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${stepsAdd}칸 앞으로! (${pg} / ${L})</span>`);}
  Store.save();SFX.win();
  showCelebrate({title:bug!=null?'오늘 탐험 성공!':'참 잘했어요!',lines,bug});
  speak(bug!=null?`오늘 탐험 성공! 새 친구, ${eulReul(cName(bug))} 만났어!`:'참 잘했어요! 별을 받았어!');}
@@ -1121,7 +1130,7 @@ function finishQuest(){const s=S();
 function subbar(title){return `<header class="subbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><h2>${title}</h2></header>`;}
 function renderStickers(){const s=S();const goal=s.settings.stickerGoal;const cur=s.stickers.current;const left=Math.max(0,goal-cur.length);
  return `<div class="screen">${subbar('🐞 탐험 스티커판')}
- <div class="gift-banner ${cur.length>=goal?'ready':''}"><div class="gift-box">🗺️</div><div>${cur.length>=goal?`<div class="gb-t">스티커판 완성! 보물 지도 한 칸 앞으로 갔어요 🏆</div>`:`<div class="gb-t">스티커 <b style="color:var(--pink-d)">${left}개</b> 더 모으면 보물 지도 한 칸!</div>`}<div class="gb-gift">🎁 최종 선물: ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">하루 퀘스트를 다 하면 스티커 1개! 다 채우면 새 판이 시작돼요</div></div></div>
+ <div class="gift-banner ${cur.length>=goal?'ready':''}"><div class="gift-box">🗺️</div><div>${cur.length>=goal?`<div class="gb-t">스티커판 완성! 🏆 보물 지도에서 한 칸 갈 수 있어요</div><button class="btn orange" style="margin:6px 0" onclick="App.go('badges')">🗺️ 보물 지도로 가서 한 칸 가기 ▶</button>`:`<div class="gb-t">스티커 <b style="color:var(--pink-d)">${left}개</b> 더 모으면 보물 지도 한 칸!</div>`}<div class="gb-gift">🎁 최종 선물: ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">하루 퀘스트를 다 하면 스티커 1개! 다 채우면 새 판이 시작돼요</div></div></div>
  <div class="board">${Array.from({length:goal},(_,i)=>i<cur.length?`<div class="slot full"><span class="no">${i+1}</span><div class="sart">${cArt(cur[i])}</div></div>`:`<div class="slot"><span class="no">${i+1}</span>?</div>`).join('')}</div>
  <h3 class="sec">🔍 탐험 도감 <small style="font-size:18px;color:var(--ink2)">(${Math.min(s.stickers.total,goal)} / ${goal})</small></h3>
  <div class="dex">${CREATURES.slice(0,goal).map((b,i)=>{const got=s.stickers.total>i;return `<div class="dexi ${got?'':'lock'}"><div class="sart">${cArt(i)}</div><div class="dn">${got?esc(b.n):'???'}</div></div>`;}).join('')}</div></div>`;}
@@ -1157,6 +1166,7 @@ function renderBadges(){const s=S();const N=s.settings.mapLen||40;const ent=mapE
  const path='M'+pts.map(p=>`${p.x} ${p.y}`).join(' L');const dp=steps?'M'+pts.slice(0,steps+1+(done?1:0)).map(p=>`${p.x} ${p.y}`).join(' L'):'';
  return `<div class="screen">${subbar('🗺️ 보물 지도')}
  <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">배지·스티커판으로 한 칸씩! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">받은 배지가 순서대로 지도에 붙어요</div>`}</div></div>
+ ${boardFull()?`<div class="claim"><div class="cl-ic">🏆</div><div class="cl-t">스티커판을 다 모았어요!<small>버튼을 누르면 보물 지도 한 칸 앞으로 가고 새 스티커판이 시작돼요</small></div><button class="btn big orange" onclick="claimBoard()">한 칸 가기 ▶</button></div>`:''}
  <div class="map" style="height:${rows*130+30}px"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${path}" class="road"/>${dp?`<path d="${dp}" class="road done"/>`:''}</svg>${nodes}</div>
  <h3 class="sec">🎯 보물 지도 앞으로 가는 방법</h3>
  <div class="how"><div><b>🏅</b>배지 받기<small>과목 퀘스트·별·연속 출석</small></div><div><b>🏆</b>스티커판 채우기<small>${s.settings.stickerGoal||10}칸을 채울 때마다</small></div><div><b>💌</b>부모님 칭찬<small>약속을 잘 지켰을 때</small></div><div><b>📺</b>TV 쿠폰은 따로!<small>퀘스트 1개 = 쿠폰 1장</small></div></div>
