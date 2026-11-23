@@ -6,8 +6,12 @@
 window.ADMIN_CONFIG = {
   rev: 3,
 
-  // 테스트 모드: true면 화면 위에 '처음으로' 버튼이 보여요. 실사용 때 false로 바꿔요.
-  testMode: true,
+  // 테스트 모드: true면 테스트 메뉴(날짜 넘기기·강제 완료)가 보여요. 실사용은 false.
+  testMode: false,
+
+  // 실사용 시작 표시: 이 값이 바뀌면 태블릿의 학습 기록·보상·그림을 한 번 비우고 새로 시작해요
+  // (아이 계정·부모 설정·가족 정보는 그대로 유지)
+  resetId: 'launch-2026-11-23',
 
   settings: {
     questCount: 5,                 // 하루 퀘스트 개수 (1~7)
