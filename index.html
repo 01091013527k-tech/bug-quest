@@ -58,6 +58,8 @@ label.lb{display:flex;flex-direction:column;gap:6px;font-size:19px;color:var(--i
 @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
 @keyframes bounceIn{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
 .shake{animation:shake .45s}
+.gicon{display:inline-block;width:42px;height:42px;vertical-align:middle}.gicon svg{width:100%;height:100%}
+.cbug.shake{animation:shake .45s}
 .pop{animation:pop .45s ease}
 
 /* loading */
@@ -151,7 +153,7 @@ label.lb{display:flex;flex-direction:column;gap:6px;font-size:19px;color:var(--i
 .meter{position:relative;height:26px;background:#fff;border-radius:14px;overflow:visible;box-shadow:inset 0 2px 0 rgba(0,0,0,.06)}
 .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFE58A,#FFB443);border-radius:14px;transition:width .3s}
 .meter .mstar{position:absolute;right:-8px;top:-12px;font-size:32px}
-.btn.ready{animation:bounceIn .6s ease infinite}
+.btn.ready{box-shadow:0 6px 0 var(--bd),0 0 0 7px rgba(92,201,107,.35)}
 @media (max-aspect-ratio:1/1){
  .trace-wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}
  .letter-card{flex-direction:row;padding:10px 16px}
@@ -401,7 +403,7 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:3,subjects:{hangul:true,abc:true,num:true,listen:true,count:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감'},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,abc:0,num:0,listen:0,count:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[]};}
+function defaultState(){return {v:1,setup:null,settings:{questCount:3,subjects:{hangul:true,abc:true,num:true,listen:true,count:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all'},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,abc:0,num:0,listen:0,count:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[]};}
 function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
@@ -430,19 +432,28 @@ const S=()=>Store.state;
 function level(stars){return Math.floor(stars/10)+1;}
 function levelTitle(l){return LEVELS[Math.min(l-1,LEVELS.length-1)];}
 function streak(){const s=S();let n=0;const d=new Date();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
+function traceSeq(q){if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;return [NUMS[(q.idx||0)%NUMS.length]];}
+function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-1)];}
+const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
+const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
 function makeQuest(t,off){const s=S();
- if(t==='hangul'||t==='abc'||t==='num'){const idx=s.progress[t]+(off[t]||0);off[t]=(off[t]||0)+1;return {type:t,idx,done:false};}
+ if(t==='hangul'||t==='abc'){return {type:t,set:t==='hangul'?(s.settings.hangulSet||'all'):'all',pos:0,done:false};}
+ if(t==='num'){const idx=s.progress[t]+(off[t]||0);off[t]=(off[t]||0)+1;return {type:t,idx,done:false};}
  if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
   for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const rounds=[];for(let r=0;r<3;r++){const n=1+rint(maxN);const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({n,bug:rint(BUGS.length),ch:shuffle(ch)});}return {type:t,rounds,done:false};}
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const rounds=[];
+  for(let r=0;r<3;r++){const bug=bugs[r];let n;const others=[];
+   if(r===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r===1?1:2;for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:bugs[3+r+k],k:c});left-=c;}}
+   const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({n,bug,others,ch:shuffle(ch)});}
+  return {type:t,rounds,done:false};}
  if(t==='eng'){const picks=shuffle(SENT.map((_,i)=>i)).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
  if(t==='draw'){return {type:t,theme:THEMES[rint(THEMES.length)],done:false};}
 }
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
-function questSub(q){if(q.type==='hangul'||q.type==='abc'||q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return '3문제';if(q.type==='eng')return '2문제';return '';}
+function questSub(q){if(q.type==='hangul'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return '3문제';if(q.type==='eng')return '2문제';return '';}
 function grantDayReward(day){const s=S();day.allDone=true;const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
@@ -570,16 +581,16 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
 
 /* ---------- 퀘스트 ---------- */
 let Q=null;
-function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i];Q={i,dayKey:k,q,practice:q.done,round:0,tapped:0,locked:false};App.go('quest');}
+function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i];Q={i,dayKey:k,q,practice:q.done,round:0,tapped:0,locked:false,pos:q.done?0:(q.pos||0)};App.go('quest');}
 function guideText(){const q=Q.q;
- if(q.type==='hangul'||q.type==='abc'||q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
+ if(q.type==='hangul'||q.type==='abc'||q.type==='num'){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
  if(q.type==='listen')return '소리를 잘 듣고, 맞는 글자를 골라봐!';
- if(q.type==='count')return '곤충을 하나씩 눌러 세어 보고, 몇 마리인지 골라봐!';
+ if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const sp=species(r.bug);return `<span class="gicon">${bugSVG(r.bug)}</span> <b>${eunNeun(sp)}</b> 몇 마리일까? ${r.others&&r.others.length?'다른 곤충은 빼고 ':''}하나씩 눌러 세어봐!`;}
  if(q.type==='eng')return '영어 문장을 듣고, 맞는 그림을 골라봐!';
  if(q.type==='draw')return `오늘의 주제는 <b>“${esc(q.theme)}”</b>! 마음껏 그려봐!`;}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
- <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div><div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
+ <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='abc')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
  <div class="qbody" id="qbody"></div></div>`;}
 function mountQuest(){const t=Q.q.type;if(t==='hangul'||t==='abc'||t==='num')mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
@@ -604,12 +615,12 @@ function pickCrayon(i,el){SFX.tap();if(!PAD)return;PAD.color=CRAYONS[i];PAD.eras
 
 /* 따라쓰기 */
 let TRACE=null;
-async function mountTrace(){const q=Q.q;const list=traceList(q.type);const it=list[q.idx%list.length];
+async function mountTrace(){const q=Q.q;const it=curItem();
  const word=q.type==='hangul'?`${it[3]}<div class="lc-word">${it[2]}</div>`:q.type==='abc'?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
  $('#qbody').innerHTML=`<div class="trace-wrap">
  <div class="letter-card"><div class="lc-ch">${esc(it[0])}</div><div class="lc-emoji">${word}</div><button class="btn sm purple" onclick="sayTrace()">🔊 들어보기</button></div>
  <div class="canvas-box" id="cbox"><div class="sq" id="sq"><canvas id="tpl"></canvas><canvas id="ink"></canvas></div></div>
- <div class="tools">${crayonHTML(0)}<button class="btn gray" onclick="clearTrace()">🧽 지우기</button><div class="meter"><i id="meter"></i><span class="mstar">⭐</span></div><button id="doneBtn" class="btn green" style="font-size:25px;padding:16px 8px" onclick="finishTrace()" disabled>다 했어요! ✅</button></div></div>`;
+ <div class="tools">${crayonHTML(0)}<button class="btn gray" onclick="clearTrace()">🧽 지우기</button><div class="meter"><i id="meter"></i><span class="mstar">⭐</span></div><button id="doneBtn" class="btn green" style="font-size:25px;padding:16px 8px" onclick="finishTrace()">다 했어요! ✅</button></div></div>`;
  try{await withTimeout(document.fonts.load('200px Jua',it[0]),3000);}catch(e){}
  if(App.screen!=='quest')return;
  const box=$('#cbox').getBoundingClientRect();const size=Math.max(220,Math.floor(Math.min(box.width,box.height)-14));const sq=$('#sq');sq.style.width=size+'px';sq.style.height=size+'px';
@@ -628,13 +639,18 @@ async function mountTrace(){const q=Q.q;const list=traceList(q.type);const it=li
  PAD=makePad(ink,{onEnd:checkTrace});PAD.size=Math.max(14,W*0.075);PAD.color=CRAYONS[0];
  TRACE={pts,W,ink,ready:false};
  setTimeout(()=>{if(App.screen==='quest')sayTrace();},300);}
-function sayTrace(){const q=Q.q;const it=traceList(q.type)[q.idx%traceList(q.type).length];
+function sayTrace(){const q=Q.q;const it=curItem();
  if(q.type==='hangul')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
-function checkTrace(){if(!TRACE)return;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.6;
- $('#meter').style.width=Math.min(100,ratio/goal*100)+'%';
- if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');b.disabled=false;b.classList.add('ready');SFX.ok();setGuide('우와, 멋지다! <b>다 했어요</b>를 눌러봐! 👏');}}
-function clearTrace(){SFX.tap();if(PAD)PAD.clear();if(TRACE){TRACE.ready=false;$('#meter').style.width='0%';const b=$('#doneBtn');b.disabled=true;b.classList.remove('ready');}}
-function finishTrace(){if(!TRACE||!TRACE.ready)return;finishQuest();}
+function checkTrace(){if(!TRACE)return 0;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.3;
+ const m=$('#meter');if(m)m.style.width=Math.min(100,ratio/goal*100)+'%';
+ if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');if(b)b.classList.add('ready');setGuide('좋아! 다 썼으면 <b>다 했어요</b>를 눌러줘! 👏');}
+ return ratio;}
+function clearTrace(){SFX.tap();if(PAD)PAD.clear();if(TRACE){TRACE.ready=false;$('#meter').style.width='0%';const b=$('#doneBtn');if(b)b.classList.remove('ready');}}
+function finishTrace(){if(!TRACE)return;const ratio=checkTrace();
+ if(ratio<0.3){SFX.no();const b=$('#doneBtn');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}setGuide('점선을 조금 더 따라 써볼까? ✏️');return;}
+ const len=traceSeq(Q.q).length;
+ if(Q.pos+1<len){Q.pos++;if(!Q.practice){Q.q.pos=Q.pos;Store.save();}SFX.ok();TRACE=null;const tp=$('#tpos');if(tp)tp.textContent=`${Q.pos+1} / ${len}`;setGuide(`잘했어! 👏 다음은 <b>${esc(curItem()[0])}</b>!`);mountTrace();}
+ else{if(!Q.practice){Q.q.pos=len;}finishQuest();}}
 
 /* 소리 듣고 고르기 */
 function listenItem(r){return r.mode==='ko'?HANGUL[r.a]:ABC[r.a];}
@@ -649,14 +665,18 @@ function pickListen(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];
 function nextRound(mount){Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mount();}},1300);}
 
 /* 곤충 세기 */
-function mountCount(){const r=Q.q.rounds[Q.round];Q.tapped=0;
- const cells=shuffle(Array.from({length:12},(_,i)=>i)).slice(0,r.n);
- $('#qbody').innerHTML=`<div class="count"><div class="field-area" id="farea">${cells.map((c,k)=>{const col=c%4,row=Math.floor(c/4);const x=6+col*23+Math.random()*6,y=4+row*31+Math.random()*6;return `<button class="cbug" style="left:${x}%;top:${y}%;animation-delay:-${(k*0.37).toFixed(2)}s" onclick="tapBug(this)">${bugSVG(r.bug)}</button>`;}).join('')}</div>
- <div class="choices num">${r.ch.map(n=>`<button class="choice" onclick="pickCount(this,${n})">${n}</button>`).join('')}</div></div>`;Q.locked=false;}
-function tapBug(el){if(el.querySelector('.n'))return;Q.tapped++;const n=Q.tapped;el.insertAdjacentHTML('beforeend',`<span class="n">${n}</span>`);SFX.tap();speak(NUMS[Math.min(n,10)-1][1]);}
+function mountCount(){const r=Q.q.rounds[Q.round];Q.tapped=0;const others=r.others||[];
+ const items=shuffle(Array(r.n).fill(r.bug).concat(...others.map(o=>Array(o.k).fill(o.bug))));
+ const cells=shuffle(Array.from({length:12},(_,i)=>i)).slice(0,items.length);
+ $('#qbody').innerHTML=`<div class="count"><div class="field-area" id="farea">${cells.map((c,k)=>{const col=c%4,row=Math.floor(c/4);const x=6+col*23+Math.random()*6,y=4+row*31+Math.random()*6;const b=items[k];return `<button class="cbug" data-b="${b}" data-t="${b===r.bug?1:0}" style="left:${x}%;top:${y}%;animation-delay:-${(k*0.37).toFixed(2)}s" onclick="tapBug(this)">${bugSVG(b)}</button>`;}).join('')}</div>
+ <div class="choices num">${r.ch.map(n=>`<button class="choice" onclick="pickCount(this,${n})">${n}</button>`).join('')}</div></div>`;Q.locked=false;
+ setTimeout(()=>{if(App.screen==='quest')speak(`${eunNeun(species(r.bug))} 몇 마리일까?`);},350);}
+function tapBug(el){const r=Q.q.rounds[Q.round];if(el.querySelector('.n'))return;
+ if(el.dataset.t!=='1'){SFX.no();el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');const o=species(+el.dataset.b),t=species(r.bug);setGuide(`이건 <b>${o}</b>야! <span class="gicon">${bugSVG(r.bug)}</span> <b>${t}</b>만 세어보자!`);speak(`이건 ${o}야! ${t}만 세어보자!`);return;}
+ Q.tapped++;const n=Q.tapped;el.insertAdjacentHTML('beforeend',`<span class="n">${n}</span>`);SFX.tap();speak(NUMS[Math.min(n,10)-1][1]);}
 function pickCount(el,n){if(Q.locked)return;const r=Q.q.rounds[Q.round];
- if(n===r.n){Q.locked=true;el.classList.add('right');SFX.ok();setGuide(`맞았어! <b>${COUNTER[n]} 마리</b>야! 👏`);speak(`맞았어! ${COUNTER[n]} 마리!`);nextRound(mountCount);}
- else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide('다시 하나씩 눌러서 세어볼까? 🐞');}}
+ if(n===r.n){Q.locked=true;el.classList.add('right');SFX.ok();const sp=species(r.bug);setGuide(`맞았어! ${sp} <b>${COUNTER[n]} 마리</b>야! 👏`);speak(`맞았어! ${sp} ${COUNTER[n]} 마리!`);nextRound(mountCount);}
+ else{el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide(`<span class="gicon">${bugSVG(r.bug)}</span> <b>${species(r.bug)}</b>만 하나씩 눌러서 다시 세어볼까?`);}}
 
 /* 영어 문장 */
 function mountEng(){const r=Q.q.rounds[Q.round];const s=SENT[r.a];
@@ -690,7 +710,7 @@ async function finishDraw(){if(!PAD)return;if(PAD.strokes<2){setGuide('조금만
 function finishQuest(){const s=S();
  if(Q.practice){SFX.win();showCelebrate({title:'연습 끝! 잘했어요!',lines:['<span>💪 연습도 정말 멋졌어!</span>']});return;}
  const day=s.days[Q.dayKey];const q=day&&day.quests[Q.i];if(!q||q.done){App.go('home');return;}
- q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.idx!=null&&s.progress[q.type]!=null)s.progress[q.type]=Math.max(s.progress[q.type],q.idx+1);
+ q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
  if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(rw.min)lines.push(`<span>📺 TV ${rw.min}분 쿠폰을 받았어요!</span>`);if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
@@ -752,6 +772,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
  if(tab==='settings'){body=`<div class="pcard"><h4>📚 하루 퀘스트</h4>
   <div class="prow"><span class="pl">하루 퀘스트 개수</span><div class="stepper"><button onclick="psStep(-1)">−</button><span id="qc">${PS.questCount}</span><button onclick="psStep(1)">+</button></div><span class="hint">퀘스트 1개에 약 2~3분</span></div>
   <div class="prow"><span class="pl">학습 과목</span><div class="chips">${TYPE_ORDER.map(t=>`<button class="chip ${PS.subjects[t]?'on':''}" onclick="psSub('${t}',this)">${TYPES[t].icon} ${TYPES[t].name}</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">한글 따라쓰기 범위</span><div class="chips">${[['all','자음+모음 24자'],['consonants','자음 14자'],['vowels','모음 10자']].map(([v,l])=>`<button class="chip ${(PS.hangulSet||'all')===v?'on':''}" onclick="psSet('hangulSet','${v}',this)">${l}</button>`).join('')}</div></div>
   <div class="hint">선택한 과목이 매일 돌아가며 나와요. 과목 수보다 퀘스트가 많으면 겹쳐서 나와요.</div></div>
   <div class="pcard"><h4>🎁 보상 규칙</h4>
   <div class="prow"><span class="pl">하루 완료 시 TV 쿠폰</span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
