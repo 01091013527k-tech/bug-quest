@@ -361,6 +361,8 @@ details.pcard summary{list-style:none;cursor:pointer}details.pcard summary::-web
 .brk{font-size:72px;color:var(--green-d);margin:6px 0}
 .pr-slot{display:flex;align-items:center;gap:8px;background:#F7F4FF;border-radius:16px;padding:8px 12px}
 @media (max-aspect-ratio:1/1){.closet{grid-template-columns:1fr}}
+.savebar{position:sticky;bottom:10px;z-index:5;display:flex;justify-content:center}.savebar .btn{box-shadow:0 6px 0 var(--green-d),0 8px 24px rgba(59,47,92,.25)}
+.ptab{font-size:20px;padding:10px 16px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -824,7 +826,7 @@ function mountLogin(){}
 function doLogin(){const st=S().setup;const id=$('#l_id').value.trim().toLowerCase(),pw=$('#l_pw').value;
  if(id===st.childId&&hash(pw)===st.pwHash){App.loggedIn=true;if($('#l_auto').checked)lsSet('bugquest_auto',hash('auto:'+st.childId+st.pwHash));else lsDel('bugquest_auto');SFX.win();App.go('home');setTimeout(()=>speak(`${callName(st.childName)}, 안녕! 오늘도 탐험하러 가자!`),400);}
  else{$('#l_err').textContent='앗! 아이디나 비밀번호가 달라요';$('.loginbox').classList.remove('shake');void $('.loginbox').offsetWidth;$('.loginbox').classList.add('shake');SFX.no();}}
-function forgotPw(){askPin('부모님 비밀번호',()=>{App.ptab='account';App.parentFrom='login';App.go('parent');});}
+function forgotPw(){askPin('부모님 비밀번호',()=>{App.ptab='account';PS=null;App.parentFrom='login';App.go('parent');});}
 function logout(){lsDel('bugquest_auto');App.loggedIn=false;App.go('login');}
 
 /* ---------- 홈 ---------- */
@@ -1018,7 +1020,8 @@ async function mountTrace(){const q=Q.q;const it=curItem();
   tc.fillStyle='#F3ECFF';tc.fillText(ch,x,y);tc.setLineDash([10*dpr,9*dpr]);tc.lineWidth=4*dpr;tc.strokeStyle='#B7A2F0';tc.lineJoin='round';tc.strokeText(ch,x,y);tc.setLineDash([]);}
  const md=m.getImageData(0,0,W,W).data;const step=Math.max(4,Math.round(W/110));const pts=[];for(let yy=0;yy<W;yy+=step)for(let xx=0;xx<W;xx+=step){if(md[(yy*W+xx)*4+3]>128)pts.push(yy*W+xx);}
  PAD=makePad(ink,{onEnd:checkTrace,onStart:()=>{stopOrder();if(TRACE&&TRACE.auto){clearTimeout(TRACE.auto);TRACE.auto=null;}}});PAD.size=Math.max(14,W*0.075);PAD.color=CRAYONS[0];
- TRACE={pts,W,ink,an,ss,ready:false,dpr};
+ const sp=ss?ss.map(p=>{const L=pLen(p);const n=Math.max(4,Math.round(L/(W*0.025)));return Array.from({length:n+1},(_,j)=>{const q=pAt(p,L*j/n);return [Math.round(q[0]),Math.round(q[1])];});}):null;
+ TRACE={pts,W,ink,an,ss,sp,ready:false,dpr};
  setTimeout(()=>{if(App.screen==='quest'){sayTrace();if(ss)playOrder();}},300);}
 let ORDER_TOK=0;
 function stopOrder(){ORDER_TOK++;if(TRACE&&TRACE.an)TRACE.an.getContext('2d').clearRect(0,0,TRACE.W,TRACE.W);}
@@ -1034,10 +1037,14 @@ function playOrder(){if(!TRACE||!TRACE.ss)return;stopOrder();const tok=ORDER_TOK
  requestAnimationFrame(step);}
 function sayTrace(){const q=Q.q;const it=curItem();
  if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else if(q.type==='abcl')speak(`small ${it[0].toUpperCase()}. ${it[1]}.`,'en');else if(q.type==='family'){speak(it[5]==='tel'?`${it[1]}, ${it[2].map(p=>p.split('').map(d=>DIGIT_KO[+d]).join(' ')).join(', ')}`:`${it[1]}, ${it[2].join('')}. ${it[0]}`);}else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
-function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.3;
+function strokeCov(){const {sp,W,ink}=TRACE;if(!sp)return null;const d=ink.getContext('2d').getImageData(0,0,W,W).data;const r=Math.round(W*0.03);const hit=(x,y)=>{for(const [dx,dy] of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=W||Y>=W)continue;if(d[(Y*W+X)*4+3]>0)return true;}return false;};return sp.map(ps=>ps.filter(([x,y])=>hit(x,y)).length/ps.length);}
+function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;const sc=strokeCov();let ratio,minS=1;
+ if(sc){minS=Math.min(...sc);ratio=sc.reduce((a,b)=>a+b,0)/sc.length;TRACE.minS=minS;TRACE.sc=sc;if(minS<0.6)ratio=Math.min(ratio,0.49);if(minS<0.35)ratio=Math.min(ratio,0.29);}
+ else{const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;ratio=pts.length?c/pts.length:0;}
+ const goal=0.3;
  const m=$('#meter');if(m)m.style.width=Math.min(100,ratio/goal*100)+'%';
  if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');if(b)b.classList.add('ready');}
- if(ratio>=0.5){const tok=TRACE;clearTimeout(tok.auto);setGuide('우와, 다 썼다! 👏');tok.auto=setTimeout(()=>{if(TRACE===tok&&App.screen==='quest')finishTrace();},700);}
+ if(ratio>=(TRACE.sp?0.75:0.5)&&(!TRACE.sp||TRACE.minS>=0.6)){const tok=TRACE;clearTimeout(tok.auto);setGuide('우와, 다 썼다! 👏');tok.auto=setTimeout(()=>{if(TRACE===tok&&App.screen==='quest')finishTrace();},700);}
  else if(TRACE.ready)setGuide('좋아! 조금만 더 따라 쓰면 다음 글자로 넘어가! ✏️');
  return ratio;}
 function clearTrace(){SFX.tap();if(PAD)PAD.clear();if(TRACE){TRACE.clears=(TRACE.clears||0)+1;TRACE.ready=false;$('#meter').style.width='0%';const b=$('#doneBtn');if(b)b.classList.remove('ready');}}
@@ -1046,7 +1053,7 @@ function saveThumb(){const T=TRACE;const S2=150;const c=document.createElement('
  if(T.ss){const ss=mapPts(compStrokes(curItem()[0]),S2);drawBody(x,ss,S2,'#EFE7FF',S2*0.1);}
  x.drawImage(T.ink,0,0,S2,S2);Q.thumbs=Q.thumbs||[];Q.thumbs[Q.pos]=c.toDataURL('image/jpeg',0.7);lsSet('bugquest_wip',{k:wipKey(),t:Q.thumbs});}
 function finishTrace(){if(!TRACE||TRACE.done||App.screen!=='quest')return;if(TRACE.auto){clearTimeout(TRACE.auto);TRACE.auto=null;}const ratio=checkTrace();if(TRACE.auto){clearTimeout(TRACE.auto);TRACE.auto=null;}
- if(ratio<0.3){TRACE.rej=(TRACE.rej||0)+1;SFX.no();const b=$('#doneBtn');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}setGuide('점선을 조금 더 따라 써볼까? ✏️');return;}
+ if(ratio<0.3){TRACE.rej=(TRACE.rej||0)+1;SFX.no();const b=$('#doneBtn');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');}{const sc=TRACE.sc;const k=sc?sc.indexOf(Math.min(...sc)):-1;setGuide(k>=0&&TRACE.ss.length>1?`아직 <b>${k+1}번</b> 선을 덜 썼어! 끝까지 따라 써볼까? ✏️`:'점선을 끝까지 따라 써볼까? ✏️');}return;}
  TRACE.done=true;stopOrder();try{saveThumb();}catch(e){}
  {const it=curItem();Q.wr=[];if(TRACE.rej)Q.wr.push(`덜 쓰고 누름 ${TRACE.rej}번`);if(TRACE.clears)Q.wr.push(`지우고 다시 씀 ${TRACE.clears}번`);logEvent(it[0],`${it[0]} 따라쓰기`,`${Math.round(ratio*100)}% 따라씀`,{c:Math.round(ratio*100)});}
  const len=traceSeq(Q.q).length;
@@ -1278,36 +1285,39 @@ function pinKey(k){SFX.tap();if(k==='del')PIN.v=PIN.v.slice(0,-1);else if(PIN.v.
 
 /* ---------- 부모 모드 ---------- */
 let PS=null;
-function openParent(){askPin('부모님 메뉴',()=>{App.ptab='records';CSEL.clear();App.parentFrom='home';App.go('parent');});}
+function openParent(){askPin('부모님 메뉴',()=>{App.ptab='records';PS=null;CSEL.clear();App.parentFrom='home';App.go('parent');});}
 function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settings));const tab=App.ptab;
- const tabs=[['records','📊 학습 리포트'],['settings','⚙️ 학습 설정'],['rewards','🎁 보상 관리'],['account','🔑 계정']];if(tab==='diary')App.ptab=tab='records';
+ if(tab==='diary')App.ptab=tab='records';if(tab==='settings')App.ptab=tab='learn';
+ const tabs=[['records','📊 리포트'],['learn','📚 학습'],['rewards','🎁 보상'],['life','⏰ 생활'],['account','🔑 계정']];
  let body='';
- if(tab==='settings'){body=`<div class="pcard"><h4>📚 하루 퀘스트</h4>
+ if(tab==='learn'){body=`<div class="pcard"><h4>📚 하루 퀘스트</h4>
   <div class="prow"><span class="pl">하루 퀘스트 개수</span><div class="stepper"><button onclick="psStep(-1)">−</button><span id="qc">${PS.questCount}</span><button onclick="psStep(1)">+</button></div><span class="hint">퀘스트 1개에 약 2~3분</span></div>
   <div class="prow"><span class="pl">학습 과목</span><div class="chips">${TYPE_ORDER.map(t=>`<button class="chip ${PS.subjects[t]?'on':''}" onclick="psSub('${t}',this)">${TYPES[t].icon} ${TYPES[t].name}</button>`).join('')}</div></div>
+  <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label>
   <div class="hint">선택한 과목이 매일 돌아가며 나와요. 과목 수보다 퀘스트가 많으면 겹쳐서 나와요.</div></div>
-  <div class="pcard"><h4>🎁 보상 규칙</h4>
-  <div class="prow"><span class="pl">학습 1개당 TV 쿠폰 1장<br><small>(1장 시청 시간)</small></span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
-  <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
-  <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
-  <div class="pcard"><h4>⏰ 사용 시간 관리</h4>
+  <div class="pcard"><h4>🔢 숫자 따라쓰기 범위</h4><div class="chips">${[10,20,30,50,100].map(m=>`<button class="chip ${(PS.numMax||10)===m?'on':''}" onclick="psSet('numMax',${m},this)">1~${m}</button>`).join('')}</div><div class="hint">매일 숫자 10개를 써요. 범위를 넓히면 새로 배우는 숫자(예: 21~30) 5개 + 앞에서 배운 숫자 5개가 섞여 나와요.</div></div>
+  <div class="pcard"><h4>👪 우리 가족 따라쓰기</h4><div class="hint">입력한 정보로 따라쓰기 문제가 만들어져요. 이 정보는 태블릿 안에만 저장되고 인터넷에 올라가지 않아요. 하나도 입력하지 않으면 이 과목은 나오지 않아요.</div>
+  ${FAMILY_FIELDS.map(([k,l,e,kind])=>`<label class="lb">${e} ${l}<input class="inp" id="f_${k}" ${kind==='tel'?'inputmode="tel" placeholder="010-1234-5678"':'placeholder="예: 김민지"'} maxlength="${kind==='tel'?16:8}" value="${esc((s.family||{})[k]||'')}"></label>`).join('')}</div>
+<div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div>`;}
+ if(tab==='life'){body=`  <div class="pcard"><h4>⏰ 사용 시간 관리</h4>
   <div class="prow"><span class="pl">하루 최대 사용</span><div class="chips">${[[0,'제한 없음'],[20,'20분'],[30,'30분'],[45,'45분'],[60,'1시간']].map(([m,l])=>`<button class="chip ${(PS.dailyMax|0)===m?'on':''}" onclick="psSet('dailyMax',${m},this)">${l}</button>`).join('')}</div></div>
   <div class="prow"><span class="pl">잠금 시간</span><div class="chips">${[[0,'없음'],[19,'저녁 7시'],[20,'저녁 8시'],[21,'밤 9시']].map(([m,l])=>`<button class="chip ${(PS.lockHour|0)===m?'on':''}" onclick="psSet('lockHour',${m},this)">${l} 이후</button>`.replace('없음 이후','없음')).join('')}</div></div>
   <div class="prow"><span class="pl">쉬는 시간 알림</span><div class="chips">${[[0,'끄기'],[10,'10분마다'],[15,'15분마다'],[20,'20분마다']].map(([m,l])=>`<button class="chip ${(PS.breakMin??15)===m?'on':''}" onclick="psSet('breakMin',${m},this)">${l}</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">TV 쿠폰 하루 한도</span><div class="chips">${[[0,'제한 없음'],[2,'2장'],[3,'3장'],[5,'5장']].map(([m,l])=>`<button class="chip ${(PS.cpCap|0)===m?'on':''}" onclick="psSet('cpCap',${m},this)">${l}</button>`).join('')}</div></div>
   <div class="hint">시간이 다 되면 "오늘 탐험 끝" 화면이 나오고, 부모님 비밀번호로 그날만 다시 열 수 있어요. 오늘 사용: ${Math.round(((s.usage||{})[todayKey()]||0)/60)}분</div></div>
   <div class="pcard"><h4>🎙️ 엄마·아빠 목소리 칭찬</h4><div class="hint">퀘스트를 끝낼 때 녹음한 칭찬이 랜덤으로 나와요. (예: "도윤아 최고야!", 3초) 태블릿 안에만 저장돼요.</div>
   <div class="prow">${[0,1,2].map(i=>{const u=praiseList()[i];return `<div class="pr-slot"><b>칭찬 ${i+1}</b>${u?`<button class="btn sm blue" onclick="playURL(praiseList()[${i}])">▶ 듣기</button><button class="btn sm gray" onclick="delPraise(${i})">지우기</button>`:`<button class="btn sm orange" id="pr${i}" onclick="recPraise(${i})">🎙️ 녹음하기</button>`}</div>`;}).join('')}</div></div>
   <div class="pcard"><h4>🌤️ 계절·날씨 배경</h4><div class="hint">배경이 계절(봄·여름·가을·겨울)과 오늘 날씨(맑음·구름·비·눈·밤)에 맞춰 매일 바뀌어요. 날씨는 30분마다 새로 확인해요.</div>
   <div class="prow"><span class="pl">날씨 지역</span><div class="chips">${Object.entries(CITIES).map(([k,c])=>`<button class="chip ${!PS.wxLoc&&(PS.wxCity||'seoul')===k?'on':''}" onclick="PS.wxLoc=null;psSet('wxCity','${k}',this)">${c[0]}</button>`).join('')}<button class="chip ${PS.wxLoc?'on':''}" onclick="useMyLoc(this)">📍 현재 위치</button></div></div>
   <div class="prow"><span class="pl">날씨 효과</span><div class="chips"><button class="chip ${PS.wxOn!==false?'on':''}" onclick="psSet('wxOn',true,this)">켜기</button><button class="chip ${PS.wxOn===false?'on':''}" onclick="psSet('wxOn',false,this)">끄기 (계절만)</button></div></div></div>
-  <div class="pcard"><h4>🔢 숫자 따라쓰기 범위</h4><div class="chips">${[10,20,30,50,100].map(m=>`<button class="chip ${(PS.numMax||10)===m?'on':''}" onclick="psSet('numMax',${m},this)">1~${m}</button>`).join('')}</div><div class="hint">매일 숫자 10개를 써요. 범위를 넓히면 새로 배우는 숫자(예: 21~30) 5개 + 앞에서 배운 숫자 5개가 섞여 나와요.</div></div>
-  <div class="pcard"><h4>👪 우리 가족 따라쓰기</h4><div class="hint">입력한 정보로 따라쓰기 문제가 만들어져요. 이 정보는 태블릿 안에만 저장되고 인터넷에 올라가지 않아요. 하나도 입력하지 않으면 이 과목은 나오지 않아요.</div>
-  ${FAMILY_FIELDS.map(([k,l,e,kind])=>`<label class="lb">${e} ${l}<input class="inp" id="f_${k}" ${kind==='tel'?'inputmode="tel" placeholder="010-1234-5678"':'placeholder="예: 김민지"'} maxlength="${kind==='tel'?16:8}" value="${esc((s.family||{})[k]||'')}"></label>`).join('')}</div>
-  <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
- if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
+<div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div>`;}
+ if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>⚙️ 보상 규칙</h4>
+  <div class="prow"><span class="pl">학습 1개당 TV 쿠폰 1장<br><small>(1장 시청 시간)</small></span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">TV 쿠폰 하루 한도</span><div class="chips">${[[0,'제한 없음'],[2,'2장'],[3,'3장'],[5,'5장']].map(([m,l])=>`<button class="chip ${(PS.cpCap|0)===m?'on':''}" onclick="psSet('cpCap',${m},this)">${l}</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
+  <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
+</div><div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div>
+  <div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
   <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards||0}개 · 판을 채울 때마다 보물 지도 1칸</span></div></div>
   <div class="pcard"><h4>🎁 최종 선물 (보물 지도)</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${mapProg()} / ${s.settings.mapLen||40}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
   ${mapProg()>=(s.settings.mapLen||40)?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">지도 끝 도착! “${esc(s.settings.mapGift||'보물 선물')}”을 주세요.</span><button class="btn pink" onclick="mapGiftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 보물 지도가 시작돼요</div>`:'<div class="hint">배지를 하나 받을 때마다 한 칸씩 가요. 칸이 다 차면 여기서 선물 지급을 확인해요.</div>'}
@@ -1318,17 +1328,18 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
  if(tab==='records'){const lv=level(s.stars);body=weeklyReport()+renderDiary()+`<div class="pcard"><h4>🧭 전체 기록</h4><div class="kv">
   <div>별<b>⭐ ${s.stars}</b></div><div>레벨<b>Lv.${lv}</b></div><div>연속 탐험<b>🔥 ${streak()}일</b></div><div>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}</b></div><div>스티커판<b>🏆 ${s.stickers.boards||0}판</b></div><div>그림<b>🎨 ${Store.drawings.length}</b></div></div>
   <div class="hint">과목별 완료 횟수: ${TYPE_ORDER.map(t=>`${TYPES[t].name} ${s.counts[t]||0}`).join(' · ')}</div></div>
-  <details class="pcard"><summary><h4>💾 기록 백업 · 초기화</h4></summary><h4>📤 기록 코드</h4><div class="hint">버튼을 눌러 복사한 코드를 Claude 채팅에 붙여주면 학습 기록을 정리해 드려요. 기기를 바꿀 때 옮기는 용도로도 써요.</div><div><button class="btn purple sm" onclick="copyRecord()">📋 기록 코드 복사</button></div><textarea class="inp" id="rc" readonly placeholder="여기에 코드가 나와요"></textarea>
-  <h4>📥 기록 불러오기</h4><textarea class="inp" id="ri" placeholder="기록 코드를 붙여넣으세요"></textarea><div><button class="btn gray sm" onclick="importRecord()">불러오기</button></div></div>
-  <h4>⚠️ 초기화</h4><div class="hint">별·스티커·쿠폰·배지·학습 기록을 모두 지워요. (계정과 설정, 그림은 남아요)</div><div><button class="btn red sm" onclick="resetProgress()">학습 기록·보상 초기화</button></div></details>`;}
+`;}
  if(tab==='account'){body=`<div class="pcard"><h4>👦 아이 로그인 정보</h4>
   <div class="prow"><span class="pl">현재 아이디</span><span style="font-size:24px">${esc(s.setup.childId)}</span></div>
   <label class="lb">새 아이디 (비워두면 그대로)<input class="inp" id="a_id" autocapitalize="off" autocomplete="off"></label>
   <label class="lb">새 비밀번호 (비워두면 그대로)<input class="inp" id="a_pw" type="password" autocomplete="new-password"></label>
   <label class="lb">새 부모님 비밀번호 4자리 (비워두면 그대로)<input class="inp" id="a_pin" type="password" inputmode="numeric" maxlength="4"></label>
   <div class="err" id="a_err"></div><button class="btn green" onclick="saveAccount()">변경 저장</button></div>
-  <div class="pcard"><h4>💾 저장 위치</h4><div class="hint">${Store.mode==='cloud'?'☁️ Claude 계정에 저장되고 있어요. 같은 Claude 계정으로 로그인한 다른 기기에서도 이어서 할 수 있어요.':'📱 이 태블릿(브라우저)에 저장되고 있어요. 브라우저 데이터를 지우면 기록이 사라질 수 있으니, 가끔 학습 기록 탭에서 기록 코드를 복사해 Claude에게 보내 두세요.'}${Store.syncErr?'<br>⚠️ 최근 저장에 실패했어요. 인터넷 연결을 확인해 주세요.':''}</div>
-  <div class="hint">아이디·비밀번호는 아이용 간단 잠금이에요. 중요한 비밀번호는 쓰지 마세요.</div></div>`;}
+  <div class="pcard"><h4>💾 저장 위치</h4><div class="hint">${Store.mode==='cloud'?'☁️ Claude 계정에 저장되고 있어요. 같은 Claude 계정으로 로그인한 다른 기기에서도 이어서 할 수 있어요.':'📱 이 태블릿(브라우저)에 저장되고 있어요. 브라우저 데이터를 지우면 기록이 사라질 수 있으니, 가끔 아래 「기록 백업」에서 기록 코드를 복사해 Claude에게 보내 두세요.'}${Store.syncErr?'<br>⚠️ 최근 저장에 실패했어요. 인터넷 연결을 확인해 주세요.':''}</div>
+  <div class="hint">아이디·비밀번호는 아이용 간단 잠금이에요. 중요한 비밀번호는 쓰지 마세요.</div></div>
+  <details class="pcard"><summary><h4>💾 기록 백업 · 초기화</h4></summary><h4>📤 기록 코드</h4><div class="hint">버튼을 눌러 복사한 코드를 Claude 채팅에 붙여주면 학습 기록을 정리해 드려요. 기기를 바꿀 때 옮기는 용도로도 써요.</div><div><button class="btn purple sm" onclick="copyRecord()">📋 기록 코드 복사</button></div><textarea class="inp" id="rc" readonly placeholder="여기에 코드가 나와요"></textarea>
+  <h4>📥 기록 불러오기</h4><textarea class="inp" id="ri" placeholder="기록 코드를 붙여넣으세요"></textarea><div><button class="btn gray sm" onclick="importRecord()">불러오기</button></div></div>
+  <h4>⚠️ 초기화</h4><div class="hint">별·스티커·쿠폰·배지·학습 기록을 모두 지워요. (계정과 설정, 그림은 남아요)</div><div><button class="btn red sm" onclick="resetProgress()">학습 기록·보상 초기화</button></div></details>`;}
  return `<div class="screen"><header class="subbar"><button class="icon-btn" onclick="leaveParent()">⬅️<small>나가기</small></button><h2>🔒 부모님 메뉴</h2></header>
  <div class="ptabs">${tabs.filter(t=>App.parentFrom!=='login'||t[0]==='account').map(t=>`<button class="ptab ${tab===t[0]?'on':''}" onclick="App.ptab='${t[0]}';App.go('parent')">${t[1]}</button>`).join('')}</div>${body}</div>`;}
 function weeklyReport(){const s=S();const wk=weekDays();const per={};let qd=0,full=0,att=0;
@@ -1359,7 +1370,7 @@ function psStep(d){PS.questCount=Math.max(1,Math.min(7,PS.questCount+d));$('#qc'
 function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.subjects[x])){PS.subjects[t]=true;toast('과목은 1개 이상 골라주세요');return;}el.classList.toggle('on',PS.subjects[t]);SFX.tap();}
 function psSet(k,v,el){PS[k]=v;el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');SFX.tap();}
 function useMyLoc(el){if(!navigator.geolocation){toast('이 기기에서는 위치를 쓸 수 없어요');return;}toast('위치를 확인하고 있어요…');navigator.geolocation.getCurrentPosition(p=>{PS.wxLoc={name:'우리 동네',lat:+p.coords.latitude.toFixed(3),lon:+p.coords.longitude.toFixed(3)};el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');toast('현재 위치로 설정했어요. 저장을 눌러주세요');},()=>toast('위치 권한이 없어요. 지역을 직접 골라주세요'),{timeout:10000});}
-function saveSettings(){const s=S();s.family=s.family||{};FAMILY_FIELDS.forEach(([k])=>{const el=$('#f_'+k);if(el)s.family[k]=el.value.trim();});PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
+function saveSettings(){const s=S();s.family=s.family||{};FAMILY_FIELDS.forEach(([k])=>{const el=$('#f_'+k);if(el)s.family[k]=el.value.trim();});{const g=$('#p_mgift');if(g)PS.mapGift=(g.value.trim()||'보물 선물');const n=$('#p_name');const nm=n&&n.value.trim();if(nm)s.setup.childName=nm;}s.settings=JSON.parse(JSON.stringify(PS));
  const rw=rebuildToday();checkBadges();setTimeout(()=>loadWeather(true),50);
  Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
  }
