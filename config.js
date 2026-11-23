@@ -18,6 +18,7 @@ window.ADMIN_CONFIG = {
     subjects: {                    // 학습 과목 켜기/끄기
       hangul: true,                //   자음 따라쓰기 (ㄱ~ㅎ)
       vowel: true,                 //   모음 따라쓰기 (ㅏ~ㅣ)
+      syll: true,                  //   글자 만들기 (ㄱ+ㅏ=가)
       abc: true,                   //   대문자 따라쓰기 (A~Z)
       abcl: true,                  //   소문자 따라쓰기 (a~z)
       num: true,                   //   숫자 따라쓰기
