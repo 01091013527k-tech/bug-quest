@@ -347,6 +347,8 @@ table.rec th{color:var(--ink2)}
 .keypad button{height:72px;border:0;border-radius:22px;background:#F3EEFF;font-size:32px;box-shadow:0 5px 0 #D9CFF5;cursor:pointer}
 .keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #D9CFF5}
 .bigimg{width:100%;border-radius:20px;display:block}
+.testbar{position:fixed;right:10px;bottom:8px;z-index:41;display:flex;gap:8px}.testbar button{border:0;border-radius:14px;background:#FFE066;color:var(--ink);font-size:15px;padding:8px 12px;box-shadow:0 3px 0 #E8B520;cursor:pointer;opacity:.95}
+.tmenu{display:flex;flex-direction:column;gap:10px;max-width:420px}
 #testbadge{position:fixed;left:8px;bottom:6px;z-index:40;border:0;border-radius:14px;background:#FFE066;color:var(--ink);font-size:14px;padding:4px 12px;box-shadow:0 3px 0 #E8B520;opacity:.9;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(200px);background:var(--ink);color:#fff;padding:12px 24px;border-radius:20px;font-size:20px;z-index:60;transition:transform .3s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{transform:translateX(-50%) translateY(0)}
@@ -497,7 +499,9 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const rint=n=>Math.floor(Math.random()*n);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rint(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
 function hash(str){let h1=0xdeadbeef,h2=0x41c6ce57;str='bugquest:'+str;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
-function todayKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+let DAY_OFF=(()=>{try{return +localStorage.getItem('bugquest_dayoff')||0;}catch(e){return 0;}})();
+function now(){return new Date(Date.now()+DAY_OFF*864e5);}
+function todayKey(d=now()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayNum(k){const p=k.split('-').map(Number);return Math.floor(Date.UTC(p[0],p[1]-1,p[2])/86400000);}
 function prettyDate(k){const p=k.split('-').map(Number);const w='일월화수목금토'[new Date(p[0],p[1]-1,p[2]).getDay()];return `${p[1]}월 ${p[2]}일 (${w})`;}
 function hasBatchim(w){if(!w)return false;const c=w.charCodeAt(w.length-1);if(c<0xAC00||c>0xD7A3)return false;return (c-0xAC00)%28!==0;}
@@ -548,7 +552,7 @@ const S=()=>Store.state;
 /* ================= 게임 로직 ================= */
 function level(stars){return Math.floor(stars/10)+1;}
 function levelTitle(l){return LEVELS[Math.min(l-1,LEVELS.length-1)];}
-function streak(){const s=S();let n=0;const d=new Date();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
+function streak(){const s=S();let n=0;const d=now();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
 const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'||t==='num'||t==='family';
 function hw(it,dv){const w=HW[it[0]];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],it[1],p[0],p[1]];}
 function aw(it,dv,low){const w=AW[it[0].toUpperCase()];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],low?p[0].toLowerCase():p[0],p[1]];}
@@ -561,7 +565,7 @@ function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-
 const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
 const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
-function yUsed(t){const s=S();const d=new Date();d.setDate(d.getDate()-1);const y=s.days[todayKey(d)];const u=new Set();if(!y)return u;y.quests.filter(q=>q.type===t).forEach(q=>{(q.rounds||[]).forEach(r=>{if(r.c!=null)u.add(r.c);if(r.sc!=null)u.add('sc'+r.sc);if(r.sub!=null)u.add('sub'+r.sub);if(r.a!=null)u.add('a'+r.a);});(q.opts||[]).forEach(o=>u.add('o'+o));});return u;}
+function yUsed(t){const s=S();const d=now();d.setDate(d.getDate()-1);const y=s.days[todayKey(d)];const u=new Set();if(!y)return u;y.quests.filter(q=>q.type===t).forEach(q=>{(q.rounds||[]).forEach(r=>{if(r.c!=null)u.add(r.c);if(r.sc!=null)u.add('sc'+r.sc);if(r.sub!=null)u.add('sub'+r.sub);if(r.a!=null)u.add('a'+r.a);});(q.opts||[]).forEach(o=>u.add('o'+o));});return u;}
 function makeQuest(t,off){const s=S();const dv=dayNum(todayKey());
  if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,dv:dv+(off[t]=(off[t]||0)+1)-1,done:false};}
  if(t==='family'){return {type:t,items:familyItems(dv+(off[t]=(off[t]||0)+1)-1),pos:0,done:false};}
@@ -628,8 +632,29 @@ function applyAdmin(){const A=window.ADMIN_CONFIG;if(!A)return;const s=S();let c
 function showGrants(){if(!PENDING_GRANTS.length)return;const g=PENDING_GRANTS.shift();SFX.win();
  showCelebrate({title:'부모님의 특별 선물!',lines:[g.note?`<span>💌 ${esc(g.note)}</span>`:''].concat(g.lines.map(l=>`<span>${l}</span>`)).filter(Boolean)});}
 const TEST_MODE=()=>!!(window.ADMIN_CONFIG&&window.ADMIN_CONFIG.testMode);
-function fullReset(){confirmBox('🧪 모든 기록과 계정을 지우고<br>처음 설정 화면으로 돌아갈까요?',()=>{lsDel('bugquest_state');lsDel('bugquest_drawings');lsDel('bugquest_auto');Store.state=defaultState();Store.drawings=[];PENDING_GRANTS=[];PS=null;App.loggedIn=false;lsSet('bugquest_state',Store.state);toast('처음 상태로 돌아갔어요');App.go('setup');},'처음으로',true);}
-function testBadge(){let b=document.getElementById('testbadge');if(TEST_MODE()){if(!b){b=document.createElement('button');b.id='testbadge';b.textContent='🧪 테스트 모드 · 처음으로';b.onclick=fullReset;document.body.appendChild(b);}}else if(b)b.remove();}
+function fullReset(){confirmBox('🧪 모든 기록과 계정을 지우고<br>처음 설정 화면으로 돌아갈까요?',()=>{lsDel('bugquest_state');lsDel('bugquest_drawings');lsDel('bugquest_auto');lsDel('bugquest_dayoff');DAY_OFF=0;testBadge();Store.state=defaultState();Store.drawings=[];PENDING_GRANTS=[];PS=null;App.loggedIn=false;lsSet('bugquest_state',Store.state);toast('처음 상태로 돌아갔어요');App.go('setup');},'처음으로',true);}
+function testBadge(){let b=document.getElementById('testbadge');if(TEST_MODE()){if(!b){b=document.createElement('button');b.id='testbadge';b.onclick=testMenu;document.body.appendChild(b);}b.textContent=`🧪 테스트 · ${prettyDate(todayKey())}${DAY_OFF?' (+'+DAY_OFF+'일)':''}`;}else if(b)b.remove();}
+function setDayOff(n){DAY_OFF=Math.max(0,n);try{localStorage.setItem('bugquest_dayoff',String(DAY_OFF));}catch(e){}testBadge();closeOverlay();if(App.loggedIn){App.go(App.screen==='quest'||App.screen==='parent'?'home':App.screen);}toast(`📅 ${prettyDate(todayKey())}로 이동했어요`);}
+function testMenu(){if(!TEST_MODE())return;openOverlay(`<div class="ov-bg" onclick="if(event.target===this)closeOverlay()"><div class="modal tmenu"><h2 style="font-size:30px">🧪 테스트 메뉴</h2>
+ <div class="hint">지금 날짜: <b>${prettyDate(todayKey())}</b>${DAY_OFF?` (실제보다 ${DAY_OFF}일 뒤)`:''}</div>
+ <button class="btn green" onclick="testCompleteDay()">✅ 오늘 퀘스트 모두 완료</button>
+ <button class="btn blue" onclick="setDayOff(DAY_OFF+1)">▶ 다음 날로</button>
+ <button class="btn purple" onclick="testCompleteDay(true)">⏩ 오늘 완료하고 다음 날로</button>
+ <button class="btn orange" onclick="setDayOff(DAY_OFF+7)">📆 일주일 뒤로</button>
+ <button class="btn gray" onclick="setDayOff(0)">↩️ 실제 오늘로 돌아가기</button>
+ <button class="btn red" onclick="closeOverlay();fullReset()">🔄 처음으로 (모두 지우기)</button>
+ <div class="hint">테스트 모드가 꺼지면 이 메뉴와 버튼은 모두 사라져요.</div></div></div>`);}
+function testCompleteDay(next){const s=S();if(!App.loggedIn||!s.setup){toast('로그인 후에 사용할 수 있어요');return;}const day=ensureToday();let n=0;let lines=[];
+ day.quests.forEach(q=>{if(q.done)return;q.done=true;n++;s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;giveCoupon();if(isTrace(q.type))q.pos=traceSeq(q).length;});
+ if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);lines.push(`스티커: ${cName(rw.bug)}`);if(LAST_BOARD_FULL)lines.push('스티커판 완성');}
+ const nb=checkBadges();if(nb.length)lines.push(`배지 ${nb.length}개`);Store.save();
+ if(next){DAY_OFF++;try{localStorage.setItem('bugquest_dayoff',String(DAY_OFF));}catch(e){}testBadge();}
+ closeOverlay();App.go(App.screen==='parent'?'parent':'home');toast(`✅ ${n}개 완료${lines.length?' · '+lines.join(' · '):''}${next?` → ${prettyDate(todayKey())}`:''}`);}
+function testNext(){if(!Q)return;const t=Q.q.type;
+ if(isTrace(t)){const len=traceSeq(Q.q).length;if(TRACE){TRACE.done=true;stopOrder();}if(Q.pos+1<len){Q.pos++;if(!Q.practice){Q.q.pos=Q.pos;Store.save();}TRACE=null;const tp=$('#tpos');if(tp)tp.textContent=`${Q.pos+1} / ${len}`;setGuide(guideText());mountTrace();}else{if(!Q.practice)Q.q.pos=len;if(len>1)showTraceSummary();else finishQuest();}return;}
+ if(Q.q.rounds){Q.locked=true;Q.round++;updRounds();Q.perm=null;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mountQuest();}return;}
+ finishQuest();}
+function testFinishQuest(){if(!Q)return;if(TRACE){TRACE.done=true;stopOrder();}if(isTrace(Q.q.type)&&!Q.practice)Q.q.pos=traceSeq(Q.q).length;lsDel('bugquest_wip');finishQuest();}
 function exportCode(){return 'BQ1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S()))));}
 function copyRecord(){const code=exportCode();const ta=$('#rc');ta.value=code;ta.focus();ta.select();
  try{navigator.clipboard.writeText(code).then(()=>toast('기록 코드를 복사했어요! Claude에게 붙여주세요'),()=>toast('코드를 길게 눌러 복사해 주세요'));}catch(e){toast('코드를 길게 눌러 복사해 주세요');}}
@@ -711,7 +736,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
   <button onclick="App.go('gallery')"><span class="ni">🎨</span>그림 갤러리<b>${Store.drawings.length}장</b></button>
  </nav></div>`;}
 
-function weekDays(){const d=new Date();const dow=(d.getDay()+6)%7;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);return Array.from({length:7},(_,i)=>{const x=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);return todayKey(x);});}
+function weekDays(){const d=now();const dow=(d.getDay()+6)%7;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);return Array.from({length:7},(_,i)=>{const x=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);return todayKey(x);});}
 function weekStrip(){const s=S();const t=todayKey();return `<div class="week"><span class="wk-l">이번 주 출석</span>${weekDays().map((k,i)=>{const d=s.days[k];const st=d&&d.allDone?'full':d&&d.quests.some(q=>q.done)?'half':'';return `<div class="wk ${st} ${k===t?'today':''}"><div class="wk-c">${st==='full'?bugSVG(dayNum(k)%BUGS.length):st==='half'?'🐾':''}</div><span>${'월화수목금토일'[i]}</span></div>`;}).join('')}</div>`;}
 
 /* ---------- 퀘스트 ---------- */
@@ -733,7 +758,7 @@ function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.le
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
  <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(isTrace(q.type)&&traceSeq(q).length>1)?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
- <div class="qbody" id="qbody"></div></div>`;}
+ <div class="qbody" id="qbody"></div>${TEST_MODE()?'<div class="testbar"><button onclick="testNext()">🧪 다음 문제로 ⏭</button><button onclick="testFinishQuest()">🧪 이 퀘스트 바로 완료 ✅</button></div>':''}</div>`;}
 function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='spot')mountSpot();else if(t==='puzzle')mountPuzzle();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
 function setGuide(html){const g=$('#guide');if(g){g.innerHTML=html;g.classList.remove('pop');void g.offsetWidth;g.classList.add('pop');}}
 function updRounds(){const r=$('#rounds');if(r)[...r.children].forEach((el,i)=>el.classList.toggle('on',i<Q.round));}
@@ -935,7 +960,7 @@ function pickListen(el,i){if(Q.locked)return;const r=Q.q.rounds[Q.round];stat(i=
 function wrongLog(label){Q.wr=Q.wr||[];Q.wr.push(String(label));}
 function logEvent(key,prompt,answer,extra){const s=S();s.log=s.log||[];const e=Object.assign({d:todayKey(),t:Q.q.type,k:key,p:prompt,a:answer,w:(Q.wr||[]).slice()},extra||{});if(Q.practice)e.pr=1;s.log.push(e);
  s.items=s.items||{};const ik=Q.q.type+':'+key;const it=s.items[ik]=s.items[ik]||{p:prompt,r:0,w:0,wa:{}};it.p=(extra&&extra.ip)||prompt;delete e.ip;if(e.w.length){it.w++;e.w.forEach(x=>{it.wa[x]=(it.wa[x]||0)+1;});}else it.r++;it.l=e.d;
- const cut=todayKey(new Date(Date.now()-35*864e5));if(s.log.length>1500||(s.log[0]&&s.log[0].d<cut))s.log=s.log.filter(x=>x.d>=cut).slice(-1500);Q.wr=[];}
+ const cut=todayKey(new Date(now().getTime()-35*864e5));if(s.log.length>1500||(s.log[0]&&s.log[0].d<cut))s.log=s.log.filter(x=>x.d>=cut).slice(-1500);Q.wr=[];}
 function stat(ok){if(Q.practice)return;const s=S();s.stats=s.stats||{};const t=Q.q.type;const o=s.stats[t]=s.stats[t]||{r:0,w:0};ok?o.r++:o.w++;}
 function nextRound(mount){Q.round++;updRounds();setTimeout(()=>{if(App.screen!=='quest')return;if(Q.round>=Q.q.rounds.length)finishQuest();else{setGuide(guideText());mount();}},1300);}
 
