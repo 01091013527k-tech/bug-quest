@@ -289,6 +289,9 @@ h3.sec{margin:6px 0 0;font-weight:400;font-size:26px}
 .wk.today span{color:var(--pink-d);font-weight:700}.wk.today .wk-c{border-color:var(--pink)}
 .sart{width:84%;height:84%;display:flex;align-items:center;justify-content:center}.sart svg{width:100%;height:100%}.sart .emo{font-size:min(70px,9vw)}
 .dexi .sart{width:76px;height:76px;margin:0 auto}.dexi.lock .sart{filter:brightness(0) opacity(.18)}.newbug .sart{width:140px;height:140px;margin:0 auto}.newbug .sart .emo{font-size:110px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.how>div{background:#fff;border-radius:22px;padding:12px 14px;box-shadow:0 5px 0 rgba(59,47,92,.1);font-size:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.how b{font-size:36px;font-weight:400}.how small{font-size:15px;color:var(--ink2)}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .gitem{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 0 rgba(59,47,92,.1);cursor:pointer}
 .gitem img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;display:block;background:#fafafa}
@@ -552,7 +555,8 @@ function giveCoupon(){const s=S();const m=s.settings.tvMinutes|0;if(m<=0)return 
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
  if(!d.allDone&&d.quests.length&&d.quests.every(q=>q.done))return grantDayReward(d);return null;}
-function addSticker(){const s=S();const goal=s.settings.stickerGoal||10;const c=(s.stickers.total%goal)%CREATURES.length;s.stickers.total++;s.stickers.current.push(c);if(s.stickers.current.length>=goal)s.giftReady=true;return c;}
+let LAST_BOARD_FULL=false;
+function addSticker(){const s=S();const goal=s.settings.stickerGoal||10;if(s.stickers.current.length>=goal)s.stickers.current=[];const c=(s.stickers.total%goal)%CREATURES.length;s.stickers.total++;s.stickers.current.push(c);LAST_BOARD_FULL=false;if(s.stickers.current.length>=goal){s.stickers.boards=(s.stickers.boards||0)+1;s.boardLog=(s.boardLog||[]).concat([{d:todayKey()}]);LAST_BOARD_FULL=true;}s.giftReady=false;return c;}
 const BADGE_TYPES=[['hangul','✏️','자음'],['vowel','🖊️','모음'],['abc','🔠','대문자'],['abcl','🔡','소문자'],['count','🐾','동물 퀴즈'],['spot','🔍','틀린 그림'],['num','🔢','숫자'],['puzzle','🧩','퍼즐'],['listen','👂','소리 듣기'],['eng','💬','영어 문장'],['draw','🎨','그림']];
 const BT=Object.fromEntries(BADGE_TYPES.map(([t,ic,lb])=>[t,{ic,lb}]));
 function activeSubjects(){const s=S();const en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);return en.length?en:['hangul'];}
@@ -561,15 +565,14 @@ function getBadges(){const s=S();const st=s.settings;const en=activeSubjects();c
  const L=[{id:'first',icon:'🎉',name:'첫 퀘스트',desc:'퀘스트 1개 성공',t:s=>s.stars>=1},{id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)}];
  [2,6,12,20].forEach((d,i)=>{const n=qc*d;L.push({id:'star_t'+(i+1),icon:['⭐','🌟','💫','🏅'][i],name:`별 ${n}개`,desc:`별 ${n}개 모으기`,t:s=>s.stars>=n});});
  [3,7,14,21].forEach(n=>L.push({id:'streak'+n,icon:n>=14?'🌈':'🔥',name:`${n}일 연속`,desc:`${n}일 연속 탐험`,t:()=>streak()>=n}));
- L.push({id:'board1',icon:'🏆',name:'스티커판 완성',desc:'스티커판 처음 채우기',t:s=>s.stickers.boards>=1||s.giftReady});
- const G=st.stickerGoal||10;L.push({id:'dex',icon:'📖',name:'탐험 도감 완성',desc:`도감 친구 ${G}마리 모두 만나기`,t:s=>s.stickers.total>=G});
- const N=st.mapLen||40;const slots=Math.max(en.length,N-L.length);const per=Math.floor(slots/en.length);const extra=slots-per*en.length;
+ const E=Math.max(1,Math.floor(D/(st.stickerGoal||10)));
+ const N=st.mapLen||40;const slots=Math.max(en.length,N-L.length-E);const per=Math.floor(slots/en.length);const extra=slots-per*en.length;
  en.forEach((t,j)=>{const m=BT[t]||{ic:'⭐',lb:t};const tiers=Math.max(1,per+(j<extra?1:0));const total=Math.max(tiers,Math.round(D*qc/en.length));let prev=0;
   for(let i=1;i<=tiers;i++){let thr=i===1?1:Math.round(total*Math.pow((i-1)/(tiers-1),1.15));thr=Math.max(thr,prev+1);prev=thr;const th=thr;
    L.push({id:`${t}_t${i}`,icon:m.ic,name:i===1?`${m.lb} 첫 도전`:`${m.lb} ${th}번`,desc:`${m.lb} 퀘스트 ${th}번 완료`,t:s=>(s.counts[t]||0)>=th});}});
  _BK=key;_BC=L;return L;}
 function badgeInfo(id){return getBadges().find(b=>b.id===id)||(S().badgeMeta||{})[id]||null;}
-function mapEntries(){const s=S();const e=[];Object.keys(s.badges).forEach(id=>{const b=badgeInfo(id);if(b)e.push({d:s.badges[id],icon:b.icon,name:b.name,o:getBadges().findIndex(x=>x.id===id)});});(s.mapBonus||[]).forEach((x,i)=>e.push({d:x.d,icon:'💌',name:'부모님 칭찬',o:1000+i}));e.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.o-b.o);return e.slice(s.mapOffset||0);}
+function mapEntries(){const s=S();const e=[];Object.keys(s.badges).forEach(id=>{const b=badgeInfo(id);if(b)e.push({d:s.badges[id],icon:b.icon,name:b.name,o:getBadges().findIndex(x=>x.id===id)});});(s.boardLog||[]).forEach((x,i)=>e.push({d:x.d,icon:'🏆',name:`스티커판 ${i+1}판 완성`,o:900+i}));(s.mapBonus||[]).forEach((x,i)=>e.push({d:x.d,icon:'💌',name:'부모님 칭찬',o:1000+i}));e.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.o-b.o);return e.slice(s.mapOffset||0);}
 function mapProg(){return Math.min(mapEntries().length,S().settings.mapLen||40);}
 function checkBadges(){const s=S();const nb=[];s.badgeMeta=s.badgeMeta||{};getBadges().forEach(b=>{if(!s.badges[b.id]&&b.t(s)){s.badges[b.id]=todayKey();s.badgeMeta[b.id]={icon:b.icon,name:b.name};nb.push(b);}});return nb;}
 
@@ -577,7 +580,7 @@ function checkBadges(){const s=S();const nb=[];s.badgeMeta=s.badgeMeta||{};getBa
 function loadConfig(){return new Promise(r=>{let done=false;const fin=()=>{if(!done){done=true;r();}};const sc=document.createElement('script');sc.src='config.js?t='+Date.now();sc.onload=fin;sc.onerror=fin;document.head.appendChild(sc);setTimeout(fin,5000);});}
 let PENDING_GRANTS=[];
 function applyAdmin(){const A=window.ADMIN_CONFIG;if(!A)return;const s=S();let ch=false;
- if(A.rev&&(s.adminRev||0)<A.rev){if(A.settings){const ns=Object.assign({},s.settings,A.settings);ns.subjects=Object.assign({},s.settings.subjects,A.settings.subjects||{});if(!TYPE_ORDER.some(t=>ns.subjects[t]))ns.subjects.hangul=true;ns.questCount=Math.max(1,Math.min(7,ns.questCount|0||3));s.settings=ns;s.giftReady=s.stickers.current.length>=ns.stickerGoal;
+ if(A.rev&&(s.adminRev||0)<A.rev){if(A.settings){const ns=Object.assign({},s.settings,A.settings);ns.subjects=Object.assign({},s.settings.subjects,A.settings.subjects||{});if(!TYPE_ORDER.some(t=>ns.subjects[t]))ns.subjects.hangul=true;ns.questCount=Math.max(1,Math.min(7,ns.questCount|0||3));s.settings=ns;s.giftReady=false;
    rebuildToday();}
   s.adminRev=A.rev;ch=true;}
  if(!Array.isArray(s.grantsApplied))s.grantsApplied=[];
@@ -668,7 +671,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  ${weekStrip()}
  <section class="quests">${qs.map((q,i)=>{const T=TYPES[q.type];return `<button class="qcard ${q.done?'done':''}" style="--c:${T.c};--cs:${T.cs}" onclick="startQuest(${i})"><div class="qnum">${i+1}</div><div class="qicon">${T.icon}</div><div class="qname">${T.name}</div><div class="qsub">${esc(questSub(q))}</div>${q.done?'<div class="stamp">참<br>잘했어요</div>':''}</button>`;}).join('')}</section>
  <nav class="bottom-nav">
-  <button onclick="App.go('stickers')"><span class="ni">🐞</span>스티커판<b>${Math.min(cur,goal)} / ${goal}${s.giftReady?' 🎁':''}</b></button>
+  <button onclick="App.go('stickers')"><span class="ni">🐞</span>스티커판<b>${Math.min(cur,goal)} / ${goal}</b></button>
   <button onclick="App.go('coupons')"><span class="ni">📺</span>쿠폰함<b>${unused}장</b></button>
   <button onclick="App.go('badges')"><span class="ni">🗺️</span>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}칸</b></button>
   <button onclick="App.go('gallery')"><span class="ni">🎨</span>그림 갤러리<b>${Store.drawings.length}장</b></button>
@@ -1011,8 +1014,8 @@ function finishQuest(){const s=S();
  q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;const cm=giveCoupon();if(cm)lines.push(`<span>📺 TV ${cm}분 쿠폰 1장을 받았어요!</span>`);
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
- if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
- const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));if(nb.length){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${nb.length}칸 앞으로! (${pg} / ${L})</span>`);}
+ if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도 한 칸 앞으로!</span>');}
+ const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));const stepsAdd=nb.length+(bug!=null&&LAST_BOARD_FULL?1:0);if(stepsAdd){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${stepsAdd}칸 앞으로! (${pg} / ${L})</span>`);}
  Store.save();SFX.win();
  showCelebrate({title:bug!=null?'오늘 탐험 성공!':'참 잘했어요!',lines,bug});
  speak(bug!=null?`오늘 탐험 성공! 새 친구, ${eulReul(cName(bug))} 만났어!`:'참 잘했어요! 별을 받았어!');}
@@ -1021,7 +1024,7 @@ function finishQuest(){const s=S();
 function subbar(title){return `<header class="subbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><h2>${title}</h2></header>`;}
 function renderStickers(){const s=S();const goal=s.settings.stickerGoal;const cur=s.stickers.current;const left=Math.max(0,goal-cur.length);
  return `<div class="screen">${subbar('🐞 탐험 스티커판')}
- <div class="gift-banner ${s.giftReady?'ready':''}"><div class="gift-box">🎁</div><div>${s.giftReady?`<div class="gb-t">스티커판 완성! 선물 받을 시간!</div><div class="gb-gift">${esc(s.settings.giftName)}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">스티커 <b style="color:var(--pink-d)">${left}개</b> 더 모으면</div><div class="gb-gift">${esc(s.settings.giftName)}</div><div class="gb-s">하루 퀘스트를 다 하면 스티커 1개!</div>`}</div></div>
+ <div class="gift-banner ${cur.length>=goal?'ready':''}"><div class="gift-box">🗺️</div><div>${cur.length>=goal?`<div class="gb-t">스티커판 완성! 보물 지도 한 칸 앞으로 갔어요 🏆</div>`:`<div class="gb-t">스티커 <b style="color:var(--pink-d)">${left}개</b> 더 모으면 보물 지도 한 칸!</div>`}<div class="gb-gift">🎁 최종 선물: ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">하루 퀘스트를 다 하면 스티커 1개! 다 채우면 새 판이 시작돼요</div></div></div>
  <div class="board">${Array.from({length:goal},(_,i)=>i<cur.length?`<div class="slot full"><span class="no">${i+1}</span><div class="sart">${cArt(cur[i])}</div></div>`:`<div class="slot"><span class="no">${i+1}</span>?</div>`).join('')}</div>
  <h3 class="sec">🔍 탐험 도감 <small style="font-size:18px;color:var(--ink2)">(${Math.min(s.stickers.total,goal)} / ${goal})</small></h3>
  <div class="dex">${CREATURES.slice(0,goal).map((b,i)=>{const got=s.stickers.total>i;return `<div class="dexi ${got?'':'lock'}"><div class="sart">${cArt(i)}</div><div class="dn">${got?esc(b.n):'???'}</div></div>`;}).join('')}</div></div>`;}
@@ -1045,8 +1048,10 @@ function renderBadges(){const s=S();const N=s.settings.mapLen||40;const ent=mapE
   return `<div class="${cls}" style="left:${p.x}%;top:${p.y}%">${here}<div class="nb">${inner}</div>${lab?`<div class="nl">${lab}</div>`:''}</div>`;}).join('');
  const path='M'+pts.map(p=>`${p.x} ${p.y}`).join(' L');const dp=steps?'M'+pts.slice(0,steps+1+(done?1:0)).map(p=>`${p.x} ${p.y}`).join(' L'):'';
  return `<div class="screen">${subbar('🗺️ 보물 지도')}
- <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">배지를 하나 받을 때마다 한 칸! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">받은 배지가 순서대로 지도에 붙어요</div>`}</div></div>
+ <div class="gift-banner ${done?'ready':''}"><div class="gift-box">${done?'🎁':'🗺️'}</div><div>${done?`<div class="gb-t">보물 지도 끝까지 왔어요!</div><div class="gb-gift">${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">엄마 아빠에게 보여주세요 💕</div>`:`<div class="gb-t">배지·스티커판으로 한 칸씩! 앞으로 <b style="color:var(--pink-d)">${N-steps}칸</b></div><div class="gb-gift">도착하면 🎁 ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">받은 배지가 순서대로 지도에 붙어요</div>`}</div></div>
  <div class="map" style="height:${rows*130+30}px"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${path}" class="road"/>${dp?`<path d="${dp}" class="road done"/>`:''}</svg>${nodes}</div>
+ <h3 class="sec">🎯 보물 지도 앞으로 가는 방법</h3>
+ <div class="how"><div><b>🏅</b>배지 받기<small>과목 퀘스트·별·연속 출석</small></div><div><b>🏆</b>스티커판 채우기<small>${s.settings.stickerGoal||10}칸을 채울 때마다</small></div><div><b>💌</b>부모님 칭찬<small>약속을 잘 지켰을 때</small></div><div><b>📺</b>TV 쿠폰은 따로!<small>퀘스트 1개 = 쿠폰 1장</small></div></div>
  <h3 class="sec">🏅 배지 모음</h3>
  <div class="badges">${getBadges().map(b=>{const g=s.badges[b.id];return `<div class="badge ${g?'':'lock'}"><div class="bi">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${g?prettyDate(g):b.desc}</div></div>`;}).join('')}</div></div>`;}
 
@@ -1087,15 +1092,13 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="pcard"><h4>🎁 보상 규칙</h4>
   <div class="prow"><span class="pl">학습 1개당 TV 쿠폰 1장<br><small>(1장 시청 시간)</small></span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
   <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
-  <label class="lb">스티커판 완성 선물<input class="inp" id="p_gift" maxlength="30" value="${esc(PS.giftName)}"></label>
   <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
-  <label class="lb">보물 지도 완성 선물<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
+  <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
   <label class="lb">아이 이름 (애칭)<input class="inp" id="p_name" maxlength="8" value="${esc(s.setup.childName)}"></label></div>
   <button class="btn big green" onclick="saveSettings()">저장하기</button><div class="hint" style="text-align:center">💡 저장하면 오늘 퀘스트에도 바로 적용돼요. (이미 한 퀘스트는 그대로 남아요) Claude를 통해 바꾼 설정이 새로 올라오면 그 값이 적용돼요.</div>`;}
- if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🎁 스티커판 선물</h4>
-  <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards}개</span></div>
-  ${s.giftReady?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">스티커판 완성! “${esc(s.settings.giftName)}” 선물을 주세요.</span><button class="btn pink" onclick="giftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 스티커판이 시작돼요 (넘친 스티커는 다음 판으로 옮겨져요)</div>`:'<div class="hint">스티커판이 다 차면 여기서 선물 지급을 확인할 수 있어요.</div>'}</div>
-  <div class="pcard"><h4>🗺️ 보물 지도 선물</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${mapProg()} / ${s.settings.mapLen||40}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
+ if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
+  <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards||0}개 · 판을 채울 때마다 보물 지도 1칸</span></div></div>
+  <div class="pcard"><h4>🎁 최종 선물 (보물 지도)</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${mapProg()} / ${s.settings.mapLen||40}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
   ${mapProg()>=(s.settings.mapLen||40)?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">지도 끝 도착! “${esc(s.settings.mapGift||'보물 선물')}”을 주세요.</span><button class="btn pink" onclick="mapGiftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 보물 지도가 시작돼요</div>`:'<div class="hint">배지를 하나 받을 때마다 한 칸씩 가요. 칸이 다 차면 여기서 선물 지급을 확인해요.</div>'}
   <div class="prow"><button class="btn sm purple" onclick="bonus('map')">🗺️ 지도 1칸 앞으로 (특별 보상)</button></div></div>
   <div class="pcard"><h4>📺 사용 안 한 TV 쿠폰 (${unused.length}장)</h4>${unused.length?unused.map(c=>`<div class="prow"><span class="pl">TV ${c.min}분</span><span class="hint">${prettyDate(c.date)}</span><button class="btn blue sm" onclick="markCoupon('${c.id}')">사용 처리</button></div>`).join(''):'<div class="hint">없어요</div>'}</div>
@@ -1133,8 +1136,7 @@ function leaveParent(){PS=null;if(App.parentFrom==='login'||!App.loggedIn)App.go
 function psStep(d){PS.questCount=Math.max(1,Math.min(7,PS.questCount+d));$('#qc').textContent=PS.questCount;SFX.tap();}
 function psSub(t,el){PS.subjects[t]=!PS.subjects[t];if(!TYPE_ORDER.some(x=>PS.subjects[x])){PS.subjects[t]=true;toast('과목은 1개 이상 골라주세요');return;}el.classList.toggle('on',PS.subjects[t]);SFX.tap();}
 function psSet(k,v,el){PS[k]=v;el.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');SFX.tap();}
-function saveSettings(){const s=S();PS.giftName=($('#p_gift').value.trim()||'선물');PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
- if(s.stickers.current.length>=s.settings.stickerGoal)s.giftReady=true;else s.giftReady=false;
+function saveSettings(){const s=S();PS.mapGift=($('#p_mgift').value.trim()||'보물 선물');const nm=$('#p_name').value.trim();if(nm)s.setup.childName=nm;s.settings=JSON.parse(JSON.stringify(PS));
  const rw=rebuildToday();checkBadges();
  Store.save();SFX.ok();toast(rw?'저장했어요! 오늘 퀘스트 완료로 스티커를 받았어요':'저장했어요! 오늘 퀘스트에 바로 적용됐어요');
  }
