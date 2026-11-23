@@ -12,7 +12,8 @@ window.ADMIN_CONFIG = {
   settings: {
     questCount: 3,                 // 하루 퀘스트 개수 (1~7)
     subjects: {                    // 학습 과목 켜기/끄기
-      hangul: true,                //   한글 따라쓰기
+      hangul: true,                //   자음 따라쓰기 (ㄱ~ㅎ)
+      vowel: true,                 //   모음 따라쓰기 (ㅏ~ㅣ)
       abc: true,                   //   알파벳 따라쓰기
       num: true,                   //   숫자 따라쓰기
       listen: true,                //   소리 듣고 고르기

@@ -361,7 +361,8 @@ const COUNTER=['','한','두','세','네','다섯','여섯','일곱','여덟','�
 const SENT=[{t:'The monkey likes bananas.',a:'🐒',b:'🍌'},{t:'The rabbit likes carrots.',a:'🐰',b:'🥕'},{t:'The bear likes honey.',a:'🐻',b:'🍯'},{t:'The bee likes flowers.',a:'🐝',b:'🌸'},{t:'The cat likes fish.',a:'🐱',b:'🐟'},{t:'The dog likes bones.',a:'🐶',b:'🦴'},{t:'The mouse likes cheese.',a:'🐭',b:'🧀'},{t:'The panda likes bamboo.',a:'🐼',b:'🎋'},{t:'The squirrel likes nuts.',a:'🐿️',b:'🌰'},{t:'The pig likes apples.',a:'🐷',b:'🍎'},{t:'The cow likes grass.',a:'🐮',b:'🌿'},{t:'The bird likes worms.',a:'🐦',b:'🪱'}];
 const THEMES=['나비','무당벌레','해님','꽃밭','우리 가족','장수풍뎅이','도깨비 뿌뿌','내 얼굴','무지개','자동차','물고기','생일 케이크','우리 집','공룡','비 오는 날','개미','눈사람','좋아하는 음식','친구랑 노는 모습','잠자리'];
 const TYPES={
- hangul:{icon:'가',name:'한글 따라쓰기',c:'#FF7EA8',cs:'#E05A86'},
+ hangul:{icon:'ㄱ',name:'자음 따라쓰기',c:'#FF7EA8',cs:'#E05A86'},
+ vowel:{icon:'ㅏ',name:'모음 따라쓰기',c:'#B388FF',cs:'#8E63E0'},
  abc:{icon:'A',name:'알파벳 따라쓰기',c:'#5BC0EB',cs:'#3A9AC4'},
  num:{icon:'3',name:'숫자 따라쓰기',c:'#FFB443',cs:'#E0921F'},
  listen:{icon:'👂',name:'소리 듣고 고르기',c:'#9C7CF4',cs:'#7A5AD6'},
@@ -369,7 +370,7 @@ const TYPES={
  eng:{icon:'💬',name:'영어 문장',c:'#2EC4B6',cs:'#1E9C90'},
  draw:{icon:'🖍️',name:'그림 그리기',c:'#F78FB3',cs:'#D96C93'}
 };
-const TYPE_ORDER=['hangul','abc','num','listen','count','eng','draw'];
+const TYPE_ORDER=['hangul','vowel','abc','num','listen','count','eng','draw'];
 const LEVELS=['알 탐험가','애벌레 탐험가','번데기 탐험가','나비 탐험가','풍뎅이 용사','곤충 박사','숲의 영웅'];
 const CRAYONS=['#FF4D6D','#FF9F43','#FFD233','#5CC96B','#2EC4B6','#3A86FF','#9C7CF4','#F78FB3','#8D5A3B','#2B2140'];
 
@@ -403,7 +404,7 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:3,subjects:{hangul:true,abc:true,num:true,listen:true,count:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all'},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,abc:0,num:0,listen:0,count:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[]};}
+function defaultState(){return {v:1,setup:null,settings:{questCount:3,subjects:{hangul:true,vowel:true,abc:true,num:true,listen:true,count:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all'},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,abc:0,num:0,listen:0,count:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[]};}
 function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
@@ -432,20 +433,21 @@ const S=()=>Store.state;
 function level(stars){return Math.floor(stars/10)+1;}
 function levelTitle(l){return LEVELS[Math.min(l-1,LEVELS.length-1)];}
 function streak(){const s=S();let n=0;const d=new Date();if(!(s.days[todayKey(d)]&&s.days[todayKey(d)].allDone))d.setDate(d.getDate()-1);for(let i=0;i<400;i++){const k=todayKey(d);if(s.days[k]&&s.days[k].allDone){n++;d.setDate(d.getDate()-1);}else break;}return n;}
-function traceSeq(q){if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;return [NUMS[(q.idx||0)%NUMS.length]];}
+const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='num';
+function traceSeq(q){if(q.type==='vowel')return HANGUL.slice(14);if(q.type==='hangul'){const st=q.set||'all';return st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL;}if(q.type==='abc')return ABC;return [NUMS[(q.idx||0)%NUMS.length]];}
 function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-1)];}
 const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
 const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
 function makeQuest(t,off){const s=S();
- if(t==='hangul'||t==='abc'){return {type:t,set:t==='hangul'?(s.settings.hangulSet||'all'):'all',pos:0,done:false};}
+ if(t==='hangul'||t==='vowel'||t==='abc'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,done:false};}
  if(t==='num'){const idx=s.progress[t]+(off[t]||0);off[t]=(off[t]||0)+1;return {type:t,idx,done:false};}
  if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
   for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const rounds=[];
-  for(let r=0;r<3;r++){const bug=bugs[r];let n;const others=[];
-   if(r===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r===1?1:2;for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:bugs[3+r+k],k:c});left-=c;}}
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const bugs=shuffle(BUGS.map((_,i)=>i));const NR=5;const rounds=[];
+  for(let r=0;r<NR;r++){const bug=bugs[r];let n;const others=[];const pool=shuffle(bugs.filter(x=>x!==bug));
+   if(r===0)n=1+rint(maxN);else{n=1+rint(Math.min(maxN,6));let left=12-n;const kinds=r%2===1?1:2;for(let k=0;k<kinds&&left>0;k++){const c=Math.min(left,1+rint(4));others.push({bug:pool[k],k:c});left-=c;}}
    const ch=[n];while(ch.length<3){const x=1+rint(Math.max(maxN,5));if(!ch.includes(x))ch.push(x);}rounds.push({n,bug,others,ch:shuffle(ch)});}
   return {type:t,rounds,done:false};}
  if(t==='eng'){const picks=shuffle(SENT.map((_,i)=>i)).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return {type:t,rounds,done:false};}
@@ -453,7 +455,7 @@ function makeQuest(t,off){const s=S();
 }
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]);if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const start=dayNum(todayKey())%en.length;const off={};const out=[];for(let k=0;k<n;k++)out.push(makeQuest(en[(start+k)%en.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
-function questSub(q){if(q.type==='hangul'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return '3문제';if(q.type==='eng')return '2문제';return '';}
+function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 글자: ${it[0]}`;}if(q.type==='draw')return `주제: ${q.theme}`;if(q.type==='listen')return '3문제';if(q.type==='count')return `${q.rounds.length}문제`;if(q.type==='eng')return '2문제';return '';}
 function grantDayReward(day){const s=S();day.allDone=true;const bug=addSticker();let min=0;if(s.settings.tvMinutes>0){min=s.settings.tvMinutes;s.coupons.unshift({id:'c'+Date.now(),min,date:todayKey(),used:false});}return {bug,min};}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
@@ -464,7 +466,8 @@ const BADGES=[
  {id:'day1',icon:'🌱',name:'첫 탐험 완료',desc:'하루 퀘스트 모두 성공',t:s=>Object.values(s.days).some(d=>d.allDone)},
  {id:'streak3',icon:'🔥',name:'3일 연속',desc:'3일 연속 탐험',t:()=>streak()>=3},
  {id:'streak7',icon:'🌈',name:'7일 연속',desc:'일주일 내내 탐험',t:()=>streak()>=7},
- {id:'hangul10',icon:'✏️',name:'한글 꼬마 작가',desc:'한글 따라쓰기 10번',t:s=>s.counts.hangul>=10},
+ {id:'hangul10',icon:'✏️',name:'자음 꼬마 작가',desc:'자음 따라쓰기 10번',t:s=>s.counts.hangul>=10},
+ {id:'vowel10',icon:'🖊️',name:'모음 꼬마 작가',desc:'모음 따라쓰기 10번',t:s=>(s.counts.vowel||0)>=10},
  {id:'abc10',icon:'🔤',name:'ABC 친구',desc:'알파벳 따라쓰기 10번',t:s=>s.counts.abc>=10},
  {id:'num10',icon:'🔢',name:'숫자 박사',desc:'숫자 따라쓰기 10번',t:s=>s.counts.num>=10},
  {id:'listen10',icon:'👂',name:'귀가 쫑긋',desc:'소리 퀘스트 10번',t:s=>s.counts.listen>=10},
@@ -473,7 +476,7 @@ const BADGES=[
  {id:'draw5',icon:'🎨',name:'꼬마 화가',desc:'그림 5장 그리기',t:s=>s.counts.draw>=5},
  {id:'star50',icon:'⭐',name:'별 50개',desc:'별 50개 모으기',t:s=>s.stars>=50},
  {id:'board1',icon:'🏆',name:'스티커판 완성',desc:'스티커판 처음 채우기',t:s=>s.stickers.boards>=1||s.giftReady},
- {id:'hangulAll',icon:'👑',name:'한글 자모 마스터',desc:'ㄱ부터 ㅣ까지 모두 쓰기',t:s=>s.progress.hangul>=HANGUL.length},
+ {id:'hangulAll',icon:'👑',name:'한글 자모 마스터',desc:'ㄱ부터 ㅣ까지 모두 쓰기',t:s=>s.progress.hangul>=14&&!!s.progress.vowel},
  {id:'abcAll',icon:'🦁',name:'A부터 Z까지',desc:'알파벳 26자 모두 쓰기',t:s=>s.progress.abc>=ABC.length},
  {id:'dex',icon:'🔍',name:'곤충 도감 완성',desc:'곤충 친구 12마리 모두 만나기',t:s=>s.stickers.total>=BUGS.length}
 ];
@@ -583,17 +586,17 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
 let Q=null;
 function startQuest(i){SFX.tap();const k=todayKey();const q=S().days[k].quests[i];Q={i,dayKey:k,q,practice:q.done,round:0,tapped:0,locked:false,pos:q.done?0:(q.pos||0)};App.go('quest');}
 function guideText(){const q=Q.q;
- if(q.type==='hangul'||q.type==='abc'||q.type==='num'){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
+ if(isTrace(q.type)){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
  if(q.type==='listen')return '소리를 잘 듣고, 맞는 글자를 골라봐!';
  if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const sp=species(r.bug);return `<span class="gicon">${bugSVG(r.bug)}</span> <b>${eunNeun(sp)}</b> 몇 마리일까? ${r.others&&r.others.length?'다른 곤충은 빼고 ':''}하나씩 눌러 세어봐!`;}
  if(q.type==='eng')return '영어 문장을 듣고, 맞는 그림을 골라봐!';
  if(q.type==='draw')return `오늘의 주제는 <b>“${esc(q.theme)}”</b>! 마음껏 그려봐!`;}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
- <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='abc')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
+ <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(q.type==='hangul'||q.type==='vowel'||q.type==='abc')?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
  <div class="qbody" id="qbody"></div></div>`;}
-function mountQuest(){const t=Q.q.type;if(t==='hangul'||t==='abc'||t==='num')mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
+function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='eng')mountEng();else if(t==='draw')mountDraw();}
 function setGuide(html){const g=$('#guide');if(g){g.innerHTML=html;g.classList.remove('pop');void g.offsetWidth;g.classList.add('pop');}}
 function updRounds(){const r=$('#rounds');if(r)[...r.children].forEach((el,i)=>el.classList.toggle('on',i<Q.round));}
 
@@ -616,7 +619,7 @@ function pickCrayon(i,el){SFX.tap();if(!PAD)return;PAD.color=CRAYONS[i];PAD.eras
 /* 따라쓰기 */
 let TRACE=null;
 async function mountTrace(){const q=Q.q;const it=curItem();
- const word=q.type==='hangul'?`${it[3]}<div class="lc-word">${it[2]}</div>`:q.type==='abc'?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
+ const word=(q.type==='hangul'||q.type==='vowel')?`${it[3]}<div class="lc-word">${it[2]}</div>`:q.type==='abc'?`${it[2]}<div class="lc-word">${it[1]}</div>`:`<div style="font-size:22px;letter-spacing:-3px;line-height:1.2">${'🐞'.repeat(Math.min(5,+it[0]))}${+it[0]>5?'<br>'+'🐞'.repeat(+it[0]-5):''}</div><div class="lc-word">${it[1]} · ${it[2]}</div>`;
  $('#qbody').innerHTML=`<div class="trace-wrap">
  <div class="letter-card"><div class="lc-ch">${esc(it[0])}</div><div class="lc-emoji">${word}</div><button class="btn sm purple" onclick="sayTrace()">🔊 들어보기</button></div>
  <div class="canvas-box" id="cbox"><div class="sq" id="sq"><canvas id="tpl"></canvas><canvas id="ink"></canvas></div></div>
@@ -640,7 +643,7 @@ async function mountTrace(){const q=Q.q;const it=curItem();
  TRACE={pts,W,ink,ready:false};
  setTimeout(()=>{if(App.screen==='quest')sayTrace();},300);}
 function sayTrace(){const q=Q.q;const it=curItem();
- if(q.type==='hangul')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
+ if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
 function checkTrace(){if(!TRACE)return 0;const {pts,W,ink}=TRACE;const d=ink.getContext('2d').getImageData(0,0,W,W).data;let c=0;for(const p of pts)if(d[p*4+3]>0)c++;const ratio=pts.length?c/pts.length:0;const goal=0.3;
  const m=$('#meter');if(m)m.style.width=Math.min(100,ratio/goal*100)+'%';
  if(ratio>=goal&&!TRACE.ready){TRACE.ready=true;const b=$('#doneBtn');if(b)b.classList.add('ready');setGuide('좋아! 다 썼으면 <b>다 했어요</b>를 눌러줘! 👏');}
@@ -710,7 +713,7 @@ async function finishDraw(){if(!PAD)return;if(PAD.strokes<2){setGuide('조금만
 function finishQuest(){const s=S();
  if(Q.practice){SFX.win();showCelebrate({title:'연습 끝! 잘했어요!',lines:['<span>💪 연습도 정말 멋졌어!</span>']});return;}
  const day=s.days[Q.dayKey];const q=day&&day.quests[Q.i];if(!q||q.done){App.go('home');return;}
- q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);
+ q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
  const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;
  if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
  if(!day.allDone&&day.quests.every(x=>x.done)){const rw=grantDayReward(day);bug=rw.bug;if(rw.min)lines.push(`<span>📺 TV ${rw.min}분 쿠폰을 받았어요!</span>`);if(s.giftReady)lines.push('<span>🎁 스티커판 완성! 선물을 받을 수 있어요!</span>');}
@@ -772,7 +775,6 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
  if(tab==='settings'){body=`<div class="pcard"><h4>📚 하루 퀘스트</h4>
   <div class="prow"><span class="pl">하루 퀘스트 개수</span><div class="stepper"><button onclick="psStep(-1)">−</button><span id="qc">${PS.questCount}</span><button onclick="psStep(1)">+</button></div><span class="hint">퀘스트 1개에 약 2~3분</span></div>
   <div class="prow"><span class="pl">학습 과목</span><div class="chips">${TYPE_ORDER.map(t=>`<button class="chip ${PS.subjects[t]?'on':''}" onclick="psSub('${t}',this)">${TYPES[t].icon} ${TYPES[t].name}</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">한글 따라쓰기 범위</span><div class="chips">${[['all','자음+모음 24자'],['consonants','자음 14자'],['vowels','모음 10자']].map(([v,l])=>`<button class="chip ${(PS.hangulSet||'all')===v?'on':''}" onclick="psSet('hangulSet','${v}',this)">${l}</button>`).join('')}</div></div>
   <div class="hint">선택한 과목이 매일 돌아가며 나와요. 과목 수보다 퀘스트가 많으면 겹쳐서 나와요.</div></div>
   <div class="pcard"><h4>🎁 보상 규칙</h4>
   <div class="prow"><span class="pl">하루 완료 시 TV 쿠폰</span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
@@ -788,7 +790,7 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><button class="btn yellow" onclick="bonus('star')">⭐ 별 1개</button><button class="btn pink" onclick="bonus('sticker')">🐞 스티커 1개</button><button class="btn blue" onclick="bonus('coupon')">📺 TV 쿠폰 1장</button></div></div>`;}
  if(tab==='records'){const keys=Object.keys(s.days).sort().reverse().slice(0,14);const lv=level(s.stars);body=`<div class="pcard"><h4>📊 한눈에 보기</h4><div class="kv">
   <div>별<b>⭐ ${s.stars}</b></div><div>레벨<b>Lv.${lv}</b></div><div>연속 탐험<b>🔥 ${streak()}일</b></div><div>배지<b>🏅 ${Object.keys(s.badges).length}</b></div>
-  <div>한글 진도<b>${Math.min(s.progress.hangul,HANGUL.length)} / ${HANGUL.length}</b></div><div>알파벳 진도<b>${Math.min(s.progress.abc,ABC.length)} / ${ABC.length}</b></div><div>숫자 진도<b>${Math.min(s.progress.num,NUMS.length)} / ${NUMS.length}</b></div><div>그림<b>🎨 ${s.counts.draw}</b></div></div>
+  <div>자음 완주<b>${(s.counts.hangul||0)}번</b></div><div>모음 완주<b>${(s.counts.vowel||0)}번</b></div><div>알파벳 완주<b>${(s.counts.abc||0)}번</b></div><div>숫자 진도<b>${Math.min(s.progress.num,NUMS.length)} / ${NUMS.length}</b></div><div>그림<b>🎨 ${s.counts.draw}</b></div></div>
   <div class="hint">과목별 완료 횟수: ${TYPE_ORDER.map(t=>`${TYPES[t].name} ${s.counts[t]||0}`).join(' · ')}</div></div>
   <div class="pcard"><h4>📅 최근 2주</h4>${keys.length?`<table class="rec"><tr><th>날짜</th><th>완료</th><th>퀘스트</th></tr>${keys.map(k=>{const d=s.days[k];const dn=d.quests.filter(q=>q.done).length;return `<tr><td>${prettyDate(k)}</td><td>${d.allDone?'✅':dn+' / '+d.quests.length}</td><td style="font-size:15px;color:var(--ink2)">${d.quests.map(q=>(q.done?'✔ ':'· ')+TYPES[q.type].name).join(', ')}</td></tr>`;}).join('')}</table>`:'<div class="hint">아직 기록이 없어요</div>'}</div>
   <div class="pcard"><h4>📤 기록 코드</h4><div class="hint">버튼을 눌러 복사한 코드를 Claude 채팅에 붙여주면 학습 기록을 정리해 드려요. 기기를 바꿀 때 옮기는 용도로도 써요.</div><div><button class="btn purple sm" onclick="copyRecord()">📋 기록 코드 복사</button></div><textarea class="inp" id="rc" readonly placeholder="여기에 코드가 나와요"></textarea>
@@ -832,7 +834,7 @@ function saveAccount(){const s=S();const id=$('#a_id').value.trim().toLowerCase(
  applyAdmin();
  const auto=lsGet('bugquest_auto');if(auto&&auto===hash('auto:'+s.setup.childId+s.setup.pwHash)){App.loggedIn=true;App.go('home');}else App.go('login');
  let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKey();if(App.screen==='home')App.go('home');}},60000);
- window.addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(App.screen==='quest'&&Q&&(Q.q.type==='hangul'||Q.q.type==='abc'||Q.q.type==='num'||Q.q.type==='draw')&&PAD&&PAD.strokes===0)App.go('quest');},400);});
+ window.addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(App.screen==='quest'&&Q&&(isTrace(Q.q.type)||Q.q.type==='draw')&&PAD&&PAD.strokes===0)App.go('quest');},400);});
 })();
 </script>
 </body>
