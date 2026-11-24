@@ -448,6 +448,36 @@ table.rec th{color:var(--ink2)}
 .msg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}.ms{display:flex;flex-direction:column;gap:6px}.ms-h{display:flex;justify-content:space-between;font-size:14px}.ms-h span{color:#6B7088}.ms small{font-size:12px;color:#6B7088}
 @media (max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.pgrid{grid-template-columns:1fr}}
 
+/* 홈 정리 · 보물 창고 · 학습 놀이터 */
+.trw{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.trw-l{font-size:17px;color:var(--ink2);margin-right:2px}
+.trw-i{display:flex;align-items:center;gap:4px;background:#fff;border-radius:14px;padding:3px 10px;font-size:17px;color:var(--ink2);opacity:.75}.trw-i em{font-style:normal;font-size:20px;filter:grayscale(.6)}
+.trw-i.got{opacity:1;color:var(--green-d);box-shadow:0 0 0 2px var(--green) inset}.trw-i.got em{filter:none}
+.big-nav{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 6px}
+.big-nav button{position:relative;border:0;border-radius:28px;padding:14px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;color:#fff;font-family:inherit;text-align:left}
+.bn-learn{background:linear-gradient(135deg,#5BC0EB,#3A9AC4);box-shadow:0 7px 0 #2D7FA6}.bn-rw{background:linear-gradient(135deg,#FFB067,#FF8A3D);box-shadow:0 7px 0 #D86E22}
+.big-nav button:active{transform:translateY(5px);box-shadow:none}
+.bn-ic{font-size:48px;line-height:1;background:rgba(255,255,255,.25);border-radius:20px;padding:6px 10px}.bn-t{font-size:30px;line-height:1.15}.bn-t small{display:block;font-size:16px;opacity:.92}
+.bn-dot{position:absolute;top:-8px;right:-6px;width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-weight:400;font-size:24px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;animation:bounceIn 1.2s ease infinite}
+.rw-top{display:grid;grid-template-columns:auto auto auto 1fr;gap:12px;align-items:center;background:rgba(255,255,255,.9);border-radius:24px;padding:10px 16px;box-shadow:0 5px 0 rgba(59,47,92,.08)}
+.rw-top>div:not(.rw-week){text-align:center;padding:0 10px;border-right:2px solid #F0ECF8}.rw-top b{display:block;font-weight:400;font-size:28px}.rw-top small{font-size:15px;color:var(--ink2)}.rw-week{justify-self:end}
+.rw-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-auto-rows:minmax(170px,auto);gap:16px}
+.rw-card{position:relative;border:0;background:#fff;border-radius:28px;padding:16px 18px 46px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;border-top:8px solid var(--c);box-shadow:0 7px 0 rgba(59,47,92,.1);display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.rw-card.big{grid-row:span 2}.rw-card:active{transform:translateY(4px)}
+.rw-h{font-size:24px}.rw-main{font-size:44px;line-height:1}.rw-main small{font-size:20px;color:var(--ink2)}.rw-s{font-size:17px;color:var(--ink2)}.rw-s b{font-weight:400;color:var(--pink-d)}
+.rw-bar{height:18px;background:#F3EFE8;border-radius:10px;overflow:hidden}.rw-bar i{display:block;height:100%;background:linear-gradient(90deg,#FFD54F,#FF9F43);border-radius:10px}
+.rw-go{position:absolute;left:18px;bottom:12px;font-size:17px;color:#fff;background:var(--c);border-radius:14px;padding:4px 12px}
+.rw-dots{display:flex;flex-wrap:wrap;gap:6px}.rw-dots i{width:22px;height:22px;border-radius:50%;background:#F3EEF8;border:2px dashed #E0D6F0}.rw-dots i.on{background:var(--pink);border:2px solid #fff;box-shadow:0 0 0 2px var(--pink)}
+.rw-tree{position:absolute;right:6px;top:6px;width:96px;opacity:.95}.rw-tree svg{width:100%;height:auto}
+.rw-av{position:absolute;right:12px;top:12px;width:78px;height:78px;border-radius:50%;background:#FFF4D6;overflow:hidden;display:flex;justify-content:center}.rw-av svg{width:100%;height:auto}
+.rw-gift{position:absolute;right:18px;bottom:10px;font-size:90px;line-height:1;animation:hop 2s ease-in-out infinite}.rw-card.big .rw-main{font-size:64px;margin:14px 0 6px}.rw-card.big .rw-bar{height:24px}
+.lh-tip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.9);border-radius:24px;padding:8px 18px;font-size:23px}.lh-tip .ppu{width:70px;flex:none}.lh-tip small{display:block;font-size:16px;color:var(--ink2)}
+.lh-sec h3{margin:6px 4px 8px;font-weight:400;font-size:25px}.lh-sec h3 small{font-size:17px;color:var(--ink2)}
+.lh-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}.lh-row{display:flex;flex-wrap:wrap;gap:12px}@media (max-aspect-ratio:1/1){.lh-wrap{grid-template-columns:1fr}}
+.lh-card{border:4px solid var(--c);background:#fff;border-radius:26px;padding:12px 8px;flex:0 0 138px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:inherit;color:var(--ink);box-shadow:0 6px 0 var(--cs)}
+.lh-card:active{transform:translateY(4px);box-shadow:none}.lh-card .qicon{width:64px;height:64px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px}.lh-n{font-size:18px;white-space:nowrap}.lh-c{font-size:15px;color:var(--ink2)}
+.lh-art{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.lh-art .gitem{width:150px}.lh-more{border:0;background:#fff;border-radius:20px;padding:14px 18px;font-family:inherit;font-size:19px;cursor:pointer;box-shadow:0 5px 0 rgba(59,47,92,.1)}
+@media (max-aspect-ratio:1/1){.rw-grid{grid-template-columns:1fr 1fr}.rw-top{grid-template-columns:1fr 1fr 1fr}.rw-week{grid-column:1/-1;justify-self:center}.bn-t{font-size:24px}}
+
 /* overlay */
 #overlay{position:fixed;inset:0;z-index:50;display:none}
 #overlay.on{display:block}
@@ -792,7 +822,7 @@ function importRecord(){const v=($('#ri').value||'').trim();let data=null;try{if
 /* ================= 앱 ================= */
 const App={screen:null,loggedIn:false,ptab:'dash',parentFrom:null,
  go(name){stopAll();this.screen=name;const app=$('#app');app.scrollTop=0;
-  const R={closet:renderCloset,setup:renderSetup,login:renderLogin,home:renderHome,quest:renderQuest,stickers:renderStickers,coupons:renderCoupons,badges:renderBadges,gallery:renderGallery,parent:renderParent,tree:renderTree};
+  const R={closet:renderCloset,setup:renderSetup,login:renderLogin,home:renderHome,quest:renderQuest,stickers:renderStickers,coupons:renderCoupons,badges:renderBadges,gallery:renderGallery,parent:renderParent,tree:renderTree,rewards:renderRewards,learnhub:renderLearnHub};
   app.innerHTML=(R[name]||renderLogin)();const M={quest:mountQuest,login:mountLogin};if(M[name])M[name]();if(name==='home'&&PENDING_GRANTS.length)setTimeout(showGrants,600);if(name==='home'||name==='quest')setTimeout(checkLimits,100);if(name==='home')setTimeout(maybeIntro,800);}
 };
 let cleanups=[];
@@ -888,9 +918,9 @@ function logout(){lsDel('bugquest_auto');App.loggedIn=false;App.go('login');}
 /* ---------- 홈 ---------- */
 function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;const done=qs.filter(q=>q.done).length;const name=s.setup.childName;const lv=level(s.stars);
  const ni=qs.findIndex(q=>!q.done);
- const msg=day.allDone?`우와, 오늘 탐험 끝! 🎉 <small>다 한 퀘스트를 누르면 연습할 수 있어</small>`:done===0?`${esc(callName(name))}! 오늘 탐험을 시작해 볼까? <small>첫 번째는 <b>${TYPES[qs[ni].type].name}</b>!</small>`:`잘하고 있어! <b>${qs.length-done}개</b>만 더 하면 스티커를 받아 <small>다음은 <b>${TYPES[qs[ni].type].name}</b>!</small>`;
+ const msg=day.allDone?`우와, 오늘 탐험 끝! 🎉 <small>📚 학습 놀이터에서 더 연습하거나 🎁 보물 창고를 구경해 봐</small>`:done===0?`${esc(callName(name))}! 오늘 탐험을 시작해 볼까? <small>첫 번째는 <b>${TYPES[qs[ni].type].name}</b>!</small>`:`잘하고 있어! <b>${qs.length-done}개</b>만 더 하면 탐험 성공! <small>다음은 <b>${TYPES[qs[ni].type].name}</b>!</small>`;
  const amsg=(window.ADMIN_CONFIG&&window.ADMIN_CONFIG.message||'').trim();
- const pct=qs.length?done/qs.length*100:0;const unused=s.coupons.filter(c=>!c.used);const umin=unused.reduce((a,c)=>a+c.min,0);const cur=s.stickers.current.length,goal=s.settings.stickerGoal;
+ const pct=qs.length?done/qs.length*100:0;const unused=s.coupons.filter(c=>!c.used);const alert=boardFull()||mapProg()>=(s.settings.mapLen||40);
  return `<div class="screen home">
  <header class="topbar">
   <div class="me" onclick="App.go('closet')" style="cursor:pointer"><div class="avatar">${heroSVG(s.look)}</div><div><div class="name">${esc(name)} 탐험가</div><div class="lv">Lv.${lv} ${levelTitle(lv)}</div><div class="lvbar"><i style="width:${(s.stars%10)*10}%"></i></div></div></div>
@@ -899,15 +929,13 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  </header>
  <section class="hboard">
   <div class="hb-msg"><div class="char ppu float">${PPU_SVG}</div><div class="bubble left">${msg}${amsg?`<span class="pmsg">💌 ${esc(amsg)}</span>`:''}</div></div>
-  <div class="hb-side"><div class="hb-row"><span class="hb-l">오늘의 탐험</span><div class="hb-bar"><i style="width:${pct}%"></i><span class="hb-bug" style="left:${Math.max(6,Math.min(94,pct))}%">${bugSVG(0)}</span></div><b class="hb-n">${done}/${qs.length}</b></div>${weekStrip()}</div>
+  <div class="hb-side"><div class="hb-row"><span class="hb-l">오늘의 탐험</span><div class="hb-bar"><i style="width:${pct}%"></i><span class="hb-bug" style="left:${Math.max(6,Math.min(94,pct))}%">${bugSVG(0)}</span></div><b class="hb-n">${done}/${qs.length}</b></div>
+  <div class="trw"><span class="trw-l">오늘 받을 보상</span>${todayRw().map(([i,n,a,b])=>`<span class="trw-i ${a>=b?'got':''}" title="${n}"><em>${i}</em>${a}/${b}</span>`).join('')}</div></div>
  </section>
  <section class="quests">${qs.map((q,i)=>{const T=TYPES[q.type];const nx=i===ni;return `<button class="qcard ${q.done?'done':''} ${nx?'next':''}" style="--c:${T.c};--cs:${T.cs}" onclick="startQuest(${i})"><div class="qnum">${i+1}</div><div class="qicon">${T.icon}</div><div class="qname">${T.name}</div><div class="qsub">${esc(questSub(q))}</div>${q.done?'<div class="stamp">참<br>잘했어요</div>':''}${nx?`<div class="qgo">▶ 시작!</div><div class="qhero">${heroSVG(s.look)}</div>`:''}</button>`;}).join('')}</section>
- <nav class="bottom-nav">
-  <button class="${boardFull()?'alert':''}" onclick="App.go('badges')"><span class="ni">🗺️</span><span>보물 지도</span><b>${boardFull()?'🏆 한 칸 가기!':`${mapProg()} / ${s.settings.mapLen||40}칸`}</b></button>
-  <button onclick="App.go('stickers')"><span class="ni">🐞</span><span>스티커판</span><b>${cur>=goal?'완성! 🏆':`${cur} / ${goal}`}</b></button>
-  <button onclick="App.go('coupons')"><span class="ni">📺</span><span>TV 쿠폰</span><b>${unused.length}장 · ${umin}분</b></button>
-  <button onclick="App.go('tree')"><span class="ni">${TREE_ST[treeStage(treeDays())][2]}</span><span>탐험 나무</span><b>${TREE_ST[treeStage(treeDays())][1]}</b></button>
-  <button onclick="App.go('gallery')"><span class="ni">🎨</span><span>갤러리</span><b>${Store.drawings.length}장</b></button>
+ <nav class="big-nav">
+  <button class="bn-learn" onclick="App.go('learnhub')"><span class="bn-ic">📚</span><span class="bn-t">학습 놀이터<small>과목 골라 연습 · 내 작품</small></span></button>
+  <button class="bn-rw ${alert?'alert':''}" onclick="App.go('rewards')"><span class="bn-ic">🎁</span><span class="bn-t">보물 창고<small>지도 ${mapProg()}/${s.settings.mapLen||40}칸 · 쿠폰 ${unused.length}장 · ${TREE_ST[treeStage(treeDays())][1]}</small></span>${alert?'<b class="bn-dot">!</b>':''}</button>
  </nav></div>`;}
 
 function weekDays(){const d=now();const dow=(d.getDay()+6)%7;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);return Array.from({length:7},(_,i)=>{const x=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);return todayKey(x);});}
@@ -932,7 +960,7 @@ function guideText0(){const q=Q.q;
  if(q.type==='draw')return Q.theme?`<b>“${esc(Q.theme)}”</b> 그림을 보고 따라 그려봐! 🖍️`:'오늘은 뭘 그려볼까? 하나 골라봐!';}
 function renderQuest(){const q=Q.q,T=TYPES[q.type];const nR=q.rounds?q.rounds.length:0;
  return `<div class="screen quest" style="--c:${T.c};--cs:${T.cs}">
- <header class="qbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(isTrace(q.type)&&traceSeq(q).length>1)?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
+ <header class="qbar"><button class="icon-btn" onclick="App.go(Q&&Q.i===-1?'learnhub':'home')">⬅️<small>돌아가기</small></button><div class="qtitle">${T.icon} ${T.name}${Q.practice?' <span class="tag">연습</span>':''}</div>${(isTrace(q.type)&&traceSeq(q).length>1)?`<div class="pill" id="tpos" style="margin-left:auto">${Q.pos+1} / ${traceSeq(q).length}</div>`:''}<div class="rounds" id="rounds">${Array.from({length:nR},(_,i)=>`<i class="${i<Q.round?'on':''}"></i>`).join('')}</div></header>
  <div class="guide"><div class="mini float">${PPU_SVG}</div><div class="bubble left" id="guide">${guideText()}</div><button class="spk" onclick="speak(document.getElementById('guide').textContent)">🔊</button></div>
  <div class="qbody" id="qbody"></div>${TEST_MODE()?'<div class="testbar"><button onclick="testNext()">🧪 다음 문제로 ⏭</button><button onclick="testFinishQuest()">🧪 이 퀘스트 바로 완료 ✅</button></div>':''}</div>`;}
 function mountQuest(){const t=Q.q.type;if(isTrace(t))mountTrace();else if(t==='listen')mountListen();else if(t==='count')mountCount();else if(t==='spot')mountSpot();else if(t==='puzzle')mountPuzzle();else if(t==='eng')mountEng();else if(t==='syll')mountSyll();else if(t==='draw')mountDraw();}
@@ -1093,7 +1121,7 @@ function playOrder(){if(!TRACE||!TRACE.ss)return;stopOrder();const tok=ORDER_TOK
   requestAnimationFrame(step);};
  requestAnimationFrame(step);}
 function sayTrace(){const q=Q.q;const it=curItem();
- if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc')speak(`${it[0]}. ${it[1]}.`,'en');else if(q.type==='abcl')speak(`small ${it[0].toUpperCase()}. ${it[1]}.`,'en');else if(q.type==='family'){speak(it[5]==='tel'?`${it[1]}, ${it[2].map(p=>p.split('').map(d=>DIGIT_KO[+d]).join(' ')).join(', ')}`:`${it[1]}, ${it[2].join('')}. ${it[0]}`);}else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
+ if(q.type==='hangul'||q.type==='vowel')speak(`${it[1]}. ${it[2]}의 ${it[1]}!`);else if(q.type==='abc'||q.type==='abcl')speak(`${it[0].toUpperCase()}.`,'en');else if(q.type==='family'){speak(it[5]==='tel'?`${it[1]}, ${it[2].map(p=>p.split('').map(d=>DIGIT_KO[+d]).join(' ')).join(', ')}`:`${it[1]}, ${it[2].join('')}. ${it[0]}`);}else(async()=>{await speak(it[1],'ko');await speak(it[2],'en',true);})();}
 function strokeCov(){const {sp,W,ink}=TRACE;if(!sp)return null;const d=ink.getContext('2d').getImageData(0,0,W,W).data;const r=Math.round(W*0.03);const hit=(x,y)=>{for(const [dx,dy] of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){const X=x+dx,Y=y+dy;if(X<0||Y<0||X>=W||Y>=W)continue;if(d[(Y*W+X)*4+3]>0)return true;}return false;};return sp.map(ps=>ps.filter(([x,y])=>hit(x,y)).length/ps.length);}
 function checkTrace(){if(!TRACE||TRACE.done)return 0;const {pts,W,ink}=TRACE;const sc=strokeCov();let ratio,minS=1;
  if(sc){minS=Math.min(...sc);ratio=sc.reduce((a,b)=>a+b,0)/sc.length;TRACE.minS=minS;TRACE.sc=sc;if(minS<0.6)ratio=Math.min(ratio,0.49);if(minS<0.35)ratio=Math.min(ratio,0.29);}
@@ -1270,7 +1298,7 @@ function finishQuest(){const s=S();
  if(!playPraise())speak(bug!=null?`오늘 탐험 성공! 새 친구, ${eulReul(cName(bug))} 만났어!`:'참 잘했어요! 별을 받았어!');}
 
 /* ---------- 스티커판 ---------- */
-function subbar(title){return `<header class="subbar"><button class="icon-btn" onclick="App.go('home')">⬅️<small>돌아가기</small></button><h2>${title}</h2></header>`;}
+function subbar(title){const bk=SUBBACK[App.screen]||'home';return `<header class="subbar"><button class="icon-btn" onclick="App.go('${bk}')">⬅️<small>돌아가기</small></button><h2>${title}</h2></header>`;}
 function renderStickers(){const s=S();const goal=s.settings.stickerGoal;const cur=s.stickers.current;const left=Math.max(0,goal-cur.length);
  return `<div class="screen">${subbar('🐞 탐험 스티커판')}
  <div class="gift-banner ${cur.length>=goal?'ready':''}"><div class="gift-box">🗺️</div><div>${cur.length>=goal?`<div class="gb-t">스티커판 완성! 🏆 보물 지도에서 한 칸 갈 수 있어요</div><button class="btn orange" style="margin:6px 0" onclick="App.go('badges')">🗺️ 보물 지도로 가서 한 칸 가기 ▶</button>`:`<div class="gb-t">스티커 <b style="color:var(--pink-d)">${left}개</b> 더 모으면 보물 지도 한 칸!</div>`}<div class="gb-gift">🎁 최종 선물: ${esc(s.settings.mapGift||'보물 선물')}</div><div class="gb-s">하루 퀘스트를 다 하면 스티커 1개! 다 채우면 새 판이 시작돼요</div></div></div>
@@ -1332,7 +1360,7 @@ function showCelebrate({title,lines,bug}){openOverlay(`<div class="ov-bg"><canva
  <div class="mchar float">${PPU_SVG}</div><h2>${title}</h2>
  ${bug!=null?`<div class="newbug"><div class="sart">${cArt(bug)}</div></div><div class="rw">🐞 새 도감 친구 <b style="color:var(--pink-d)">${esc(cName(bug))}</b>!</div><div class="hint">스티커판에 붙였어요</div>`:''}
  <div class="rws">${lines.map(l=>`<div class="rw">${l}</div>`).join('')}</div>
- <div class="btns">${(()=>{const d=S().days[todayKey()];const ni=d&&!Q?.practice?d.quests.findIndex(q=>!q.done):-1;return ni>=0?`<button class="btn gray" onclick="closeOverlay();App.go('home')">🏠 홈으로</button><button class="btn big green" onclick="closeOverlay();startQuest(${ni})">다음 탐험 하기 ▶</button>`:`<button class="btn big green" onclick="closeOverlay();App.go('home')">좋아요! 🙌</button>`;})()}</div></div></div>`);confetti();}
+ <div class="btns">${(()=>{const d=S().days[todayKey()];const ni=d&&!Q?.practice?d.quests.findIndex(q=>!q.done):-1;return ni>=0?`<button class="btn gray" onclick="closeOverlay();App.go('home')">🏠 홈으로</button><button class="btn big green" onclick="closeOverlay();startQuest(${ni})">다음 탐험 하기 ▶</button>`:(Q&&Q.i===-1?`<button class="btn gray" onclick="closeOverlay();App.go('home')">🏠 홈으로</button><button class="btn big green" onclick="closeOverlay();startPractice('${Q.q.type}')">한 번 더 ▶</button><button class="btn blue" onclick="closeOverlay();App.go('learnhub')">📚 다른 연습</button>`:`<button class="btn big green" onclick="closeOverlay();App.go('home')">좋아요! 🙌</button>`);})()}</div></div></div>`);confetti();}
 function confirmBox(text,onYes,yesLabel='응, 할래',danger=false){openOverlay(`<div class="ov-bg"><div class="modal"><div class="mchar">${PPU_SVG}</div><div class="rw" style="font-size:26px">${text}</div><div class="btns"><button class="btn gray" onclick="closeOverlay()">아니</button><button class="btn ${danger?'red':'green'}" id="cy">${yesLabel}</button></div></div></div>`);$('#cy').onclick=()=>{closeOverlay();onYes();};}
 let PIN={v:'',cb:null};
 function askPin(title,cb){PIN={v:'',cb};openOverlay(`<div class="ov-bg"><div class="modal" id="pinm" style="max-width:380px"><div style="font-size:30px">🔒 ${title}</div><div class="hint">숫자 4자리를 눌러주세요</div><div class="pin-dots" id="pd">${'<i></i>'.repeat(4)}</div>
@@ -1627,6 +1655,31 @@ function renderDash(){const s=S();const a=rangeStat(dKeys(7)),b=rangeStat(dKeys(
  <div class="pgrid"><div class="pcard"><h4>영역별 성취 <span class="tag2">누리과정 기준</span></h4>${domainBars()}</div>
  <div class="pcard"><h4>이번 달 탐험가 유형</h4>${diagnose()}</div></div>
  <div class="pcard"><h4>글자·숫자 익히기 현황</h4><div class="msg">${masteryRows()}</div></div>`;}
+
+/* ---------- 보물 창고 (보상 한곳에) · 학습 놀이터 (학습 한곳에) ---------- */
+const SUBBACK={stickers:'rewards',coupons:'rewards',badges:'rewards',tree:'rewards',closet:'rewards',gallery:'learnhub'};
+function todayRw(){const s=S();const d=s.days[todayKey()];const qs=d?d.quests:[];const done=qs.filter(q=>q.done).length;const cp=s.coupons.filter(c=>c.date===todayKey()&&!c.bonus).length;const cap=s.settings.cpCap|0;const tvOn=(s.settings.tvMinutes|0)>0;
+ const it=[['⭐','별',done,qs.length]];if(tvOn)it.push(['📺','TV 쿠폰',cp,cap?Math.min(cap,qs.length):qs.length]);it.push(['🐞','스티커',d&&d.allDone?1:0,1],['🍎','나무 열매',d&&d.allDone?1:0,1]);return it;}
+function renderRewards(){const s=S();const N=s.settings.mapLen||40;const mp=mapProg();const goal=s.settings.stickerGoal||10;const cur=s.stickers.current;const unused=s.coupons.filter(c=>!c.used);const umin=unused.reduce((a,c)=>a+c.min,0);
+ const td=treeDays();const ts=treeStage(td);const nb=Object.keys(s.badges||{}).length;const lv=level(s.stars);
+ return `<div class="screen">${subbar('🎁 보물 창고')}
+ <div class="rw-top"><div><b>⭐ ${s.stars}</b><small>별 · Lv.${lv} ${levelTitle(lv)}</small></div><div><b>🏅 ${nb}</b><small>받은 배지</small></div><div><b>🔥 ${streak()}일</b><small>연속 탐험</small></div><div class="rw-week">${weekStrip()}</div></div>
+ ${boardFull()?`<div class="claim"><div class="cl-ic">🏆</div><div class="cl-t">스티커판을 다 모았어요!<small>누르면 보물 지도 한 칸 앞으로 가고 새 스티커판이 시작돼요</small></div><button class="btn big orange" onclick="claimBoard()">한 칸 가기 ▶</button></div>`:''}
+ <div class="rw-grid">
+  <button class="rw-card big" style="--c:#FF9F43" onclick="App.go('badges')"><div class="rw-h">🗺️ 보물 지도</div><div class="rw-main">${mp} <small>/ ${N}칸</small></div><div class="rw-bar"><i style="width:${mp/N*100}%"></i></div><div class="rw-s">도착하면 🎁 <b>${esc(s.settings.mapGift||'보물 선물')}</b></div><div class="rw-gift">🎁</div><span class="rw-go">지도 보기 ▶</span></button>
+  <button class="rw-card" style="--c:#FF7EA8" onclick="App.go('stickers')"><div class="rw-h">🐞 스티커판</div><div class="rw-dots">${Array.from({length:goal},(_,i)=>`<i class="${i<cur.length?'on':''}"></i>`).join('')}</div><div class="rw-s">${cur.length>=goal?'다 모았어요! 🏆':`${goal-cur.length}개 더 모으면 지도 한 칸`}</div><span class="rw-go">스티커판 ▶</span></button>
+  <button class="rw-card" style="--c:#5BC0EB" onclick="App.go('coupons')"><div class="rw-h">📺 TV 쿠폰</div><div class="rw-main">${unused.length} <small>장 · ${umin}분</small></div><div class="rw-s">퀘스트 1개 = 쿠폰 1장</div><span class="rw-go">쿠폰 쓰기 ▶</span></button>
+  <button class="rw-card" style="--c:#5CC96B" onclick="App.go('tree')"><div class="rw-tree">${treeSVG(td)}</div><div class="rw-h">${TREE_ST[ts][2]} ${TREE_ST[ts][1]}</div><div class="rw-s">탐험 끝낸 날 ${td}일</div><span class="rw-go">탐험 나무 ▶</span></button>
+  <button class="rw-card" style="--c:#9C7CF4" onclick="App.go('closet')"><div class="rw-av">${heroSVG(s.look)}</div><div class="rw-h">👕 꾸미기</div><div class="rw-s">별을 모으면 새 옷이 열려요</div><span class="rw-go">꾸미러 가기 ▶</span></button>
+ </div></div>`;}
+const AREAS=[['🔤 한글','hangul vowel syll family'],['🔠 영어','abc abcl eng listen'],['🔢 숫자 · 동물','num count'],['🧩 생각 놀이','spot puzzle'],['🎨 표현','draw']];
+function renderLearnHub(){const s=S();const act=activeSubjects();const ds=Store.drawings;
+ const secs=AREAS.map(([n,ts])=>{const list=ts.split(' ').filter(t=>act.includes(t));if(!list.length)return '';return `<div class="lh-sec"><h3>${n}</h3><div class="lh-row">${list.map(t=>{const T=TYPES[t];return `<button class="lh-card" style="--c:${T.c};--cs:${T.cs}" onclick="startPractice('${t}')"><div class="qicon">${T.icon}</div><div class="lh-n">${T.name}</div><div class="lh-c">${s.counts[t]||0}번 했어요</div></button>`;}).join('')}</div></div>`;}).join('');
+ return `<div class="screen">${subbar('📚 학습 놀이터')}
+ <div class="lh-tip"><div class="char ppu">${PPU_SVG}</div><div>하고 싶은 걸 골라서 <b>마음껏 연습</b>해 봐!<small>연습은 별·쿠폰 없이 자유롭게 · 보상은 오늘의 탐험에서 받아요</small></div></div>
+ <div class="lh-wrap">${secs}</div>
+ <div class="lh-sec"><h3>🖼️ 내 작품 <small>${ds.length}장</small></h3>${ds.length?`<div class="lh-art">${ds.slice(0,5).map(d=>`<button class="gitem" onclick="viewDrawing('${d.id}')"><img src="${d.img}" alt=""></button>`).join('')}<button class="lh-more" onclick="App.go('gallery')">모두 보기 ▶</button></div>`:'<div class="hint" style="font-size:18px">그림 그리기·따라쓰기를 하면 여기에 모여요</div>'}</div></div>`;}
+function startPractice(t){SFX.tap();const k=todayKey();const q=makeQuest(t,{});if(q.rounds&&q.rounds.length>1)q.rounds=shuffle(q.rounds.slice());Q={i:-1,dayKey:k,q,practice:true,round:0,wr:[],tapped:0,locked:false,pos:0,theme:null,thumbs:[]};App.go('quest');}
 
 (async function boot(){WX=lsGet('bugquest_wx');renderBG();
  $('#app').innerHTML=`<div class="screen center loading"><div class="crawl">${bugSVG(0)}</div><p>탐험 준비 중...</p></div>`;
