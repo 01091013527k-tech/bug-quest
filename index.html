@@ -473,8 +473,8 @@ table.rec th{color:var(--ink2)}
 .lh-tip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.9);border-radius:24px;padding:8px 18px;font-size:23px}.lh-tip .ppu{width:70px;flex:none}.lh-tip small{display:block;font-size:16px;color:var(--ink2)}
 .lh-sec h3{margin:6px 4px 8px;font-weight:400;font-size:25px}.lh-sec h3 small{font-size:17px;color:var(--ink2)}
 .lh-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}.lh-row{display:flex;flex-wrap:wrap;gap:12px}@media (max-aspect-ratio:1/1){.lh-wrap{grid-template-columns:1fr}}
-.lh-card{border:4px solid var(--c);background:#fff;border-radius:26px;padding:12px 8px;flex:0 0 138px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:inherit;color:var(--ink);box-shadow:0 6px 0 var(--cs)}
-.lh-card:active{transform:translateY(4px);box-shadow:none}.lh-card .qicon{width:64px;height:64px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px}.lh-n{font-size:18px;white-space:nowrap}.lh-c{font-size:15px;color:var(--ink2)}
+.lh-card{border:4px solid var(--c);background:#fff;border-radius:26px;padding:12px 6px;flex:0 0 128px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:inherit;color:var(--ink);box-shadow:0 6px 0 var(--cs)}
+.lh-card:active{transform:translateY(4px);box-shadow:none}.lh-card .qicon{width:64px;height:64px;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px}.lh-n{font-size:17px;white-space:nowrap}.lh-c{font-size:15px;color:var(--ink2)}
 .lh-art{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.lh-art .gitem{width:150px}.lh-more{border:0;background:#fff;border-radius:20px;padding:14px 18px;font-family:inherit;font-size:19px;cursor:pointer;box-shadow:0 5px 0 rgba(59,47,92,.1)}
 @media (max-aspect-ratio:1/1){.rw-grid{grid-template-columns:1fr 1fr}.rw-top{grid-template-columns:1fr 1fr 1fr}.rw-week{grid-column:1/-1;justify-self:center}.bn-t{font-size:24px}}
 
@@ -1672,7 +1672,7 @@ function renderRewards(){const s=S();const N=s.settings.mapLen||40;const mp=mapP
   <button class="rw-card" style="--c:#5CC96B" onclick="App.go('tree')"><div class="rw-tree">${treeSVG(td)}</div><div class="rw-h">${TREE_ST[ts][2]} ${TREE_ST[ts][1]}</div><div class="rw-s">탐험 끝낸 날 ${td}일</div><span class="rw-go">탐험 나무 ▶</span></button>
   <button class="rw-card" style="--c:#9C7CF4" onclick="App.go('closet')"><div class="rw-av">${heroSVG(s.look)}</div><div class="rw-h">👕 꾸미기</div><div class="rw-s">별을 모으면 새 옷이 열려요</div><span class="rw-go">꾸미러 가기 ▶</span></button>
  </div></div>`;}
-const AREAS=[['🔤 한글','hangul vowel syll family'],['🔠 영어','abc abcl eng listen'],['🔢 숫자 · 동물','num count'],['🧩 생각 놀이','spot puzzle'],['🎨 표현','draw']];
+const AREAS=[['🔤 한글','hangul vowel syll family'],['🔠 영어 쓰기','abc abcl'],['👂 듣고 말하기','listen eng'],['🔢 숫자 · 동물','num count'],['🧩 생각 놀이','spot puzzle'],['🎨 표현','draw']];
 function renderLearnHub(){const s=S();const act=activeSubjects();const ds=Store.drawings;
  const secs=AREAS.map(([n,ts])=>{const list=ts.split(' ').filter(t=>act.includes(t));if(!list.length)return '';return `<div class="lh-sec"><h3>${n}</h3><div class="lh-row">${list.map(t=>{const T=TYPES[t];return `<button class="lh-card" style="--c:${T.c};--cs:${T.cs}" onclick="startPractice('${t}')"><div class="qicon">${T.icon}</div><div class="lh-n">${T.name}</div><div class="lh-c">${s.counts[t]||0}번 했어요</div></button>`;}).join('')}</div></div>`;}).join('');
  return `<div class="screen">${subbar('📚 학습 놀이터')}
