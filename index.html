@@ -459,7 +459,7 @@ table.rec th{color:var(--ink2)}
 .bn-ic{font-size:48px;line-height:1;background:rgba(255,255,255,.25);border-radius:20px;padding:6px 10px}.bn-t{font-size:30px;line-height:1.15}.bn-t small{display:block;font-size:16px;opacity:.92}
 .bn-dot{position:absolute;top:-8px;right:-6px;width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-weight:400;font-size:24px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;animation:bounceIn 1.2s ease infinite}
 .rw-top{display:grid;grid-template-columns:auto auto auto 1fr;gap:12px;align-items:center;background:rgba(255,255,255,.9);border-radius:24px;padding:10px 16px;box-shadow:0 5px 0 rgba(59,47,92,.08)}
-.rw-top>div:not(.rw-week){text-align:center;padding:0 10px;border-right:2px solid #F0ECF8}.rw-top b{display:block;font-weight:400;font-size:28px}.rw-top small{font-size:15px;color:var(--ink2)}.rw-week{justify-self:end}
+.rw-top .wm{box-shadow:none;padding:0;background:none}.rw-top>div:not(.rw-week){text-align:center;padding:0 10px;border-right:2px solid #F0ECF8}.rw-top b{display:block;font-weight:400;font-size:28px}.rw-top small{font-size:15px;color:var(--ink2)}.rw-week{justify-self:end}
 .rw-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;grid-auto-rows:minmax(170px,auto);gap:16px}
 .rw-card{position:relative;border:0;background:#fff;border-radius:28px;padding:16px 18px 46px;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;border-top:8px solid var(--c);box-shadow:0 7px 0 rgba(59,47,92,.1);display:flex;flex-direction:column;gap:6px;overflow:hidden}
 .rw-card.big{grid-row:span 2}.rw-card:active{transform:translateY(4px)}
@@ -478,6 +478,17 @@ table.rec th{color:var(--ink2)}
 .lh-art{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.lh-art .gitem{width:150px}.lh-more{border:0;background:#fff;border-radius:20px;padding:14px 18px;font-family:inherit;font-size:19px;cursor:pointer;box-shadow:0 5px 0 rgba(59,47,92,.1)}
 @media (max-aspect-ratio:1/1){.rw-grid{grid-template-columns:1fr 1fr}.rw-top{grid-template-columns:1fr 1fr 1fr}.rw-week{grid-column:1/-1;justify-self:center}.bn-t{font-size:24px}}
 
+.egg-banner{display:flex;align-items:center;gap:16px;border:0;width:100%;text-align:left;font-family:inherit;color:var(--ink);background:linear-gradient(90deg,#FFF6D8,#FFE9F1);border-radius:26px;padding:10px 20px;cursor:pointer;box-shadow:0 6px 0 #F2C76E}
+.egg-ic{width:70px;animation:wobble 1.4s ease-in-out infinite}.egg-ic svg{width:100%;height:auto;display:block}.eb-t{font-size:26px}.eb-t b{font-weight:400;color:var(--pink-d)}.eb-s{font-size:16px;color:var(--ink2)}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(-10deg)}40%{transform:rotate(9deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(3deg)}}
+.egg-open{position:relative;height:150px;width:220px;margin:0 auto}.egg-half{position:absolute;top:20px;width:90px;overflow:hidden;height:110px}.egg-half svg{width:90px}.egg-half.l{left:10px;clip-path:inset(0 50% 0 0);animation:hl .7s ease forwards}.egg-half.r{right:10px;clip-path:inset(0 0 0 50%);animation:hr .7s ease forwards}
+@keyframes hl{to{transform:translate(-30px,20px) rotate(-30deg)}}@keyframes hr{to{transform:translate(30px,20px) rotate(30deg)}}
+.egg-bug{position:absolute;left:60px;top:10px;width:100px;animation:pop .6s .3s ease both}.clines{display:flex;flex-direction:column;gap:6px;font-size:22px}
+.wm{background:rgba(255,255,255,.9);border-radius:24px;padding:10px 16px;box-shadow:0 5px 0 rgba(59,47,92,.08)}.wm-h{font-size:22px}.wm-h small{font-size:16px;color:var(--ink2);margin-left:6px}
+.wm-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}.wm-n{margin-left:auto;font-size:24px;background:#F3EFFA;border-radius:16px;padding:4px 14px}.wm-n.ok{background:#E3F6E5;color:var(--green-d)}
+@media (min-aspect-ratio:1/1){.home .quests{position:relative;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));max-width:1240px;margin:0 auto;width:100%;align-self:stretch}.home .quests::before{content:'';position:absolute;left:6%;right:6%;top:50%;border-top:8px dotted rgba(255,255,255,.95);z-index:0}.home .qcard{z-index:1;min-height:220px;justify-content:center}.home .qcard .qicon{width:92px;height:92px;font-size:56px}.home .qcard .qname{font-size:25px}}
+
+.modal .rws{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;margin:8px 0}.modal .newbug~.rws{margin-top:4px}.modal:has(.newbug) .mchar{display:none}.modal .rws .rw{background:#F7F4FF;border-radius:16px;padding:6px 14px;font-size:21px;margin:0}.rws .rw small{font-size:15px;color:var(--ink2)}.modal .newbug~.rws{margin-top:4px}
 /* overlay */
 #overlay{position:fixed;inset:0;z-index:50;display:none}
 #overlay.on{display:block}
@@ -674,7 +685,7 @@ async function speak(text,lang='ko',queue=false){
 }
 
 /* ================= 데이터 / 저장 ================= */
-function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,syll:true,abc:true,abcl:true,count:true,family:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40,mapDays:40,numMax:10,dailyMax:0,lockHour:0,breakMin:15,cpCap:0,focus:[]},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,syll:0,abc:0,abcl:0,family:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0};}
+function defaultState(){return {v:1,setup:null,settings:{questCount:5,subjects:{hangul:true,vowel:true,syll:true,abc:true,abcl:true,count:true,family:true,spot:true,num:true,puzzle:true,listen:true,eng:true,draw:true},tvMinutes:10,stickerGoal:10,giftName:'갖고 싶은 장난감',hangulSet:'all',mapGift:'보물 상자 선물',mapLen:40,mapDays:40,numMax:10,dailyMax:0,lockHour:0,breakMin:15,cpCap:0,focus:[]},stars:0,progress:{hangul:0,abc:0,num:0},counts:{hangul:0,vowel:0,syll:0,abc:0,abcl:0,family:0,num:0,listen:0,count:0,spot:0,puzzle:0,eng:0,draw:0},days:{},stickers:{current:[],total:0,boards:0},coupons:[],badges:{},giftReady:false,adminRev:0,grantsApplied:[],mapBonus:[],mapOffset:0,maps:0,eggs:0,weekly:{}};}
 function normalize(s){const d=defaultState();const m=(t,src)=>{for(const k in src){if(t[k]===undefined||t[k]===null){if(!(k==='setup'))t[k]=JSON.parse(JSON.stringify(src[k]));}else if(typeof src[k]==='object'&&src[k]&&!Array.isArray(src[k])&&typeof t[k]==='object')m(t[k],src[k]);}};s=JSON.parse(JSON.stringify(s||{}));m(s,d);if(s.setup===undefined)s.setup=null;return s;}
 const Store={mode:'local',state:null,drawings:[],ref:null,dcol:null,saving:false,pending:false,timer:null,syncErr:false,
  async init(){
@@ -739,7 +750,7 @@ function makeQuest(t,off){const s=S();const dv=dayNum(todayKey());
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]&&(t!=='family'||familyReady()));if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const fo=(s.settings.focus||[]).filter(t=>en.includes(t)).slice(0,n);const base=en.filter(t=>!fo.includes(t));const B=base.length?base:en;const start=dayNum(todayKey())%B.length;const off={};const out=fo.map(t=>makeQuest(t,off));for(let k=0;out.length<n;k++)out.push(makeQuest(B[(start+k)%B.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
 function questSub(q){if(q.type==='hangul'||q.type==='vowel'||q.type==='abc'||q.type==='abcl'){const sq=traceSeq(q);return `${sq[0][0]}~${sq[sq.length-1][0]} ${sq.length}글자`+(!q.done&&q.pos?` (${q.pos}/${sq.length})`:'');}if(q.type==='num'){if(q.nums)return `숫자 ${q.nums.length}개 (${q.nums[0]}~${q.nums[q.nums.length-1]})`+(!q.done&&q.pos?` (${q.pos}/${q.nums.length})`:'');const it=traceList(q.type)[q.idx%traceList(q.type).length];return `오늘의 숫자: ${it[0]}`;}if(q.type==='family'){const ls=[...new Set((q.items||[]).map(x=>x[1]))];return ls.join(' · ')||'가족 정보 필요';}if(q.type==='draw')return q.theme?`주제: ${q.theme}`:'주제 골라서 그리기';if(q.type==='listen')return '3문제';if(q.type==='count'||q.type==='syll')return `${q.rounds.length}문제`;if(q.type==='spot')return `그림 ${q.rounds.length}장`;if(q.type==='puzzle')return `퍼즐 ${q.rounds.length}개`;if(q.type==='eng')return '2문제';return '';}
-function grantDayReward(day){day.allDone=true;const bug=addSticker();return {bug,min:0};}
+function grantDayReward(day){day.allDone=true;const s0=S();s0.eggs=(s0.eggs|0)+1;const bug=addSticker();return {bug,min:0};}
 function giveCoupon(){const s=S();const m=s.settings.tvMinutes|0;if(m<=0)return 0;const cap=s.settings.cpCap|0;if(cap&&s.coupons.filter(c=>c.date===todayKey()&&!c.bonus).length>=cap)return -1;s.coupons.unshift({id:'c'+Date.now()+'_'+rint(1e6),min:m,date:todayKey(),used:false});return m;}
 function rebuildToday(){const s=S();const d=s.days[todayKey()];if(!d)return null;const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const done=d.quests.filter(q=>q.done);
  if(done.length>=n)d.quests=done;else{const fresh=genQuests();const dt=done.map(q=>q.type);const pool=fresh.filter(q=>!dt.includes(q.type)).concat(fresh.filter(q=>dt.includes(q.type)));const add=pool.slice(0,n-done.length);add.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));d.quests=done.concat(add);}
@@ -920,7 +931,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  const ni=qs.findIndex(q=>!q.done);
  const msg=day.allDone?`우와, 오늘 탐험 끝! 🎉 <small>📚 학습 놀이터에서 더 연습하거나 🎁 보물 창고를 구경해 봐</small>`:done===0?`${esc(callName(name))}! 오늘 탐험을 시작해 볼까? <small>첫 번째는 <b>${TYPES[qs[ni].type].name}</b>!</small>`:`잘하고 있어! <b>${qs.length-done}개</b>만 더 하면 탐험 성공! <small>다음은 <b>${TYPES[qs[ni].type].name}</b>!</small>`;
  const amsg=(window.ADMIN_CONFIG&&window.ADMIN_CONFIG.message||'').trim();
- const pct=qs.length?done/qs.length*100:0;const unused=s.coupons.filter(c=>!c.used);const alert=boardFull()||mapProg()>=(s.settings.mapLen||40);
+ const pct=qs.length?done/qs.length*100:0;const unused=s.coupons.filter(c=>!c.used);const alert=boardFull()||mapProg()>=(s.settings.mapLen||40)||(s.eggs|0)>0;
  return `<div class="screen home">
  <header class="topbar">
   <div class="me" onclick="App.go('closet')" style="cursor:pointer"><div class="avatar">${heroSVG(s.look)}</div><div><div class="name">${esc(name)} 탐험가</div><div class="lv">Lv.${lv} ${levelTitle(lv)}</div><div class="lvbar"><i style="width:${(s.stars%10)*10}%"></i></div></div></div>
@@ -935,7 +946,7 @@ function renderHome(){const s=S();const day=ensureToday();const qs=day.quests;co
  <section class="quests">${qs.map((q,i)=>{const T=TYPES[q.type];const nx=i===ni;return `<button class="qcard ${q.done?'done':''} ${nx?'next':''}" style="--c:${T.c};--cs:${T.cs}" onclick="startQuest(${i})"><div class="qnum">${i+1}</div><div class="qicon">${T.icon}</div><div class="qname">${T.name}</div><div class="qsub">${esc(questSub(q))}</div>${q.done?'<div class="stamp">참<br>잘했어요</div>':''}${nx?`<div class="qgo">▶ 시작!</div><div class="qhero">${heroSVG(s.look)}</div>`:''}</button>`;}).join('')}</section>
  <nav class="big-nav">
   <button class="bn-learn" onclick="App.go('learnhub')"><span class="bn-ic">📚</span><span class="bn-t">학습 놀이터<small>과목 골라 연습 · 내 작품</small></span></button>
-  <button class="bn-rw ${alert?'alert':''}" onclick="App.go('rewards')"><span class="bn-ic">🎁</span><span class="bn-t">보물 창고<small>지도 ${mapProg()}/${s.settings.mapLen||40}칸 · 쿠폰 ${unused.length}장 · ${TREE_ST[treeStage(treeDays())][1]}</small></span>${alert?'<b class="bn-dot">!</b>':''}</button>
+  <button class="bn-rw ${alert?'alert':''}" onclick="App.go('rewards')"><span class="bn-ic">🎁</span><span class="bn-t">보물 창고<small>${(s.eggs|0)>0?`🥚 알 ${s.eggs}개 · `:''}지도 ${mapProg()}/${s.settings.mapLen||40}칸 · 쿠폰 ${unused.length}장 · ${TREE_ST[treeStage(treeDays())][1]}</small></span>${alert?'<b class="bn-dot">!</b>':''}</button>
  </nav></div>`;}
 
 function weekDays(){const d=now();const dow=(d.getDay()+6)%7;const mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);return Array.from({length:7},(_,i)=>{const x=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i);return todayKey(x);});}
@@ -1289,9 +1300,9 @@ function finishQuest(){const s=S();
  if(Q.practice){SFX.win();showCelebrate({title:'연습 끝! 잘했어요!',lines:['<span>💪 연습도 정말 멋졌어!</span>']});return;}
  const day=s.days[Q.dayKey];const q=day&&day.quests[Q.i];if(!q||q.done){App.go('home');return;}
  q.done=true;const lvB=level(s.stars);s.stars++;s.counts[q.type]=(s.counts[q.type]||0)+1;if(q.type==='num'&&q.idx!=null)s.progress.num=Math.max(s.progress.num,q.idx+1);if(q.type==='num'&&q.nums)s.progress.num=Math.max(s.progress.num,q.nums[q.nums.length-1]);if(q.type==='abc')s.progress.abc=ABC.length;if(q.type==='abcl')s.progress.abcl=ABC.length;if(q.type==='hangul'&&q.set!=='vowels')s.progress.hangul=Math.max(s.progress.hangul,traceSeq(q).length);if(q.type==='vowel'||(q.type==='hangul'&&q.set==='all'))s.progress.vowel=1;
- const lines=['<span>⭐ 별 1개를 받았어요!</span>'];let bug=null;const cm=giveCoupon();if(cm>0)lines.push(`<span>📺 TV ${cm}분 쿠폰 1장을 받았어요!</span>`);else if(cm<0)lines.push(`<span>📺 오늘 TV 쿠폰은 다 받았어요 (하루 ${s.settings.cpCap}장)</span>`);const un=newUnlocks(s.stars);
+ const lines=['<span>⭐ 별 +1</span>'];let bug=null;const cm=giveCoupon();if(cm>0)lines.push(`<span>📺 TV ${cm}분 쿠폰 +1</span>`);else if(cm<0)lines.push(`<span>📺 오늘 TV 쿠폰은 다 받았어요 (하루 ${s.settings.cpCap}장)</span>`);const un=newUnlocks(s.stars);
  if(un.length)lines.push(`<span>👕 새 꾸미기가 열렸어요: ${un.join(', ')}</span>`);if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);
- if(!day.allDone&&day.quests.every(x=>x.done)){const tb=treeStage(treeDays());const rw=grantDayReward(day);bug=rw.bug;const ta=treeStage(treeDays());lines.push(ta>tb?`<span>🌳 탐험 나무가 <b>${TREE_ST[ta][1]}</b>${TREE_ST[ta][3]} 자랐어요!</span>`:'<span>🍎 탐험 나무에 열매가 하나 열렸어요!</span>');if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도에서 <b>한 칸 가기</b> 버튼을 눌러봐!</span>');}
+ if(!day.allDone&&day.quests.every(x=>x.done)){const tb=treeStage(treeDays());const rw=grantDayReward(day);bug=rw.bug;const ta=treeStage(treeDays());lines.push(ta>tb?`<span>🌳 탐험 나무가 <b>${TREE_ST[ta][1]}</b>${TREE_ST[ta][3]} 자랐어요!</span>`:'<span>🍎 나무 열매 +1</span>');lines.push('<span>🥚 깜짝 알 +1 <small>(보물 창고에서 깨기)</small></span>');checkWeekly(lines);if(LAST_BOARD_FULL)lines.push('<span>🏆 스티커판 완성! 보물 지도에서 <b>한 칸 가기</b> 버튼을 눌러봐!</span>');}
  const nb=checkBadges();nb.forEach(b=>lines.push(`<span>🏅 새 배지: ${b.icon} ${b.name}</span>`));const stepsAdd=nb.length;if(stepsAdd){const L=s.settings.mapLen||40;const pg=mapProg();lines.push(pg>=L?'<span>🗺️ 보물 지도 끝에 도착! 🎁</span>':`<span>🗺️ 보물 지도 ${stepsAdd}칸 앞으로! (${pg} / ${L})</span>`);}
  Store.save();SFX.win();
  showCelebrate({title:bug!=null?'오늘 탐험 성공!':'참 잘했어요!',lines,bug});
@@ -1397,25 +1408,22 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <div class="prow"><span class="pl">날씨 지역</span><div class="chips">${Object.entries(CITIES).map(([k,c])=>`<button class="chip ${!PS.wxLoc&&(PS.wxCity||'seoul')===k?'on':''}" onclick="PS.wxLoc=null;psSet('wxCity','${k}',this)">${c[0]}</button>`).join('')}<button class="chip ${PS.wxLoc?'on':''}" onclick="useMyLoc(this)">📍 현재 위치</button></div></div>
   <div class="prow"><span class="pl">날씨 효과</span><div class="chips"><button class="chip ${PS.wxOn!==false?'on':''}" onclick="psSet('wxOn',true,this)">켜기</button><button class="chip ${PS.wxOn===false?'on':''}" onclick="psSet('wxOn',false,this)">끄기 (계절만)</button></div></div></div>
 <div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div>`;}
- if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`<div class="pcard"><h4>⚙️ 보상 규칙</h4>
-  <div class="prow"><span class="pl">학습 1개당 TV 쿠폰 1장<br><small>(1장 시청 시간)</small></span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">TV 쿠폰 하루 한도</span><div class="chips">${[[0,'제한 없음'],[2,'2장'],[3,'3장'],[5,'5장']].map(([m,l])=>`<button class="chip ${(PS.cpCap|0)===m?'on':''}" onclick="psSet('cpCap',${m},this)">${l}</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
-  <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
-  <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
-</div><div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div>
-  <div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
+ if(tab==='rewards'){const unused=s.coupons.filter(c=>!c.used);body=`  <div class="pcard"><h4>🐞 스티커판 (보물 지도 서브 미션)</h4>
   <div class="prow"><span class="pl">현재 스티커</span><span style="font-size:26px">${s.stickers.current.length} / ${s.settings.stickerGoal}</span><span class="hint">완성한 판: ${s.stickers.boards||0}개 · 판을 채울 때마다 보물 지도 1칸</span></div></div>
   <div class="pcard"><h4>🎁 최종 선물 (보물 지도)</h4><div class="prow"><span class="pl">지도 진행</span><span style="font-size:26px">${mapProg()} / ${s.settings.mapLen||40}칸</span><span class="hint">완성한 지도: ${s.maps||0}장</span></div>
   ${mapProg()>=(s.settings.mapLen||40)?`<div class="prow"><span style="font-size:22px;color:var(--pink-d)">지도 끝 도착! “${esc(s.settings.mapGift||'보물 선물')}”을 주세요.</span><button class="btn pink" onclick="mapGiftGiven()">✔ 선물 줬어요</button></div><div class="hint">누르면 새 보물 지도가 시작돼요</div>`:'<div class="hint">배지를 하나 받을 때마다 한 칸씩 가요. 칸이 다 차면 여기서 선물 지급을 확인해요.</div>'}
   <div class="prow"><button class="btn sm purple" onclick="bonus('map')">🗺️ 지도 1칸 앞으로 (특별 보상)</button></div></div>
   <div class="pcard"><h4>📺 TV 쿠폰 사용 처리</h4><div class="hint">여러 장을 골라 한 번에 사용 처리할 수 있어요.</div>${couponPicker('parent')}</div>
   <div class="pcard"><h4>🌟 특별 보상 주기</h4><div class="hint">약속을 잘 지켰거나 칭찬할 일이 있을 때 직접 줄 수 있어요.</div>
-  <div class="prow"><button class="btn yellow" onclick="bonus('star')">⭐ 별 1개</button><button class="btn pink" onclick="bonus('sticker')">🐞 스티커 1개</button><button class="btn blue" onclick="bonus('coupon')">📺 TV 쿠폰 1장</button></div></div>`;}
- if(tab==='records'){const lv=level(s.stars);body=weeklyReport()+renderDiary()+`<div class="pcard"><h4>🧭 전체 기록</h4><div class="kv">
-  <div>별<b>⭐ ${s.stars}</b></div><div>레벨<b>Lv.${lv}</b></div><div>연속 탐험<b>🔥 ${streak()}일</b></div><div>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}</b></div><div>스티커판<b>🏆 ${s.stickers.boards||0}판</b></div><div>그림<b>🎨 ${Store.drawings.length}</b></div></div>
-  <div class="hint">과목별 완료 횟수: ${TYPE_ORDER.map(t=>`${TYPES[t].name} ${s.counts[t]||0}`).join(' · ')}</div></div>
-`;}
+  <div class="prow"><button class="btn yellow" onclick="bonus('star')">⭐ 별 1개</button><button class="btn pink" onclick="bonus('sticker')">🐞 스티커 1개</button><button class="btn blue" onclick="bonus('coupon')">📺 TV 쿠폰 1장</button></div></div>
+  <details class="pcard"><summary><h4>⚙️ 보상 규칙 설정 <span class="tag2">눌러서 펼치기</span></h4></summary>
+  <div class="prow"><span class="pl">학습 1개당 TV 쿠폰 1장<br><small>(1장 시청 시간)</small></span><div class="chips">${[0,5,10,15,20,30].map(m=>`<button class="chip ${PS.tvMinutes===m?'on':''}" onclick="psSet('tvMinutes',${m},this)">${m?m+'분':'안 줌'}</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">TV 쿠폰 하루 한도</span><div class="chips">${[[0,'제한 없음'],[2,'2장'],[3,'3장'],[5,'5장']].map(([m,l])=>`<button class="chip ${(PS.cpCap|0)===m?'on':''}" onclick="psSet('cpCap',${m},this)">${l}</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">스티커판 칸 수</span><div class="chips">${[5,7,10,15,20,30].map(m=>`<button class="chip ${PS.stickerGoal===m?'on':''}" onclick="psSet('stickerGoal',${m},this)">${m}칸</button>`).join('')}</div></div>
+  <div class="prow"><span class="pl">보물 지도 완주 목표</span><div class="chips">${[[30,'한 달'],[40,'한 달 반'],[60,'두 달']].map(([m,l])=>`<button class="chip ${(PS.mapDays||40)===m?'on':''}" onclick="psSet('mapDays',${m},this)">${l} (${m}일)</button>`).join('')}</div><span class="hint">선택한 과목과 퀘스트 수에 맞춰 배지 ${PS.mapLen||40}개가 자동으로 만들어져요</span></div>
+  <label class="lb">🎁 최종 선물 (보물 지도 끝에서 받아요)<input class="inp" id="p_mgift" maxlength="30" value="${esc(PS.mapGift||'보물 상자 선물')}"></label>
+<div class="savebar"><button class="btn big green" onclick="saveSettings()">💾 저장하기</button></div></details>`;}
+ if(tab==='records'){body=renderDiary();}
  if(tab==='account'){body=`<div class="pcard"><h4>👦 아이 로그인 정보</h4>
   <div class="prow"><span class="pl">현재 아이디</span><span style="font-size:24px">${esc(s.setup.childId)}</span></div>
   <label class="lb">새 아이디 (비워두면 그대로)<input class="inp" id="a_id" autocapitalize="off" autocomplete="off"></label>
@@ -1429,16 +1437,6 @@ function renderParent(){const s=S();if(!PS)PS=JSON.parse(JSON.stringify(s.settin
   <h4>⚠️ 초기화</h4><div class="hint">별·스티커·쿠폰·배지·학습 기록을 모두 지워요. (계정과 설정, 그림은 남아요)</div><div><button class="btn red sm" onclick="resetProgress()">학습 기록·보상 초기화</button></div></details>`;}
  return `<div class="screen pro"><header class="subbar pro-h"><button class="icon-btn" onclick="leaveParent()">⬅️<small>나가기</small></button><div><h2>${esc(s.setup.childName)} 학습 관리</h2><div class="pro-sub">${prettyDate(todayKey())} 기준 · 곤충 탐험대 부모 관리자</div></div></header>
  <div class="ptabs">${tabs.filter(t=>App.parentFrom!=='login'||t[0]==='account').map(t=>`<button class="ptab ${tab===t[0]?'on':''}" onclick="App.ptab='${t[0]}';App.go('parent')">${t[1]}</button>`).join('')}</div>${body}</div>`;}
-function weeklyReport(){const s=S();const wk=weekDays();const per={};let qd=0,full=0,att=0;
- wk.forEach(k=>{const d=s.days[k];if(!d)return;if(d.quests.some(q=>q.done))att++;if(d.allDone)full++;d.quests.forEach(q=>{if(q.done){qd++;per[q.type]=(per[q.type]||0)+1;}});});
- const acc=Object.entries(s.stats||{}).filter(([t,o])=>TYPES[t]&&o.r+o.w>=5).map(([t,o])=>({t,p:Math.round(o.r/(o.r+o.w)*100),n:o.r+o.w})).sort((a,b)=>b.p-a.p);
- const best=acc[0],weak=acc.length>1?acc[acc.length-1]:null;
- const comment=att===0?'이번 주는 아직 탐험 기록이 없어요. 오늘 함께 시작해 보세요!':full>=5?'이번 주 정말 꾸준했어요! 많이 칭찬해 주세요 👏':full>=3?'잘하고 있어요. 이틀만 더 하면 연속 배지에 가까워져요.':'조금씩 시작했어요. 정해진 시간에 같이 앉아 주면 습관이 잡혀요.';
- return `<div class="pcard"><h4>📈 이번 주 학습 리포트</h4><div class="kv"><div>출석<b>${att} / 7일</b></div><div>하루 완료<b>${full}일</b></div><div>끝낸 퀘스트<b>${qd}개</b></div><div>보물 지도<b>${mapProg()} / ${s.settings.mapLen||40}칸</b></div></div>
-  <div class="hint">과목별: ${Object.keys(per).length?Object.entries(per).map(([t,n])=>`${TYPES[t]?TYPES[t].name:t} ${n}`).join(' · '):'아직 없어요'}</div>
-  ${acc.length?`<div class="hint">정답률: ${acc.map(a=>`${TYPES[a.t].name} ${a.p}%`).join(' · ')}</div>`:''}
-  ${best?`<div class="prow"><span style="font-size:19px">💪 잘하는 과목: <b>${TYPES[best.t].name}</b>${weak&&weak.p<best.p?` &nbsp; 🌱 더 연습하면 좋은 과목: <b>${TYPES[weak.t].name}</b>`:''}</span></div>`:''}
-  <div style="font-size:19px;color:var(--pink-d)">💬 ${comment}</div></div>`;}
 function renderDiary(){const s=S();const log=(s.log||[]);
  const items=Object.entries(s.items||{}).filter(([k,v])=>v.w>0).map(([k,v])=>({k,t:k.split(':')[0],...v,rate:v.w/(v.r+v.w)})).sort((a,b)=>b.w-a.w||b.rate-a.rate).slice(0,10);
  const weak=items.length?items.map(v=>{const top=Object.entries(v.wa||{}).sort((a,b)=>b[1]-a[1])[0];const T=TYPES[v.t]||{icon:'•',name:v.t};return `<div class="dy-row"><span class="dy-ic">${T.icon}</span><div class="dy-m"><b>${esc(v.p)}</b><small>${T.name} · 어려워함 ${v.w}번 / 바로 맞힘 ${v.r}번${top&&!/번$/.test(top[0])?` · 자주 고른 답: <b>${esc(top[0])}</b>`:''}${top&&/번$/.test(top[0])?` · ${esc(top[0])}`:''}</small></div><div class="dy-bar"><i style="width:${Math.round(v.rate*100)}%"></i></div></div>`;}).join(''):'<div class="hint">아직 틀린 문제가 없어요 👏 (퀘스트를 할수록 여기에 쌓여요)</div>';
@@ -1583,6 +1581,7 @@ function migrate(){const s=S();if(!s.setup||(s.migV|0)>=2)return;const t=todayKe
  Object.entries(s.days||{}).forEach(([k,d])=>{if(!d||!d.quests)return;const n=d.quests.filter(q=>q.done).length;if(k<t)d.intro=1;
   if(n&&!(s.usage[k]>0)){s.usage[k]=n*150;s.usageEst[k]=1;}});
  if(!Array.isArray(s.settings.focus))s.settings.focus=[];s.migV=2;Store.save();}
+function migrate3(){const s=S();if(!s.setup||(s.migV|0)>=3)return;const t=todayKey();const wk=dKeys(8).filter(k=>k<t);s.eggs=(s.eggs|0)+wk.filter(k=>s.days[k]&&s.days[k].allDone).length;s.weekly=s.weekly||{};checkWeekly();s.migV=3;Store.save();}
 
 /* ---------- 부모 대시보드 ---------- */
 const DOMAINS=[['의사소통 · 한글','hangul vowel syll family'],['의사소통 · 영어','abc abcl eng'],['의사소통 · 듣기','listen'],['자연탐구 · 수','num'],['자연탐구 · 동물','count'],['관찰 · 문제해결','spot puzzle'],['예술경험 · 그리기','draw']].map(([n,t])=>({n,t:t.split(' ')}));
@@ -1659,11 +1658,11 @@ function renderDash(){const s=S();const a=rangeStat(dKeys(7)),b=rangeStat(dKeys(
 /* ---------- 보물 창고 (보상 한곳에) · 학습 놀이터 (학습 한곳에) ---------- */
 const SUBBACK={stickers:'rewards',coupons:'rewards',badges:'rewards',tree:'rewards',closet:'rewards',gallery:'learnhub'};
 function todayRw(){const s=S();const d=s.days[todayKey()];const qs=d?d.quests:[];const done=qs.filter(q=>q.done).length;const cp=s.coupons.filter(c=>c.date===todayKey()&&!c.bonus).length;const cap=s.settings.cpCap|0;const tvOn=(s.settings.tvMinutes|0)>0;
- const it=[['⭐','별',done,qs.length]];if(tvOn)it.push(['📺','TV 쿠폰',cp,cap?Math.min(cap,qs.length):qs.length]);it.push(['🐞','스티커',d&&d.allDone?1:0,1],['🍎','나무 열매',d&&d.allDone?1:0,1]);return it;}
+ const it=[['⭐','별',done,qs.length]];if(tvOn)it.push(['📺','TV 쿠폰',cp,cap?Math.min(cap,qs.length):qs.length]);it.push(['🐞','스티커',d&&d.allDone?1:0,1],['🥚','깜짝 알',d&&d.allDone?1:0,1]);return it;}
 function renderRewards(){const s=S();const N=s.settings.mapLen||40;const mp=mapProg();const goal=s.settings.stickerGoal||10;const cur=s.stickers.current;const unused=s.coupons.filter(c=>!c.used);const umin=unused.reduce((a,c)=>a+c.min,0);
  const td=treeDays();const ts=treeStage(td);const nb=Object.keys(s.badges||{}).length;const lv=level(s.stars);
  return `<div class="screen">${subbar('🎁 보물 창고')}
- <div class="rw-top"><div><b>⭐ ${s.stars}</b><small>별 · Lv.${lv} ${levelTitle(lv)}</small></div><div><b>🏅 ${nb}</b><small>받은 배지</small></div><div><b>🔥 ${streak()}일</b><small>연속 탐험</small></div><div class="rw-week">${weekStrip()}</div></div>
+ ${eggBanner()}<div class="rw-top"><div><b>⭐ ${s.stars}</b><small>별 · Lv.${lv} ${levelTitle(lv)}</small></div><div><b>🏅 ${nb}</b><small>받은 배지</small></div><div><b>🔥 ${streak()}일</b><small>연속 탐험</small></div><div class="rw-week">${weekMission()}</div></div>
  ${boardFull()?`<div class="claim"><div class="cl-ic">🏆</div><div class="cl-t">스티커판을 다 모았어요!<small>누르면 보물 지도 한 칸 앞으로 가고 새 스티커판이 시작돼요</small></div><button class="btn big orange" onclick="claimBoard()">한 칸 가기 ▶</button></div>`:''}
  <div class="rw-grid">
   <button class="rw-card big" style="--c:#FF9F43" onclick="App.go('badges')"><div class="rw-h">🗺️ 보물 지도</div><div class="rw-main">${mp} <small>/ ${N}칸</small></div><div class="rw-bar"><i style="width:${mp/N*100}%"></i></div><div class="rw-s">도착하면 🎁 <b>${esc(s.settings.mapGift||'보물 선물')}</b></div><div class="rw-gift">🎁</div><span class="rw-go">지도 보기 ▶</span></button>
@@ -1681,6 +1680,18 @@ function renderLearnHub(){const s=S();const act=activeSubjects();const ds=Store.
  <div class="lh-sec"><h3>🖼️ 내 작품 <small>${ds.length}장</small></h3>${ds.length?`<div class="lh-art">${ds.slice(0,5).map(d=>`<button class="gitem" onclick="viewDrawing('${d.id}')"><img src="${d.img}" alt=""></button>`).join('')}<button class="lh-more" onclick="App.go('gallery')">모두 보기 ▶</button></div>`:'<div class="hint" style="font-size:18px">그림 그리기·따라쓰기를 하면 여기에 모여요</div>'}</div></div>`;}
 function startPractice(t){SFX.tap();const k=todayKey();const q=makeQuest(t,{});if(q.rounds&&q.rounds.length>1)q.rounds=shuffle(q.rounds.slice());Q={i:-1,dayKey:k,q,practice:true,round:0,wr:[],tapped:0,locked:false,pos:0,theme:null,thumbs:[]};App.go('quest');}
 
+/* ---------- 깜짝 곤충 알 · 주간 미션 ---------- */
+const WEEK_GOAL=5;
+function weekKey(){return weekDays()[0];}
+function weekFull(){const s=S();return weekDays().filter(k=>s.days[k]&&s.days[k].allDone).length;}
+function checkWeekly(lines){const s=S();s.weekly=s.weekly||{};const wk=weekKey();if(s.weekly[wk]||weekFull()<WEEK_GOAL)return 0;s.weekly[wk]=todayKey();s.stars+=5;if(lines)lines.push('<span>🏆 이번 주 미션 성공! 보너스 별 5개!</span>');return 5;}
+function eggSVG(){return `<svg viewBox="0 0 100 120"><ellipse cx="50" cy="66" rx="40" ry="50" fill="#FFF3D6" stroke="#F2C76E" stroke-width="4"/><circle cx="34" cy="50" r="7" fill="#FFB74D"/><circle cx="62" cy="78" r="9" fill="#81C784"/><circle cx="60" cy="38" r="5" fill="#64B5F6"/><circle cx="36" cy="88" r="5" fill="#F48FB1"/></svg>`;}
+function hatchEgg(){const s=S();if(!(s.eggs>0))return;const r=Math.random();const n=r<.6?1:r<.9?2:3;const lvB=level(s.stars);s.eggs--;s.stars+=n;const b=rint(12);s.eggLog=(s.eggLog||[]).concat([{d:todayKey(),n}]).slice(-60);
+ const lines=[`<span>⭐ 별 ${n}개가 나왔어요!</span>`];if(level(s.stars)>lvB)lines.push(`<span>🎊 레벨 업! Lv.${level(s.stars)} ${levelTitle(level(s.stars))}</span>`);const nb=checkBadges();nb.forEach(x=>lines.push(`<span>🏅 새 배지: ${x.icon} ${x.name}</span>`));Store.save();SFX.win();
+ openOverlay(`<div class="ov-bg"><canvas id="confetti"></canvas><div class="modal"><div class="egg-open"><div class="egg-half l">${eggSVG()}</div><div class="egg-bug">${bugSVG(b)}</div><div class="egg-half r">${eggSVG()}</div></div><h2 style="font-size:34px;margin:6px 0;font-weight:400;color:var(--pink-d)">톡! ${esc(BUGS[b].n)} 등장!</h2><div class="clines">${lines.join('')}</div><div class="btns"><button class="btn big green" onclick="closeOverlay();App.go('rewards')">좋아요! 🙌</button></div></div></div>`);confetti();speak(`톡! ${BUGS[b].n} 등장! 별 ${n}개!`);}
+function eggBanner(){const s=S();if(!(s.eggs>0))return '';return `<button class="egg-banner" onclick="hatchEgg()"><div class="egg-ic">${eggSVG()}</div><div><div class="eb-t">깜짝 곤충 알 <b>${s.eggs}개</b>! 눌러서 톡 깨 봐!</div><div class="eb-s">하루 탐험을 다 끝내면 알을 1개 받아요 · 안에서 별이 나와요</div></div></button>`;}
+function weekMission(){const s=S();const n=weekFull();const ok=(s.weekly||{})[weekKey()];return `<div class="wm"><div class="wm-h">🏆 이번 주 미션 <small>탐험 ${WEEK_GOAL}일 끝내면 보너스 별 5개</small></div><div class="wm-row">${weekDays().map((k,i)=>{const d=s.days[k];const st=d&&d.allDone?'full':d&&d.quests.some(q=>q.done)?'half':'';return `<div class="wk ${st} ${k===todayKey()?'today':''}"><div class="wk-c">${st==='full'?bugSVG(dayNum(k)%BUGS.length):st==='half'?'🐾':''}</div><span>${'월화수목금토일'[i]}</span></div>`;}).join('')}<div class="wm-n ${ok?'ok':''}">${ok?'성공! ⭐+5':`${Math.min(n,WEEK_GOAL)} / ${WEEK_GOAL}일`}</div></div></div>`;}
+
 (async function boot(){WX=lsGet('bugquest_wx');renderBG();
  $('#app').innerHTML=`<div class="screen center loading"><div class="crawl">${bugSVG(0)}</div><p>탐험 준비 중...</p></div>`;
  try{window.speechSynthesis&&window.speechSynthesis.getVoices();}catch(e){}
@@ -1689,7 +1700,7 @@ function startPractice(t){SFX.tap();const k=todayKey();const q=makeQuest(t,{});i
  renderBG();loadWeather();setInterval(()=>loadWeather(),30*60e3);setInterval(usageTick,15000);
  const s=S();
  if(!s.setup){App.go('setup');return;}
- applyAdmin();migrate();
+ applyAdmin();migrate();migrate3();
  const auto=lsGet('bugquest_auto');if(auto&&auto===hash('auto:'+s.setup.childId+s.setup.pwHash)){App.loggedIn=true;App.go('home');}else App.go('login');
  let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKey();renderBG();if(App.screen==='home')App.go('home');}},60000);
  window.addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(()=>{if(App.screen==='quest'&&Q&&(isTrace(Q.q.type)||Q.q.type==='draw')&&PAD&&PAD.strokes===0)App.go('quest');},400);});
