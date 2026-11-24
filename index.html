@@ -687,9 +687,12 @@ function makeMood(){const lv=moodLv();const pool=lv===1?['happy','sad']:lv===2?[
  const sd=()=>1+rint(99999);const pickO=(m,P,n)=>shuffle(P.filter(x=>x!==m&&!mConf(m,x))).slice(0,n);
  const face=m=>({k:'face',m,ch:shuffle([m].concat(pickO(m,pool,nc-1))),seed:sd()});
  const animal=m=>({k:'animal',m,ch:shuffle([m].concat(shuffle(apool.filter(x=>x!==m)).slice(0,nc-1))),seed:sd()});
- const scene=m=>{const o=pickO(m,pool,1)[0];const opts=shuffle([m,o]);const L=MSCENE[m];return {k:'pair',m,sc:L[rint(L.length)],opts,seeds:opts.map(sd)};};
+ const scene=m=>{const o=pickO(m,pool,1)[0];const opts=shuffle([m,o]);const sc=freshOrder('mood',MSCENE[m],x=>'sc'+x[1])[0];return {k:'pair',m,sc,opts,seeds:opts.map(sd)};};
  const ms=shuffle(pool.concat(pool));const as=shuffle(apool.concat(apool));
  return {type:'mood',lv,rounds:[face(ms[0]),animal(as[0]),scene(ms[1]),face(ms[2]),animal(as[1])],done:false};}
+function moodMk(kind,m){const lv=moodLv();const pool=lv===1?['happy','sad']:lv===2?['happy','sad','calm','scary']:['happy','sad','calm','scary','angry'];const apool=lv===1?['elephant','bird']:['elephant','bird','turtle','rabbit'];const nc=lv===1?2:3;const sd=()=>1+rint(99999);const pickO=(m,P,n)=>shuffle(P.filter(x=>x!==m&&!mConf(m,x))).slice(0,n);
+ if(kind==='face'&&MOODS[m])return {k:'face',m,ch:shuffle([m].concat(pickO(m,pool,nc-1))),seed:sd()};if(kind==='animal'&&MANIM[m])return {k:'animal',m,ch:shuffle([m].concat(shuffle(apool.filter(x=>x!==m)).slice(0,nc-1))),seed:sd()};
+ if(kind==='pair'&&MOODS[m]){const o=pickO(m,pool.includes(m)?pool:pool.concat([m]),1)[0];const opts=shuffle([m,o]);const L=MSCENE[m];return {k:'pair',m,sc:L[rint(L.length)],opts,seeds:opts.map(sd)};}return null;}
 function moodPrompt(r){if(r.k==='animal')return '이 음악은 어떤 동물 같아?';if(r.k==='pair')return r.sc?`${r.sc[1]}! 어울리는 음악은 어느 쪽일까?`:`${MOODS[r.m].adj} 음악은 어느 쪽일까?`;return '음악을 잘 듣고, 어떤 기분인지 골라 봐!';}
 function mountMood(){const r=Q.q.rounds[Q.round];Q.locked=false;Q.msel=null;cleanups.push(()=>MUS.stop());
  if(r.k==='face'||r.k==='animal'){const A=r.k==='animal';$('#qbody').innerHTML=`<div class="mood">${Q.round===0&&Q.q.lv?`<div class="mz-lv">${'⭐'.repeat(Q.q.lv)} ${Q.q.lv}단계</div>`:''}<button class="mz-play big" onclick="moodPlay()"><span class="eq"><i></i><i></i><i></i><i></i></span>🎵 음악 듣기</button><div class="choices mz-ch">${r.ch.map(m=>`<button class="choice mz-face" onclick="pickMood(this,'${m}')"><span class="mf">${A?MANIM[m].e:MOODS[m].face}</span><span class="mn">${A?MANIM[m].n:MOODS[m].n}</span></button>`).join('')}</div></div>`;
@@ -733,16 +736,16 @@ const COLORS=[['빨간색','#FF5252'],['파란색','#3D8BFF'],['노란색','#FFC
 function shapeSVG(s,c){const P={circle:'<circle cx="50" cy="50" r="40"/>',tri:'<path d="M50 10 L92 86 L8 86Z"/>',sq:'<rect x="12" y="12" width="76" height="76" rx="6"/>',star:'<path d="M50 6 L62 38 L96 38 L68 58 L79 92 L50 72 L21 92 L32 58 L4 38 L38 38Z"/>',heart:'<path d="M50 88 C10 60 4 36 20 22 C32 12 46 18 50 30 C54 18 68 12 80 22 C96 36 90 60 50 88Z"/>'};return `<svg viewBox="0 0 100 100"><g fill="${c}" stroke="rgba(0,0,0,.15)" stroke-width="3">${P[s]}</g></svg>`;}
 function tkItem(o){if(o.box){return `<div class="tk-box">${Array(o.n).fill(`<span>${o.box}</span>`).join('')}</div>`;}if(o.s)return `<div class="tk-shape">${shapeSVG(o.s,o.c)}</div>`;if(o.num!=null)return `<span class="tk-num">${o.num}</span>`;if(o.z)return `<span class="tk-e" style="font-size:${[0,40,70,104][o.z]}px">${o.e}</span>`;return `<span class="tk-e">${o.e}</span>`;}
 function tkPrompt(r){return {pattern:'규칙을 찾아봐! ❓에 들어갈 것은?',odd:'하나만 달라요! 다른 하나를 찾아봐',more:r.less?'어느 쪽이 더 적을까?':'어느 쪽이 더 많을까?',size:r.small?'가장 작은 것을 찾아봐!':'가장 큰 것을 찾아봐!',shape:`${r.name}${hasBatchim(r.name)?'을':'를'} 찾아봐!`,color:`${r.name} ${r.sname}${hasBatchim(r.sname||'')?'을':'를'} 찾아봐!`,num:'다음에 올 숫자는 뭘까?'}[r.k];}
-function makeThink(){const kinds=shuffle(['pattern','odd','more','size',rint(2)?'shape':'color','num']);const ems=()=>{const out=[];while(out.length<3){const i=cntPick();const e=CREATURES[i].e;if(e&&!out.includes(e))out.push(e);}return out;};
- const rounds=kinds.map(k=>{
+function makeThink(){const kinds=shuffle(['pattern','odd','more','size',rint(2)?'shape':'color','num']);const seen=seenMap('think');const rounds=kinds.map(k=>{let r,g=0;do{r=thinkRound(k);g++;}while(seen.has(thinkSig(r))&&g<25);return r;});return {type:'think',rounds,done:false};}
+function thinkRound(k){const ems=()=>{const out=[];while(out.length<3){const i=cntPick();const e=CREATURES[i].e;if(e&&!out.includes(e))out.push(e);}return out;};
+
   if(k==='pattern'){const [A,B,C]=ems();const t=rint(3);let seq,ans;if(t===0){seq=[A,B,A,B,A];ans=B;}else if(t===1){seq=[A,A,B,A,A];ans=B;}else{seq=[A,B,C,A,B];ans=C;}const opts=[ans].concat([A,B,C].filter(x=>x!==ans)).slice(0,3);const ch=shuffle(opts.map(e=>({e})));return {k,seq:seq.map(e=>({e})),ch,a:ch.findIndex(o=>o.e===ans)};}
   if(k==='odd'){const gs=shuffle(CNT_G.concat(['직업','몸']).filter(g=>CREATURES.filter(c=>c.g===g).length>=3));const g=gs[0],g2=gs[1];const same=shuffle(CREATURES.map((c,i)=>i).filter(i=>CREATURES[i].g===g)).slice(0,3);const o=shuffle(CREATURES.map((c,i)=>i).filter(i=>CREATURES[i].g===g2))[0];const ids=shuffle(same.concat([o]));const ch=ids.map(i=>({ci:i}));return {k,g,ch,a:ids.indexOf(o)};}
   if(k==='more'){const e=CREATURES[cntPick()].e||'🍎';let a=2+rint(5),b;do{b=1+rint(8);}while(Math.abs(a-b)<2);const less=!rint(3);const ch=[{box:e,n:a},{box:e,n:b}];const tgt=less?Math.min(a,b):Math.max(a,b);return {k,less,ch,a:ch.findIndex(o=>o.n===tgt)};}
   if(k==='size'){const e=CREATURES[cntPick()].e||'🎈';const small=!rint(2);const ch=shuffle([1,2,3].map(z=>({e,z})));return {k,small,ch,a:ch.findIndex(o=>o.z===(small?1:3))};}
   if(k==='shape'){const sh=shuffle(SHAPES).slice(0,3);const col=COLORS[rint(COLORS.length)][1];const ch=shuffle(sh.map(([s])=>({s,c:col})));return {k,name:sh[0][1],ch,a:ch.findIndex(o=>o.s===sh[0][0])};}
   if(k==='color'){const cs=shuffle(COLORS).slice(0,3);const s=SHAPES[rint(SHAPES.length)][0];const ch=cs.map(([n,c])=>({s,c,n}));const sh=shuffle(ch);return {k,name:cs[0][0],sname:SHAPES.find(x=>x[0]===s)[1],ch:sh,a:sh.findIndex(o=>o.n===cs[0][0])};}
-  if(k==='num'){const st=1+rint(6);const L=3;const seq=Array.from({length:L},(_,i)=>st+i);const ans=st+L;const opts=[ans].concat(shuffle([ans+1,ans+2,st,st+1]).slice(0,2));const ch=shuffle(opts.map(n=>({num:n})));return {k,seq:seq.map(n=>({num:n})),ch,a:ch.findIndex(o=>o.num===ans)};}});
- return {type:'think',rounds,done:false};}
+  if(k==='num'){const st=1+rint(6);const L=3;const down=!rint(3);const seq=Array.from({length:L},(_,i)=>down?st+L-i:st+i);const ans=down?st:st+L;const opts=[ans].concat(shuffle(down?[ans+1,ans+2,st+L+1,ans+3]:[ans+1,ans+2,st,st+1]).filter(x=>x!==ans).slice(0,2));const ch=shuffle(opts.map(n=>({num:n})));return {k,seq:seq.map(n=>({num:n})),ch,a:ch.findIndex(o=>o.num===ans)};}}
 function mountThink(){const r=Q.q.rounds[Q.round];Q.locked=false;
  const seq=r.seq?`<div class="tk-seq">${r.seq.map(tkItem).join('')}<span class="tk-q">❓</span></div>`:'';
  $('#qbody').innerHTML=`<div class="think">${seq}<div class="choices tk-ch tk-${r.k}">${r.ch.map((o,i)=>`<button class="choice tk" onclick="pickThink(this,${i})">${o.ci!=null?cArt(o.ci):tkItem(o)}</button>`).join('')}</div></div>`;
@@ -759,7 +762,7 @@ const eulReul=w=>w+(hasBatchim(w)?'을':'를');
 const PRAISE=['딩동댕!','정답!','맞았어!','우와, 대단해!','최고야!'];
 const NUMS=[['1','하나','one'],['2','둘','two'],['3','셋','three'],['4','넷','four'],['5','다섯','five'],['6','여섯','six'],['7','일곱','seven'],['8','여덟','eight'],['9','아홉','nine'],['10','열','ten']];
 const COUNTER=['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
-const SENT=[{t:'The monkey likes bananas.',a:'🐒',b:'🍌'},{t:'The rabbit likes carrots.',a:'🐰',b:'🥕'},{t:'The bear likes honey.',a:'🐻',b:'🍯'},{t:'The bee likes flowers.',a:'🐝',b:'🌸'},{t:'The cat likes fish.',a:'🐱',b:'🐟'},{t:'The dog likes bones.',a:'🐶',b:'🦴'},{t:'The mouse likes cheese.',a:'🐭',b:'🧀'},{t:'The panda likes bamboo.',a:'🐼',b:'🎋'},{t:'The squirrel likes nuts.',a:'🐿️',b:'🌰'},{t:'The pig likes apples.',a:'🐷',b:'🍎'},{t:'The cow likes grass.',a:'🐮',b:'🌿'},{t:'The bird likes worms.',a:'🐦',b:'🪱'},{t:'The boy likes ice cream.',a:'👦',b:'🍦'},{t:'The girl likes balloons.',a:'👧',b:'🎈'},{t:'The baby likes milk.',a:'👶',b:'🥛'},{t:'Mom likes flowers.',a:'👩',b:'🌷'},{t:'Dad likes trains.',a:'👨',b:'🚂'},{t:'The robot likes stars.',a:'🤖',b:'⭐'},{t:'Grandma likes music.',a:'👵',b:'🎵'},{t:'The chef likes pizza.',a:'🧑‍🍳',b:'🍕'},{t:'The astronaut likes the moon.',a:'👩‍🚀',b:'🌙'},{t:'The kid likes cars.',a:'🧒',b:'🚗'}];
+const SENT=[{t:'The monkey likes bananas.',a:'🐒',b:'🍌'},{t:'The rabbit likes carrots.',a:'🐰',b:'🥕'},{t:'The bear likes honey.',a:'🐻',b:'🍯'},{t:'The bee likes flowers.',a:'🐝',b:'🌸'},{t:'The cat likes fish.',a:'🐱',b:'🐟'},{t:'The dog likes bones.',a:'🐶',b:'🦴'},{t:'The mouse likes cheese.',a:'🐭',b:'🧀'},{t:'The panda likes bamboo.',a:'🐼',b:'🎋'},{t:'The squirrel likes nuts.',a:'🐿️',b:'🌰'},{t:'The pig likes apples.',a:'🐷',b:'🍎'},{t:'The cow likes grass.',a:'🐮',b:'🌿'},{t:'The bird likes worms.',a:'🐦',b:'🪱'},{t:'The boy likes ice cream.',a:'👦',b:'🍦'},{t:'The girl likes balloons.',a:'👧',b:'🎈'},{t:'The baby likes milk.',a:'👶',b:'🥛'},{t:'Mom likes flowers.',a:'👩',b:'🌷'},{t:'Dad likes trains.',a:'👨',b:'🚂'},{t:'The robot likes stars.',a:'🤖',b:'⭐'},{t:'Grandma likes music.',a:'👵',b:'🎵'},{t:'The chef likes pizza.',a:'🧑‍🍳',b:'🍕'},{t:'The astronaut likes the moon.',a:'👩‍🚀',b:'🌙'},{t:'The kid likes cars.',a:'🧒',b:'🚗'},{t:'The frog likes flies.',a:'🐸',b:'🪰'},{t:'The horse likes carrots.',a:'🐴',b:'🥕'},{t:'The penguin likes snow.',a:'🐧',b:'❄️'},{t:'The fish likes water.',a:'🐟',b:'💧'},{t:'The lion likes meat.',a:'🦁',b:'🍖'},{t:'The koala likes leaves.',a:'🐨',b:'🍃'},{t:'The girl likes books.',a:'👧',b:'📚'},{t:'The boy likes soccer.',a:'👦',b:'⚽'},{t:'Grandpa likes fishing.',a:'👴',b:'🎣'},{t:'The baby likes teddy bears.',a:'👶',b:'🧸'},{t:'Mom likes coffee.',a:'👩',b:'☕'},{t:'Dad likes bikes.',a:'👨',b:'🚲'},{t:'The clown likes balloons.',a:'🤡',b:'🎈'},{t:'The farmer likes corn.',a:'🧑‍🌾',b:'🌽'}];
 const THEMES=[{n:'나비',b:2},{n:'무당벌레',b:0},{n:'꿀벌',b:3},{n:'장수풍뎅이',b:1},{n:'잠자리',b:6},{n:'개미',b:4},{n:'메뚜기',b:7},{n:'도깨비 뿌뿌',p:1},
  {n:'해님',e:'☀️'},{n:'튤립 꽃',e:'🌷'},{n:'무지개',e:'🌈'},{n:'자동차',e:'🚗'},{n:'물고기',e:'🐟'},{n:'생일 케이크',e:'🎂'},{n:'우리 집',e:'🏠'},{n:'공룡',e:'🦕'},{n:'눈사람',e:'⛄'},{n:'사과',e:'🍎'},{n:'고양이',e:'🐱'},{n:'강아지',e:'🐶'},{n:'나무',e:'🌳'},{n:'비행기',e:'✈️'},{n:'기차',e:'🚂'},{n:'웃는 얼굴',e:'😊'},{n:'로켓',e:'🚀'},{n:'수박',e:'🍉'},{n:'거북이',e:'🐢'},{n:'별',e:'⭐'}];
 function themeArt(name){const t=THEMES.find(x=>x.n===name);if(!t)return `<div class="ex-e">🖍️</div>`;if(t.b!=null)return `<div class="ex-s">${bugSVG(t.b)}</div>`;if(t.p)return `<div class="ex-s">${PPU_SVG}</div>`;return `<div class="ex-e">${t.e}</div>`;}
@@ -849,7 +852,8 @@ function streak(){const s=S();let n=0;const d=now();if(!(s.days[todayKey(d)]&&s.
 const isTrace=t=>t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'||t==='num'||t==='family';
 function hw(it,dv){const w=HW[it[0]];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],it[1],p[0],p[1]];}
 function aw(it,dv,low){const w=AW[it[0].toUpperCase()];if(!w)return it;const p=w[(dv||0)%w.length];return [it[0],low?p[0].toLowerCase():p[0],p[1]];}
-function traceSeq(q){const dv=q.dv||0;if(q.type==='vowel')return HANGUL.slice(14).map(it=>hw(it,dv));if(q.type==='hangul'){const st=q.set||'all';return (st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL).map(it=>hw(it,dv));}if(q.type==='abc')return ABC.map(it=>aw(it,dv));if(q.type==='abcl')return ABCL.map(it=>aw(it,dv,true));if(q.type==='family')return q.items||[];if(q.nums)return q.nums.map(n=>[String(n),koNum(n),enNum(n)]);return [NUMS[(q.idx||0)%NUMS.length]];}
+function traceSeq(q){return applyFirst(traceSeq0(q),q);}
+function traceSeq0(q){const dv=q.dv||0;if(q.type==='vowel')return HANGUL.slice(14).map(it=>hw(it,dv));if(q.type==='hangul'){const st=q.set||'all';return (st==='consonants'?HANGUL.slice(0,14):st==='vowels'?HANGUL.slice(14):HANGUL).map(it=>hw(it,dv));}if(q.type==='abc')return ABC.map(it=>aw(it,dv));if(q.type==='abcl')return ABCL.map(it=>aw(it,dv,true));if(q.type==='family')return q.items||[];if(q.nums)return q.nums.map(n=>[String(n),koNum(n),enNum(n)]);return [NUMS[(q.idx||0)%NUMS.length]];}
 function familyReady(){const f=S().family||{};return FAMILY_FIELDS.some(([k])=>(f[k]||'').trim());}
 function familyItems(dv){const f=S().family||{};const filled=FAMILY_FIELDS.filter(([k])=>(f[k]||'').trim());if(!filled.length)return [];const pick=filled.length<=2?filled:[0,1].map(j=>filled[(dv+j)%filled.length]);const items=[];
  pick.forEach(([k,label,emo,kind])=>{const v=f[k].trim();let parts;if(kind==='tel'){const d=v.replace(/\D/g,'');parts=d.length===11?[d.slice(0,3),d.slice(3,7),d.slice(7)]:d.length===10?[d.slice(0,3),d.slice(3,6),d.slice(6)]:(d.match(/.{1,4}/g)||[]);}else parts=v.replace(/\s/g,'').split('');
@@ -858,29 +862,43 @@ function curItem(){const sq=traceSeq(Q.q);return sq[Math.min(Q.pos||0,sq.length-
 const species=i=>BUGS[((i%BUGS.length)+BUGS.length)%BUGS.length].n.split(' ')[0];
 const eunNeun=w=>w+(hasBatchim(w)?'은':'는');
 function traceList(t){return t==='hangul'?HANGUL:t==='abc'?ABC:NUMS;}
-function yUsed(t){const s=S();const d=now();d.setDate(d.getDate()-1);const y=s.days[todayKey(d)];const u=new Set();if(!y)return u;y.quests.filter(q=>q.type===t).forEach(q=>{(q.rounds||[]).forEach(r=>{if(r.c!=null)u.add(r.c);if(r.sc!=null)u.add('sc'+r.sc);if(r.sub!=null)u.add('sub'+r.sub);if(r.a!=null)u.add('a'+r.a);});(q.opts||[]).forEach(o=>u.add('o'+o));});return u;}
+/* ---------- 매일 새 문제: 지난 기록 기반 출제 (안 나온 문제 우선 · 어제 문제 제외 · 약한 문제만 변형 반복) ---------- */
+function thinkSig(r){return r.k+':'+JSON.stringify(r.seq||[])+'|'+JSON.stringify((r.ch||[]).map(o=>o.e||o.num||o.s||o.ci||o.box||'')).replace(/"/g,'')+(r.name||'');}
+function qKeys(q){const R=q.rounds||[];const t=q.type;
+ if(t==='count')return R.map(r=>'c'+(r.c!=null?r.c:r.bug));if(t==='listen')return R.map(r=>r.mode+':'+r.a);if(t==='syll')return R.map(r=>r.c+r.v);if(t==='eng')return R.map(r=>'a'+r.a);
+ if(t==='spot')return R.map(r=>'sc'+r.sc);if(t==='puzzle')return R.map(r=>'sub'+r.sub);if(t==='draw')return (q.opts||[]).map(n=>'o'+n);if(t==='think')return R.map(thinkSig);
+ if(t==='mood')return R.map(r=>r.sc?'sc'+r.sc[1]:r.k+':'+r.m+':'+(r.seed||''));return [];}
+let _SEEN=null;
+function seenMap(t){const s=S();const today=todayKey();const ck=today+'|'+Object.keys(s.days).length;if(!_SEEN||_SEEN.ck!==ck)_SEEN={ck};if(_SEEN[t])return _SEEN[t];const m=new Map();
+ Object.entries(s.days).forEach(([d,day])=>{if(d>=today||!day||!day.quests)return;day.quests.filter(q=>q.type===t).forEach(q=>qKeys(q).forEach(k=>{if(!m.has(k)||m.get(k)<d)m.set(k,d);}));});return (_SEEN[t]=m);}
+function freshOrder(t,cands,keyFn){const m=seenMap(t);const y=todayKey(new Date(now().getTime()-864e5));const sh=shuffle(cands);
+ const never=sh.filter(c=>!m.has(keyFn(c)));const old=sh.filter(c=>m.has(keyFn(c))&&m.get(keyFn(c))<y).sort((a,b)=>m.get(keyFn(a)).localeCompare(m.get(keyFn(b))));const recent=sh.filter(c=>m.has(keyFn(c))&&m.get(keyFn(c))>=y);
+ return never.concat(old,recent);}
+function applyFirst(L,q){if(!q.first||!q.first.length)return L;const f=q.first.filter(x=>L.some(it=>String(it[0])===x));return f.map(x=>L.find(it=>String(it[0])===x)).concat(L.filter(it=>!f.includes(String(it[0]))));}
+function weakFirst(t){return weakKeys(t).filter(k=>!k.includes(':')).slice(0,4);}
 function makeQuest(t,off){const s=S();const dv=dayNum(todayKey());
- if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,dv:dv+(off[t]=(off[t]||0)+1)-1,done:false};}
+ if(t==='hangul'||t==='vowel'||t==='abc'||t==='abcl'){return {type:t,set:t==='hangul'?'consonants':'all',pos:0,dv:dv+(off[t]=(off[t]||0)+1)-1,first:weakFirst(t),done:false};}
  if(t==='family'){return {type:t,items:familyItems(dv+(off[t]=(off[t]||0)+1)-1),pos:0,done:false};}
- if(t==='num'){const M=Math.max(10,s.settings.numMax||10);let nums;if(M<=10)nums=Array.from({length:10},(_,i)=>i+1);else{const top=shuffle(Array.from({length:10},(_,i)=>M-9+i)).slice(0,5);const rest=shuffle(Array.from({length:M-10},(_,i)=>i+1)).slice(0,5);nums=top.concat(rest).sort((a,b)=>a-b);}return {type:t,nums,pos:0,done:false};}
+ if(t==='num'){const M=Math.max(10,s.settings.numMax||10);let nums;if(M<=10)nums=Array.from({length:10},(_,i)=>i+1);else{const top=shuffle(Array.from({length:10},(_,i)=>M-9+i)).slice(0,5);const rest=shuffle(Array.from({length:M-10},(_,i)=>i+1)).slice(0,5);nums=top.concat(rest).sort((a,b)=>a-b);}return {type:t,nums,pos:0,first:weakFirst('num').filter(x=>+x>=1&&+x<=M),done:false};}
  if(t==='syll'){return injectWeak({type:t,rounds:makeSyll(),done:false});}
- if(t==='listen'){const koPool=Math.min(HANGUL.length,Math.max(6,s.progress.hangul+4)),enPool=Math.min(ABC.length,Math.max(6,s.progress.abc+4));const rounds=[];const used={ko:[],en:[]};
-  for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;let a;do{a=rint(pool);}while(used[mode].includes(a)&&used[mode].length<pool);used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
+ if(t==='listen'){const koPool=HANGUL.length,enPool=ABC.length;const rounds=[];const used={ko:[],en:[]};
+  const ordK=freshOrder('listen',Array.from({length:koPool},(_,i)=>i),i=>'ko:'+i),ordE=freshOrder('listen',Array.from({length:enPool},(_,i)=>i),i=>'en:'+i);
+  for(let r=0;r<3;r++){const mode=(r===1)?'en':'ko';const pool=mode==='ko'?koPool:enPool;const a=(mode==='ko'?ordK:ordE).find(x=>!used[mode].includes(x));used[mode].push(a);const ch=[a];while(ch.length<3){const x=rint(pool);if(!ch.includes(x))ch.push(x);}rounds.push({mode,a,ch:shuffle(ch)});}
   return injectWeak({type:t,rounds,done:false});}
- if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const all=CREATURES.map((_,i)=>i);const yu=yUsed('count');const kinds=shuffle(['count','count','count','name','name','find','find','feat','feat','feat']);const used=[];const rounds=[];
+ if(t==='count'){const maxN=Math.min(10,5+Math.floor((s.counts.count||0)/2));const all=CREATURES.map((_,i)=>i);const kinds=shuffle(['count','count','count','name','name','find','find','feat','feat','feat']);const used=[];const rounds=[];
   const G=[...new Set(CREATURES.map(c=>c.g))];let gq=[];const nextG=cnt=>{for(let z=0;z<40;z++){if(!gq.length)gq=shuffle(G);const g=gq.shift();if(!cnt||CNT_G.includes(g))return g;}return '과일·채소';};
-  const pick=cnt=>{const g=nextG(cnt);const pool=all.filter(i=>CREATURES[i].g===g&&!used.includes(i));const fr=pool.filter(i=>!yu.has(i));const P=fr.length?fr:pool.length?pool:all;const c=P[rint(P.length)];used.push(c);return c;};
+  const pick=cnt=>{const g=nextG(cnt);const pool=all.filter(i=>CREATURES[i].g===g&&!used.includes(i));const P=pool.length?pool:all.filter(i=>!used.includes(i));const c=freshOrder('count',P,i=>'c'+i)[0];used.push(c);return c;};
   const others=(c,n)=>{const g=CREATURES[c].g;const same=shuffle(all.filter(i=>i!==c&&CREATURES[i].g===g));const rest=shuffle(all.filter(i=>i!==c&&CREATURES[i].g!==g));return shuffle([c].concat(same.concat(rest).slice(0,n-1)));};
   kinds.forEach((k,r)=>{const c=pick(k==='count');
    if(k==='count'){const kk=rint(3);const n=kk===0?3+rint(8):2+rint(7);const oth=[];let left=Math.min(12-n,kk*4);const pool=shuffle(all.filter(x=>x!==c&&CNT_G.includes(CREATURES[x].g)));for(let j=0;j<kk&&left>0;j++){const m=Math.min(left,1+rint(4));oth.push({c:pool[j],k:m});left-=m;}const near=shuffle([n-2,n-1,n+1,n+2].filter(x=>x>=1&&x<=10));const ch=[n,near[0],near[1]];rounds.push({k,c,n,others:oth,ch:shuffle(ch)});}
    else rounds.push({k,c,ch:others(c,k==='find'?4:3)});});
   return injectWeak({type:t,rounds,done:false});}
- if(t==='think')return makeThink();
- if(t==='mood')return makeMood();
- if(t==='spot'){const yu=yUsed('spot');const sc=shuffle(SPOT_SCENES.map((_,i)=>i));const ord=sc.filter(i=>!yu.has('sc'+i)).concat(sc.filter(i=>yu.has('sc'+i)));return {type:t,rounds:[makeSpot(ord[0]),makeSpot(ord[1])],done:false};}
- if(t==='puzzle'){const yu=yUsed('puzzle');const subs=shuffle(['ppu','hero'].concat(BUGS.map((_,i)=>i).filter((_,i)=>i%2===0),['e:🚀','e:🚂','e:🍉','e:🦕','e:🏰','e:🎂','e:🚒','e:🌈','e:🐳','e:🎠','e:🍦','e:⛵']));const ord=subs.filter(x=>!yu.has('sub'+x)).concat(subs.filter(x=>yu.has('sub'+x)));return {type:t,rounds:[makePuzzle(2,ord[0]),makePuzzle(3,ord[1]),makePuzzle(3,ord[2])],done:false};}
- if(t==='eng'){const yu=yUsed('eng');const all=shuffle(SENT.map((_,i)=>i));const picks=all.filter(i=>!yu.has('a'+i)).concat(all.filter(i=>yu.has('a'+i))).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return injectWeak({type:t,rounds,done:false});}
- if(t==='draw'){const yu=yUsed('draw');const all=shuffle(THEMES.map(x=>x.n));return {type:t,theme:null,opts:all.filter(n=>!yu.has('o'+n)).concat(all.filter(n=>yu.has('o'+n))).slice(0,4),done:false};}
+ if(t==='think')return injectWeak(makeThink());
+ if(t==='mood')return injectWeak(makeMood());
+ if(t==='spot'){const ord=freshOrder('spot',SPOT_SCENES.map((_,i)=>i),i=>'sc'+i);return {type:t,rounds:[makeSpot(ord[0]),makeSpot(ord[1])],done:false};}
+ if(t==='puzzle'){const subs=(['ppu','hero'].concat(BUGS.map((_,i)=>i).filter((_,i)=>i%2===0),['e:🚀','e:🚂','e:🍉','e:🦕','e:🏰','e:🎂','e:🚒','e:🌈','e:🐳','e:🎠','e:🍦','e:⛵']));const ord=freshOrder('puzzle',subs,x=>'sub'+x);return {type:t,rounds:[makePuzzle(2,ord[0]),makePuzzle(3,ord[1]),makePuzzle(3,ord[2])],done:false};}
+ if(t==='eng'){const picks=freshOrder('eng',SENT.map((_,i)=>i),i=>'a'+i).slice(0,2);const rounds=picks.map(a=>{const ch=[a];while(ch.length<3){const x=rint(SENT.length);if(!ch.includes(x))ch.push(x);}return {a,ch:shuffle(ch)};});return injectWeak({type:t,rounds,done:false});}
+ if(t==='draw'){return {type:t,theme:null,opts:freshOrder('draw',THEMES.map(x=>x.n),n=>'o'+n).slice(0,4),done:false};}
 }
 function genQuests(){const s=S();let en=TYPE_ORDER.filter(t=>s.settings.subjects[t]&&(t!=='family'||familyReady()));if(!en.length)en=['hangul'];const n=Math.max(1,Math.min(7,s.settings.questCount|0||3));const fo=(s.settings.focus||[]).filter(t=>en.includes(t)).slice(0,n);const base=en.filter(t=>!fo.includes(t));const B=base.length?base:en;const start=dayNum(todayKey())%B.length;const off={};const out=fo.map(t=>makeQuest(t,off));for(let k=0;out.length<n;k++)out.push(makeQuest(B[(start+k)%B.length],off));out.sort((a,b)=>(a.type==='draw')-(b.type==='draw'));return out;}
 function ensureToday(){const s=S();const k=todayKey();if(!s.days[k]){s.days[k]={quests:genQuests(),allDone:false};Store.save();}return s.days[k];}
@@ -1092,7 +1110,7 @@ function guideText(){const t=guideText0();const r=Q.q.rounds&&Q.q.rounds[Q.round
 function guideText0(){const q=Q.q;
  if(q.type==='mood'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];return esc(moodPrompt(r));}
  if(q.type==='think'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];return esc(tkPrompt(r)).replace('❓','<b>❓</b>');}
- if(isTrace(q.type)){const it=curItem();return `손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
+ if(isTrace(q.type)){const it=curItem();return `${(q.first||[]).includes(String(it[0]))?'<span class="retag">🔁 다시 연습!</span> ':''}손가락으로 점선을 따라 <b>${esc(it[0])}</b> 써보자!`;}
  if(q.type==='listen')return '소리를 잘 듣고, 맞는 글자를 골라봐!';
  if(q.type==='count'){const r=q.rounds[Math.min(Q.round,q.rounds.length-1)];const k=qKind(r);const c=qC(r);const n=cName(c);
   if(k==='count')return `<span class="gicon">${cArt(c)}</span> <b>${eunNeun(n)}</b> 몇 ${cUnit(c)}일까? ${r.others&&r.others.length?'다른 친구는 빼고 ':''}하나씩 눌러 세어봐!`;
@@ -1617,9 +1635,11 @@ function injectWeak(q){try{const t=q.type;const wk=weakKeys(t).slice(0,6);if(!wk
  wk.forEach(k=>{if(put>=2)return;
   if(t==='listen'){const [mode,ch]=k.split(':');const list=mode==='ko'?HANGUL:ABC;const a=list.findIndex(x=>x[0]===ch);if(a<0)return;const c=[a];while(c.length<3){const x=rint(Math.min(list.length,Math.max(8,a+4)));if(!c.includes(x))c.push(x);}place({mode,a,ch:shuffle(c)});}
   else if(t==='count'){const [kind,val]=k.split(':');if(kind==='count'){const n=+val;if(!n)return;const near=shuffle([n-2,n-1,n+1,n+2].filter(x=>x>=1&&x<=10));place({k:'count',c:cntPick(),n,others:[],ch:shuffle([n,near[0],near[1]])});}
-   else{const c=CREATURES.findIndex(x=>x.n===val);if(c<0)return;const o=[c];while(o.length<(kind==='find'?4:3)){const x=rint(CREATURES.length);if(!o.includes(x))o.push(x);}place({k:kind,c,ch:shuffle(o)});}}
+   else{const c=CREATURES.findIndex(x=>x.n===val);if(c<0)return;const nk=shuffle(['name','find','feat'].filter(x=>x!==kind))[0];const o=[c];while(o.length<(nk==='find'?4:3)){const x=rint(CREATURES.length);if(!o.includes(x))o.push(x);}place({k:nk,c,ch:shuffle(o)});}}
   else if(t==='eng'){const a=+k.slice(1);if(isNaN(a)||!SENT[a]||q.rounds.some(r=>r.a===a))return;const c=[a];while(c.length<3){const x=rint(SENT.length);if(!c.includes(x))c.push(x);}place({a,ch:shuffle(c)});}
-  else if(t==='syll'){const [kind,cv]=[k.split(':')[0],k.split(':')[1]];if(!cv||cv.length<2)return;place(makeSyllRound(kind,cv[0],cv[1]));}
+  else if(t==='syll'){const [kind,cv]=[k.split(':')[0],k.split(':')[1]];if(!cv||cv.length<2)return;place(makeSyllRound(kind==='make'?'read':'make',cv[0],cv[1]));}
+  else if(t==='think'){const kind=k.split(':')[0];if(!['pattern','odd','more','size','shape','color','num'].includes(kind))return;place(thinkRound(kind));}
+  else if(t==='mood'){const [kind,m]=k.split(':');const r=moodMk(kind,m);if(r)place(r);}
  });}catch(e){}return q;}
 
 /* 글자 만들기 */
@@ -1627,7 +1647,7 @@ const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ',JUNG='ㅏ�
 const syl=(c,v)=>String.fromCharCode(0xAC00+(CHO.indexOf(c)*21+JUNG.indexOf(v))*28);
 const jamoName=ch=>{const it=HANGUL.find(x=>x[0]===ch);return it?it[1]:ch;};
 function makeSyllRound(kind,c,v){const ans=syl(c,v);const o=new Set([ans]);let g=0;while(o.size<3&&g<40){g++;o.add(rint(2)?syl(c,BASE_V[rint(10)]):syl(BASE_C[rint(14)],v));}return {k:kind,c,v,ch:shuffle([...o])};}
-function makeSyll(){const rounds=[];const used=new Set();for(let r=0;r<8;r++){let c,v,g=0;do{c=BASE_C[rint(14)];v=BASE_V[rint(10)];g++;}while(used.has(c+v)&&g<30);used.add(c+v);rounds.push(makeSyllRound(r%3===2?'read':'make',c,v));}return rounds;}
+function makeSyll(){const all=[];for(const c of BASE_C)for(const v of BASE_V)all.push(c+v);const ord=freshOrder('syll',all,x=>x);return ord.slice(0,8).map((cv,r)=>makeSyllRound(r%3===2?'read':'make',cv[0],cv[1]));}
 function mountSyll(){const r=Q.q.rounds[Q.round];Q.locked=false;const ans=syl(r.c,r.v);
  if(r.k==='make')$('#qbody').innerHTML=`<div class="quiz"><div class="sy-eq pop"><span class="sy-c">${r.c}</span><span class="sy-op">+</span><span class="sy-v">${r.v}</span><span class="sy-op">=</span><span class="sy-q">?</span></div><div class="choices">${r.ch.map(x=>`<button class="choice" onclick="pickSyll(this,'${x}')">${x}</button>`).join('')}</div></div>`;
  else $('#qbody').innerHTML=`<div class="quiz"><button class="big-speaker" onclick="playSyll()"><span>🔊</span><small>다시 듣기</small></button><div class="choices">${r.ch.map(x=>`<button class="choice" onclick="pickSyll(this,'${x}')">${x}</button>`).join('')}</div></div>`;
