@@ -518,6 +518,12 @@ table.rec th{color:var(--ink2)}
 .choice.mz-pick.sel{border-color:#EC407A;background:#FFF0F6}
 #mzok[disabled]{opacity:.45;pointer-events:none}
 
+.mz-lv{font-size:20px;background:#fff;border-radius:999px;padding:4px 16px;color:var(--ink2);box-shadow:0 3px 0 rgba(59,47,92,.1)}
+.feel{margin:4px 0 14px}.feel-q{font-size:24px;margin-bottom:6px}.feel-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.feel b{font-weight:400;display:flex;flex-direction:column;align-items:center;background:#fff;border:3px solid #EEE7F7;border-radius:20px;padding:6px 10px;cursor:pointer;font-size:15px;min-width:74px}.feel b span{font-size:40px;line-height:1.1}.feel b.on{border-color:var(--pink);background:#FFF0F6;transform:scale(1.08)}
+#feelmsg{min-height:24px;font-size:18px;color:var(--pink-d);margin-top:6px}
+.fr{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}.fr-d{display:flex;flex-direction:column;align-items:center;background:#F6F7FB;border-radius:8px;padding:4px 0}.fr-d span{font-size:22px;line-height:1.2}.fr-d small{font-size:11px;color:#6B7088}
+
 /* overlay */
 #overlay{position:fixed;inset:0;z-index:50;display:none}
 #overlay.on{display:block}
@@ -653,40 +659,58 @@ const CREATURES=[
  {n:'얼룩말',e:'🦓',f:'나는 하얀 몸에 까만 줄무늬가 있는 말이야.'},{n:'부엉이',e:'🦉',f:'나는 밤에 깨어 있어. 눈이 동그랗고 부엉부엉 울어.'},{n:'병아리',e:'🐤',f:'나는 노랗고 작아. 삐약삐약 울어.'},{n:'문어',e:'🐙',f:'나는 바다에 살고 다리가 여덟 개야.'},
  {n:'악어',e:'🐊',f:'나는 입이 크고 이빨이 뾰족해. 물가에 살아.'},{n:'다람쥐',e:'🐿️',f:'나는 도토리를 볼에 가득 모아. 꼬리가 복슬복슬해.'}];
 const cName=i=>CREATURES[i].n;
-/* ---------- 음악 기분 퀴즈 (음악을 듣고 느낌·기분 맞히기) ---------- */
-const MOODS={happy:{n:'기뻐요',adj:'기쁜',face:'😄',why:'빠르고 통통 튀는 밝은 소리라서'},sad:{n:'슬퍼요',adj:'슬픈',face:'😢',why:'느리고 낮게 내려가는 소리라서'},scary:{n:'무서워요',adj:'무서운',face:'😱',why:'낮고 으스스한 소리라서'},calm:{n:'편안해요',adj:'편안한',face:'😌',why:'느리고 부드러운 자장가 같은 소리라서'},angry:{n:'화나요',adj:'화난',face:'😠',why:'세고 쿵쾅쿵쾅 울리는 소리라서'}};
+/* ---------- 음악 기분 퀴즈 v2 (단계별 · 표정/장면/동물 · 연구 기반) ---------- */
+const MOODS={happy:{n:'기뻐요',adj:'기쁜',face:'😄',why:'빠르고 통통 튀는 밝은 소리라서'},sad:{n:'슬퍼요',adj:'슬픈',face:'😢',why:'아주 느리고 낮게 내려가는 소리라서'},scary:{n:'무서워요',adj:'무서운',face:'😱',why:'낮고 으스스한 소리라서'},calm:{n:'편안해요',adj:'편안한',face:'😌',why:'느리고 부드러운 자장가 같은 소리라서'},angry:{n:'화나요',adj:'화난',face:'😠',why:'세고 쿵쾅쿵쾅 울리는 소리라서'}};
+const MANIM={elephant:{n:'코끼리',e:'🐘',why:'낮고 느리게 쿵쿵 걷는 소리라서'},bird:{n:'작은 새',e:'🐦',why:'높고 빠르게 짹짹거리는 소리라서'},turtle:{n:'거북이',e:'🐢',why:'아주 느릿느릿 기어가는 소리라서'},rabbit:{n:'토끼',e:'🐰',why:'톡톡 끊어지며 깡충깡충 뛰는 소리라서'}};
+const MSCENE={happy:[['🎂','생일 파티'],['🎡','놀이공원 가는 날'],['🎁','선물을 받았어']],sad:[['🧸','장난감이 망가졌어'],['🎈','풍선이 날아가 버렸어'],['👋','친구랑 헤어졌어']],scary:[['🌩️','천둥이 쾅쾅 치는 밤'],['👻','깜깜한 동굴'],['🕷️','커다란 거미가 나타났어']],calm:[['🌙','잠잘 시간'],['🛁','따뜻한 목욕 시간'],['🌳','숲속 산책']],angry:[['🧱','친구가 블록을 무너뜨렸어'],['🚫','친구가 차례를 안 지켰어']]};
+const mConf=(a,b)=>(a==='sad'&&b==='calm')||(a==='calm'&&b==='sad')||(a==='scary'&&b==='angry')||(a==='angry'&&b==='scary');
+function moodLv(){const n=S().counts.mood||0;return n<3?1:n<8?2:3;}
 const MUS={g:null,timer:null,
- ac(){AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC;},
+ ac(){AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended'&&AC.resume)AC.resume();return AC;},
  stop(){if(this.g){const g=this.g;try{g.gain.setTargetAtTime(0,AC.currentTime,.05);setTimeout(()=>{try{g.disconnect();}catch(e){}},400);}catch(e){}this.g=null;}clearTimeout(this.timer);document.querySelectorAll('.mz-play').forEach(b=>b.classList.remove('on'));},
  play(mood,seed,onEnd){this.stop();const ac=this.ac();const out=ac.createGain();out.gain.value=.55;const comp=ac.createDynamicsCompressor();out.connect(comp);comp.connect(ac.destination);this.g=out;
   let sd=seed||1;const R=()=>{sd=(sd*9301+49297)%233280;return sd/233280;};const RI=n=>Math.floor(R()*n);const t0=ac.currentTime+.08;
   const hz=m=>440*Math.pow(2,(m-69)/12);
   const note=(t,m,d,{type='triangle',vol=.3,att=.01,rel=.12,cut=0}={})=>{const o=ac.createOscillator();o.type=type;o.frequency.value=hz(m);const g=ac.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.setValueAtTime(vol,t+Math.max(att,d-rel));g.gain.linearRampToValueAtTime(0,t+d+.02);let n=o;if(cut){const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=cut;o.connect(f);n=f;}n.connect(g);g.connect(out);o.start(t);o.stop(t+d+.05);};
   let T=0;
-  if(mood==='happy'){const r=60+RI(5);const sc=[0,2,4,5,7,9,11,12,14,16];const st=.17+R()*.04;let i=RI(3);for(let k=0;k<20;k++){const step=[1,1,2,-1,1,2,-2,1][RI(8)];i=Math.max(0,Math.min(sc.length-1,i+step));if(k%4===3)i=[0,2,4,7][RI(4)];note(t0+k*st,r+sc[i],st*.8,{type:'triangle',vol:.28});if(k%2===0)note(t0+k*st,r-12+(k%8<4?0:7),st*.7,{type:'sine',vol:.22});}T=20*st;}
-  else if(mood==='sad'){const r=57+RI(3);const sc=[0,2,3,5,7,8,10,12];const st=.55+R()*.1;let i=7;const n=9;for(let k=0;k<n;k++){i=Math.max(0,Math.min(7,i-[1,1,0,2,1,-1][RI(6)]));if(k===n-1)i=0;note(t0+k*st,r+sc[i],st*1.1,{type:'sine',vol:.3,att:.08,rel:.3});}[[0,3,7],[5,8,12],[-2,3,7],[0,3,7]].forEach((ch,j)=>ch.forEach(x=>note(t0+j*st*n/4,r-12+x,st*n/4,{type:'sine',vol:.08,att:.3,rel:.5})));T=n*st;}
+  if(mood==='happy'){const r=62+RI(5);const sc=[0,2,4,5,7,9,11,12,14,16];const st=.14+R()*.03;let i=RI(3);for(let k=0;k<26;k++){const step=[1,1,2,-1,1,2,-2,1][RI(8)];i=Math.max(0,Math.min(sc.length-1,i+step));if(k%4===3)i=[0,2,4,7][RI(4)];note(t0+k*st,r+sc[i],st*.75,{type:'triangle',vol:.28});if(k%2===0)note(t0+k*st,r-12+(k%8<4?0:7),st*.6,{type:'sine',vol:.22});}T=26*st;}
+  else if(mood==='sad'){const r=55+RI(3);const sc=[0,2,3,5,7,8,10,12];const st=.68+R()*.08;let i=7;const n=8;for(let k=0;k<n;k++){i=Math.max(0,Math.min(7,i-[1,1,0,2,1,-1][RI(6)]));if(k===n-1)i=0;note(t0+k*st,r+sc[i],st*1.1,{type:'sine',vol:.3,att:.1,rel:.35});}[[0,3,7],[5,8,12],[-2,3,7],[0,3,7]].forEach((ch,j)=>ch.forEach(x=>note(t0+j*st*n/4,r-12+x,st*n/4,{type:'sine',vol:.08,att:.3,rel:.5})));T=n*st;}
   else if(mood==='scary'){const r=40+RI(4);const st=.42;note(t0,r-12,st*10,{type:'sawtooth',vol:.12,att:.6,rel:.8,cut:300});const pat=[0,1,0,6,0,1,7,6,13];pat.forEach((x,k)=>note(t0+k*st+(R()*.08),r+x,st*.9,{type:'sawtooth',vol:.18,att:.02,rel:.25,cut:700}));note(t0+pat.length*st,r+18,.5,{type:'square',vol:.12,cut:1500});T=pat.length*st+.5;}
-  else if(mood==='calm'){const r=64+RI(4);const sc=[0,2,4,7,9,12];const st=.48+R()*.06;const mel=[5,4,3,4,2,3,1,2,0];mel.forEach((x,k)=>{const y=Math.max(0,Math.min(5,x+(R()<.3?1:0)));note(t0+k*st,r+sc[y],st*1.05,{type:'sine',vol:.26,att:.1,rel:.3});if(k%3===0)note(t0+k*st,r-12+(k%6===0?0:7),st*3,{type:'sine',vol:.1,att:.2,rel:.6});});T=mel.length*st;}
-  else{const r=38+RI(4);const st=.13;const p0=[0,0,0,1,0,0,6,0,0,0,1,0,6,6,0,12];const pat=p0.concat(p0.map(x=>x===12?13:x));pat.forEach((x,k)=>note(t0+k*st,r+x,st*.75,{type:'square',vol:k%4===0?.34:.2,cut:900,rel:.04}));[0,4,8,12,16,20,24,28].forEach(k=>note(t0+k*st,r-12,st*.9,{type:'sawtooth',vol:.25,cut:400}));T=pat.length*st;}
+  else if(mood==='calm'){const r=64+RI(4);const sc=[0,2,4,7,9,12];const st=.5+R()*.06;const mel=[5,4,3,4,2,3,1,2,0];mel.forEach((x,k)=>{const y=Math.max(0,Math.min(5,x+(R()<.3?1:0)));note(t0+k*st,r+sc[y],st*1.05,{type:'sine',vol:.26,att:.1,rel:.3});if(k%3===0)note(t0+k*st,r-12+(k%6===0?0:7),st*3,{type:'sine',vol:.1,att:.2,rel:.6});});T=mel.length*st;}
+  else if(mood==='angry'){const r=38+RI(4);const st=.13;const p0=[0,0,0,1,0,0,6,0,0,0,1,0,6,6,0,12];const pat=p0.concat(p0.map(x=>x===12?13:x));pat.forEach((x,k)=>note(t0+k*st,r+x,st*.75,{type:'square',vol:k%4===0?.34:.2,cut:900,rel:.04}));[0,4,8,12,16,20,24,28].forEach(k=>note(t0+k*st,r-12,st*.9,{type:'sawtooth',vol:.25,cut:400}));T=pat.length*st;}
+  else if(mood==='elephant'){const r=33+RI(4);const st=.62;const pat=[0,2,4,5,7,5,4,2,0];pat.forEach((x,k)=>{note(t0+k*st,r+x,st*.85,{type:'sawtooth',vol:.32,cut:420,att:.03,rel:.15});note(t0+k*st,r+x+12,st*.6,{type:'triangle',vol:.12});});T=pat.length*st;}
+  else if(mood==='bird'){const r=86+RI(4);let t=0;for(let g=0;g<6;g++){const n=3+RI(4);for(let k=0;k<n;k++){note(t0+t,r+(k%2?2:0)+RI(3),.07,{type:'sine',vol:.22,rel:.03});t+=.08;}t+=.22+R()*.15;}T=t;}
+  else if(mood==='turtle'){const r=55+RI(3);const st=1.0;[0,2,4,2,0].forEach((x,k)=>note(t0+k*st,r+x,st*1.05,{type:'triangle',vol:.26,att:.15,rel:.4}));T=5*st;}
+  else if(mood==='rabbit'){const r=70+RI(4);const st=.2;const pat=[0,4,7,-1,7,4,0,-1,2,5,9,-1,9,5,2,-1,0,4,7,12];pat.forEach((x,k)=>{if(x>=0)note(t0+k*st,r+x,.06,{type:'triangle',vol:.3,rel:.03});});T=pat.length*st;}
   this.timer=setTimeout(()=>{document.querySelectorAll('.mz-play').forEach(b=>b.classList.remove('on'));if(onEnd)onEnd();},(T+.3)*1000);return T;}};
-function makeMood(){const s=S();const pool=(s.counts.mood||0)>=3?['happy','sad','scary','calm','angry']:['happy','sad','scary','calm'];const ms=shuffle(pool.concat(pool)).slice(0,5);
- return {type:'mood',rounds:ms.map((m,i)=>{const seed=1+rint(99999);if(i===2||i===4){const o=shuffle(pool.filter(x=>x!==m&&!(m==='sad'&&x==='calm')&&!(m==='calm'&&x==='sad')))[0];const opts=shuffle([m,o]);return {k:'pair',m,opts,seeds:opts.map(()=>1+rint(99999))};}
-  const others=shuffle(pool.filter(x=>x!==m&&!(m==='sad'&&x==='calm')&&!(m==='calm'&&x==='sad'))).slice(0,2);return {k:'face',m,ch:shuffle([m].concat(others)),seed};}),done:false};}
-function moodPrompt(r){return r.k==='pair'?`${MOODS[r.m].adj} 음악은 어느 쪽일까? 둘 다 들어 보고 골라 봐!`:'음악을 잘 듣고, 어떤 기분인지 골라 봐!';}
+function makeMood(){const lv=moodLv();const pool=lv===1?['happy','sad']:lv===2?['happy','sad','calm','scary']:['happy','sad','calm','scary','angry'];const apool=lv===1?['elephant','bird']:['elephant','bird','turtle','rabbit'];const nc=lv===1?2:3;
+ const sd=()=>1+rint(99999);const pickO=(m,P,n)=>shuffle(P.filter(x=>x!==m&&!mConf(m,x))).slice(0,n);
+ const face=m=>({k:'face',m,ch:shuffle([m].concat(pickO(m,pool,nc-1))),seed:sd()});
+ const animal=m=>({k:'animal',m,ch:shuffle([m].concat(shuffle(apool.filter(x=>x!==m)).slice(0,nc-1))),seed:sd()});
+ const scene=m=>{const o=pickO(m,pool,1)[0];const opts=shuffle([m,o]);const L=MSCENE[m];return {k:'pair',m,sc:L[rint(L.length)],opts,seeds:opts.map(sd)};};
+ const ms=shuffle(pool.concat(pool));const as=shuffle(apool.concat(apool));
+ return {type:'mood',lv,rounds:[face(ms[0]),animal(as[0]),scene(ms[1]),face(ms[2]),animal(as[1])],done:false};}
+function moodPrompt(r){if(r.k==='animal')return '이 음악은 어떤 동물 같아?';if(r.k==='pair')return r.sc?`${r.sc[1]}! 어울리는 음악은 어느 쪽일까?`:`${MOODS[r.m].adj} 음악은 어느 쪽일까?`;return '음악을 잘 듣고, 어떤 기분인지 골라 봐!';}
 function mountMood(){const r=Q.q.rounds[Q.round];Q.locked=false;Q.msel=null;cleanups.push(()=>MUS.stop());
- if(r.k==='face'){$('#qbody').innerHTML=`<div class="mood"><button class="mz-play big" onclick="moodPlay()"><span class="eq"><i></i><i></i><i></i><i></i></span>🎵 음악 듣기</button><div class="choices mz-ch">${r.ch.map(m=>`<button class="choice mz-face" onclick="pickMood(this,'${m}')"><span class="mf">${MOODS[m].face}</span><span class="mn">${MOODS[m].n}</span></button>`).join('')}</div></div>`;
-  const first=Q.round===0;if(first)setTimeout(()=>{if(App.screen==='quest')speak('음악을 잘 듣고, 어떤 기분인지 골라 봐!');},300);const tm=setTimeout(()=>{if(App.screen==='quest'&&!Q.locked)moodPlay();},first?2800:500);cleanups.push(()=>clearTimeout(tm));return;}
- $('#qbody').innerHTML=`<div class="mood"><div class="mz-target"><span class="mf">${MOODS[r.m].face}</span><b>${MOODS[r.m].adj} 음악 찾기</b></div><div class="choices mz-ch">${r.opts.map((m,i)=>`<button class="choice mz-pick" id="mzp${i}" onclick="moodPick(${i})"><span class="mz-play"><span class="eq"><i></i><i></i><i></i><i></i></span></span><span class="mn">🎵 음악 ${i+1}</span></button>`).join('')}</div><button class="btn big green" id="mzok" disabled onclick="moodConfirm()">이거야! ✔</button></div>`;
- setTimeout(()=>{if(App.screen==='quest')speak(moodPrompt(r));},300);}
-function moodPlay(){const r=Q.q.rounds[Q.round];if(!r)return;SFX.tap&&0;try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch(e){}const b=document.querySelector('.mz-play.big');if(b)b.classList.add('on');MUS.play(r.m,r.seed);}
-function pickMood(el,m){if(Q.locked)return;const r=Q.q.rounds[Q.round];const ok=m===r.m;stat(ok);
- if(ok){Q.locked=true;MUS.stop();el.classList.add('right');SFX.ok();sparkle(el);const M=MOODS[r.m];logEvent('face:'+r.m,`음악 듣고 기분 맞히기 (${M.adj} 음악)`,M.n);setGuide(`맞았어! 👏 ${M.why} <b>${M.adj} 느낌</b>이야!`);speak(`맞았어! ${M.why} ${M.adj} 느낌이야!`);nextRound(mountMood);}
- else{wrongLog(MOODS[m].n);el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide('음… 다시 한번 들어 볼까? 🎵');setTimeout(()=>{if(App.screen==='quest'&&!Q.locked)moodPlay();},700);}}
+ if(r.k==='face'||r.k==='animal'){const A=r.k==='animal';$('#qbody').innerHTML=`<div class="mood">${Q.round===0&&Q.q.lv?`<div class="mz-lv">${'⭐'.repeat(Q.q.lv)} ${Q.q.lv}단계</div>`:''}<button class="mz-play big" onclick="moodPlay()"><span class="eq"><i></i><i></i><i></i><i></i></span>🎵 음악 듣기</button><div class="choices mz-ch">${r.ch.map(m=>`<button class="choice mz-face" onclick="pickMood(this,'${m}')"><span class="mf">${A?MANIM[m].e:MOODS[m].face}</span><span class="mn">${A?MANIM[m].n:MOODS[m].n}</span></button>`).join('')}</div></div>`;
+  const say=Q.round===0||A&&!Q.q.rounds.slice(0,Q.round).some(x=>x.k==='animal');if(say)setTimeout(()=>{if(App.screen==='quest')speak(moodPrompt(r));},300);const tm=setTimeout(()=>{if(App.screen==='quest'&&!Q.locked)moodPlay();},say?2600:500);cleanups.push(()=>clearTimeout(tm));return;}
+ $('#qbody').innerHTML=`<div class="mood"><div class="mz-target">${r.sc?`<span class="mf">${r.sc[0]}</span><b>${esc(r.sc[1])}</b>`:`<span class="mf">${MOODS[r.m].face}</span><b>${MOODS[r.m].adj} 음악 찾기</b>`}</div><div class="choices mz-ch">${r.opts.map((m,i)=>`<button class="choice mz-pick" id="mzp${i}" onclick="moodPick(${i})"><span class="mz-play"><span class="eq"><i></i><i></i><i></i><i></i></span></span><span class="mn">🎵 음악 ${i+1}</span></button>`).join('')}</div><button class="btn big green" id="mzok" disabled onclick="moodConfirm()">이거야! ✔</button></div>`;
+ setTimeout(()=>{if(App.screen==='quest')speak(moodPrompt(r)+' 둘 다 들어 보고 골라 봐!');},300);}
+function moodPlay(){const r=Q.q.rounds[Q.round];if(!r)return;try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch(e){}const b=document.querySelector('.mz-play.big');if(b)b.classList.add('on');MUS.play(r.m,r.seed);}
+function pickMood(el,m){if(Q.locked)return;const r=Q.q.rounds[Q.round];const ok=m===r.m;stat(ok);const A=r.k==='animal';
+ if(ok){Q.locked=true;MUS.stop();el.classList.add('right');SFX.ok();sparkle(el);let msg;if(A){const X=MANIM[r.m];logEvent('animal:'+r.m,'음악 듣고 어울리는 동물 찾기',X.n);msg=`${X.why} <b>${X.n}</b> 같아!`;}else{const M=MOODS[r.m];logEvent('face:'+r.m,`음악 듣고 기분 맞히기 (${M.adj} 음악)`,M.n);msg=`${M.why} <b>${M.adj} 느낌</b>이야!`;}
+  setGuide(`맞았어! 👏 ${msg}`);speak('맞았어! '+msg.replace(/<[^>]+>/g,''));nextRound(mountMood);}
+ else{wrongLog(A?MANIM[m].n:MOODS[m].n);el.classList.add('wrong','shake');el.disabled=true;SFX.no();setGuide(A?'음… 소리가 높아? 낮아? 빨라? 느려? 다시 들어 보자 🎵':'음… 빨라? 느려? 다시 한번 들어 볼까? 🎵');setTimeout(()=>{if(App.screen==='quest'&&!Q.locked)moodPlay();},900);}}
 function moodPick(i){if(Q.locked)return;const r=Q.q.rounds[Q.round];try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch(e){}Q.msel=i;document.querySelectorAll('.mz-pick').forEach((b,j)=>b.classList.toggle('sel',j===i));const b=$('#mzp'+i);b.querySelector('.mz-play').classList.add('on');MUS.play(r.opts[i],r.seeds[i]);$('#mzok').disabled=false;}
 function moodConfirm(){if(Q.locked||Q.msel==null)return;const r=Q.q.rounds[Q.round];const m=r.opts[Q.msel];const ok=m===r.m;stat(ok);const el=$('#mzp'+Q.msel);
- if(ok){Q.locked=true;MUS.stop();el.classList.add('right');SFX.ok();sparkle(el);const M=MOODS[r.m];logEvent('pair:'+r.m,`기분에 맞는 음악 찾기 (${M.adj} 음악)`,M.n);setGuide(`맞았어! 👏 ${M.why} <b>${M.adj} 음악</b>이야!`);speak(`맞았어! ${M.why} ${M.adj} 음악이야!`);nextRound(mountMood);}
- else{MUS.stop();wrongLog(`${MOODS[m].adj} 음악을 고름`);el.classList.add('wrong','shake');SFX.no();setTimeout(()=>el.classList.remove('wrong','shake'),700);setGuide(`이건 <b>${MOODS[m].adj}</b> 느낌이었어. 다른 음악도 들어 볼까? 🎵`);speak(`이건 ${MOODS[m].adj} 느낌이었어. 다른 음악도 들어 볼까?`);}}
-
+ if(ok){Q.locked=true;MUS.stop();el.classList.add('right');SFX.ok();sparkle(el);const M=MOODS[r.m];const what=r.sc?`${r.sc[1]}에는 ${M.adj} 음악이 어울려`:`${M.adj} 음악이야`;logEvent('pair:'+r.m,r.sc?`장면에 어울리는 음악 찾기: ${r.sc[1]}`:`기분에 맞는 음악 찾기 (${M.adj})`,M.n);setGuide(`맞았어! 👏 ${what}. ${M.why}!`);speak(`맞았어! ${what}. ${M.why}!`);nextRound(mountMood);}
+ else{MUS.stop();wrongLog(`${MOODS[m].adj} 음악을 고름`);el.classList.add('wrong','shake');SFX.no();setTimeout(()=>el.classList.remove('wrong','shake'),700);setGuide(`이건 <b>${MOODS[m].adj}</b> 느낌의 음악이었어. 다른 음악도 들어 볼까? 🎵`);speak(`이건 ${MOODS[m].adj} 느낌의 음악이었어. 다른 음악도 들어 볼까?`);}}
+/* 오늘의 기분 체크인 */
+const FEELS=[['happy','😄','기뻐요','기쁘구나! 오늘 탐험도 신나게 해 보자!'],['calm','😌','편안해요','편안하구나. 천천히 즐겁게 해 보자.'],['sad','😢','슬퍼요','슬프구나. 슬플 땐 엄마 아빠한테 꼭 안아 달라고 해도 돼.'],['angry','😠','화나요','화가 났구나. 숨을 크게 후~ 세 번 쉬어 볼까?'],['worry','😟','걱정돼요','걱정되는구나. 엄마 아빠한테 이야기하면 마음이 가벼워져.']];
+function pickFeel(k,el){const s=S();s.feel=s.feel||{};s.feel[todayKey()]=k;const ks=Object.keys(s.feel).sort();if(ks.length>60)ks.slice(0,ks.length-60).forEach(x=>delete s.feel[x]);Store.save();const f=FEELS.find(x=>x[0]===k);document.querySelectorAll('.feel b').forEach(b=>b.classList.remove('on'));el.classList.add('on');const t=document.getElementById('feelmsg');if(t)t.textContent=f[3];speak(f[3]);}
+function feelRow(){const s=S();const F=s.feel||{};const ks=dKeys(14);if(!ks.some(k=>F[k]))return '<div class="hint">아직 기록이 없어요. 하루 첫 접속 때 아이가 오늘 기분을 골라요.</div>';
+ const cnt={};ks.forEach(k=>{if(F[k])cnt[F[k]]=(cnt[F[k]]||0)+1;});
+ return `<div class="fr">${ks.map(k=>{const f=FEELS.find(x=>x[0]===F[k]);const p=k.split('-');return `<div class="fr-d" title="${prettyDate(k)}${f?' · '+f[2]:''}"><span>${f?f[1]:'·'}</span><small>${+p[2]}</small></div>`;}).join('')}</div><div class="hint">최근 14일: ${FEELS.filter(f=>cnt[f[0]]).map(f=>`${f[1]} ${f[2]} ${cnt[f[0]]}일`).join(' · ')}${(cnt.sad||0)+(cnt.angry||0)+(cnt.worry||0)>=3?' · 힘든 기분이 자주 보여요. 오늘 어땠는지 이야기 나눠 보세요.':''}</div>`;}
 /* ---------- 세상 퀴즈 확장 (곤충·동물 + 과일·탈것·음식·물건·자연·직업·몸·악기) ---------- */
 CREATURES.forEach(c=>{if(!c.g)c.g=c.b!=null?'곤충':'동물';});
 [['과일·채소','개',[['사과','🍎','빨갛고 동그래. 아삭아삭 씹어 먹는 과일이야.','red'],['바나나','🍌','길쭉하고 노래. 껍질을 벗겨서 먹어.','yellow'],['딸기','🍓','빨갛고 작은 씨가 콕콕 박혀 있어.','red'],['포도','🍇','작은 보라색 알이 송이송이 달려 있어.','purple'],['수박','🍉','겉은 초록 줄무늬, 속은 빨개. 여름 과일이야.','green'],['귤','🍊','주황색이고 껍질을 손으로 까서 먹어.','orange'],['당근','🥕','주황색이고 길쭉해. 토끼가 좋아해.','orange'],['옥수수','🌽','노란 알갱이가 줄줄이 붙어 있어.','yellow'],['브로콜리','🥦','작은 초록 나무처럼 생긴 채소야.','green'],['토마토','🍅','빨갛고 동그란 채소야. 케첩을 만들어.','red']]],
@@ -1688,8 +1712,9 @@ function maybeIntro(){if(App.screen!=='home'||$('#overlay').classList.contains('
  openOverlay(`<div class="ov-bg"><div class="modal intro"><div class="in-scene">${pl[0]}</div><div class="in-bug float">${cArt(fr)}</div>
  <h2>오늘의 탐험: ${pl[1]}!</h2><p>${esc(name)}, 오늘의 친구 <b>${esc(fn)}</b>${hasBatchim(fn)?'이':'가'} ${pl[1]}에서 기다리고 있어!<br>퀘스트 <b>${day.quests.length}개</b>를 끝내면 새 친구를 만날 수 있어.</p>
  <div class="in-qs">${day.quests.map((q,i)=>`<span style="--c:${TYPES[q.type].c}"><b>${i+1}</b>${TYPES[q.type].icon}</span>`).join('<i>›</i>')}</div>
+ <div class="feel"><div class="feel-q">오늘 기분은 어때?</div><div class="feel-row">${FEELS.map(f=>`<b onclick="pickFeel('${f[0]}',this)"><span>${f[1]}</span>${f[2]}</b>`).join('')}</div><div id="feelmsg"></div></div>
  <button class="btn big orange" onclick="closeOverlay();SFX.ok();speak('탐험 출발!')">🚀 탐험 출발!</button></div></div>`);
- speak(`오늘의 탐험은 ${pl[1]}! ${fn}${hasBatchim(fn)?'이':'가'} 기다리고 있어!`);}
+ speak(`오늘의 탐험은 ${pl[1]}! ${fn}${hasBatchim(fn)?'이':'가'} 기다리고 있어! 오늘 기분은 어때?`);}
 const CHEERS=['딩동댕!','최고야!','멋져!','정답!','우와!'];
 function sparkle(el){try{const r=el.getBoundingClientRect();const d=document.createElement('div');d.className='spk';d.innerHTML=`${CHEERS[rint(CHEERS.length)]} <b>✨</b>`;d.style.left=(r.left+r.width/2)+'px';d.style.top=Math.max(10,r.top-50)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1000);}catch(e){}}
 
@@ -1770,6 +1795,7 @@ function renderDash(){const s=S();const a=rangeStat(dKeys(7)),b=rangeStat(dKeys(
  <div class="pcard"><h4>${now().getMonth()+1}월 학습 달력</h4>${calHeat()}</div></div>
  <div class="pgrid"><div class="pcard"><h4>영역별 성취 <span class="tag2">누리과정 기준</span></h4>${domainBars()}</div>
  <div class="pcard"><h4>이번 달 탐험가 유형</h4>${diagnose()}</div></div>
+ <div class="pcard"><h4>오늘의 기분 기록 <span class="tag2">감정 체크인</span></h4>${feelRow()}</div>
  <div class="pcard"><h4>글자·숫자 익히기 현황</h4><div class="msg">${masteryRows()}</div></div>`;}
 
 /* ---------- 보물 창고 (보상 한곳에) · 학습 놀이터 (학습 한곳에) ---------- */
